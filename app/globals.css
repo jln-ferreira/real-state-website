@@ -9,6 +9,13 @@
   --color-muted:     #64748b;
 }
 
+:root {
+  --color-brand:      #1a56db;
+  --color-brand-dark: #1e429f;
+  --color-surface:    #f8fafc;
+  --color-muted:      #64748b;
+}
+
 html {
   scroll-behavior: smooth;
 }

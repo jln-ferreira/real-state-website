@@ -33,11 +33,11 @@ export default function Header() {
             onClick={e => handleNavClick(e, '#home')}
             className="flex items-center gap-2 shrink-0"
           >
-            <svg className="h-7 w-7 text-[--color-brand]" fill="currentColor" viewBox="0 0 24 24">
+            <svg className="h-7 w-7 text-[#1a56db]" fill="currentColor" viewBox="0 0 24 24">
               <path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z" />
             </svg>
             <span className="text-xl font-bold tracking-tight text-slate-900">
-              Estate<span className="text-[--color-brand]">Find</span>
+              Estate<span className="text-[#1a56db]">Find</span>
             </span>
           </a>
 
@@ -49,7 +49,7 @@ export default function Header() {
                 href={href}
                 onClick={e => handleNavClick(e, href)}
                 className="rounded-lg px-3 py-2 text-sm font-medium text-slate-600
-                           hover:text-[--color-brand] hover:bg-slate-50 transition-colors"
+                           hover:text-[#1a56db] hover:bg-slate-50 transition-colors"
               >
                 {label}
               </a>
@@ -57,8 +57,8 @@ export default function Header() {
             <a
               href="#listings"
               onClick={e => handleNavClick(e, '#listings')}
-              className="ml-3 rounded-xl bg-[--color-brand] px-4 py-2 text-sm font-semibold
-                         text-white hover:bg-[--color-brand-dark] transition-colors shadow-sm"
+              className="ml-3 rounded-xl bg-[#1a56db] px-4 py-2 text-sm font-semibold
+                         text-white hover:bg-[#1e429f] transition-colors shadow-sm"
             >
               Browse Listings
             </a>

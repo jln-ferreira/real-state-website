@@ -60,7 +60,7 @@ export default function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
         {/* Panel header */}
         <div className="flex items-center justify-between px-6 py-5 border-b border-slate-100">
           <span className="text-lg font-bold tracking-tight text-slate-900">
-            Estate<span className="text-[--color-brand]">Find</span>
+            Estate<span className="text-[#1a56db]">Find</span>
           </span>
           <button
             onClick={onClose}
@@ -82,7 +82,7 @@ export default function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
                   href={href}
                   onClick={e => handleLinkClick(e, href)}
                   className="flex items-center gap-3 rounded-lg px-4 py-3 text-base font-medium text-slate-700
-                             hover:bg-slate-50 hover:text-[--color-brand] transition-colors"
+                             hover:bg-slate-50 hover:text-[#1a56db] transition-colors"
                 >
                   {label}
                 </a>
@@ -96,8 +96,8 @@ export default function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
           <a
             href="#listings"
             onClick={e => handleLinkClick(e, '#listings')}
-            className="block w-full rounded-xl bg-[--color-brand] px-4 py-3 text-center
-                       text-sm font-semibold text-white hover:bg-[--color-brand-dark] transition-colors"
+            className="block w-full rounded-xl bg-[#1a56db] px-4 py-3 text-center
+                       text-sm font-semibold text-white hover:bg-[#1e429f] transition-colors"
           >
             Browse Listings
           </a>

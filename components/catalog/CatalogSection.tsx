@@ -19,63 +19,68 @@ interface CatalogProps {
   onFiltersChange: (f: Filters) => void
 }
 
+// ── Label maps (used by ActiveChips) ──────────────────────────────────────────
+
+const TIPO_LABELS: Record<string, string> = {
+  house: 'House', apartment: 'Apartment', commercial: 'Commercial', land: 'Land',
+}
+
+const FEATURE_LABELS: Record<Feature, string> = {
+  balcony: 'Balcony', parking: 'Parking', gym: 'Gym', pool: 'Pool',
+  garden: 'Garden', furnished: 'Furnished', 'pet-friendly': 'Pet Friendly', concierge: 'Concierge',
+}
+
 // ── Active filter chips ────────────────────────────────────────────────────────
 
 function ActiveChips({ filters, onChange }: { filters: Filters; onChange: (f: Filters) => void }) {
   const chips: { label: string; clear: () => void }[] = []
   const set = (patch: Partial<Filters>) => onChange({ ...filters, ...patch })
 
-  if (filters.transaction !== 'all')
-    chips.push({ label: filters.transaction === 'buy' ? 'For Sale' : 'For Rent', clear: () => set({ transaction: 'all' }) })
-
-  filters.types.forEach(t =>
+  if (filters.negocio !== 'all')
     chips.push({
-      label: t.charAt(0).toUpperCase() + t.slice(1),
-      clear: () => set({ types: filters.types.filter(x => x !== t) }),
+      label: filters.negocio === 'sale' ? 'For Sale' : 'For Rent',
+      clear: () => set({ negocio: 'all' }),
     })
-  )
 
-  if (filters.location.trim())
-    chips.push({ label: `"${filters.location}"`, clear: () => set({ location: '' }) })
-
-  if (filters.priceMin || filters.priceMax) {
-    const lo = filters.priceMin ? `$${Number(filters.priceMin).toLocaleString()}` : ''
-    const hi = filters.priceMax ? `$${Number(filters.priceMax).toLocaleString()}` : ''
+  if (filters.tipo !== 'all')
     chips.push({
-      label: lo && hi ? `${lo} – ${hi}` : lo ? `≥ ${lo}` : `≤ ${hi}`,
-      clear: () => set({ priceMin: '', priceMax: '' }),
+      label: TIPO_LABELS[filters.tipo] ?? filters.tipo,
+      clear: () => set({ tipo: 'all' }),
     })
-  }
 
-  if (filters.minBeds > 0)
-    chips.push({ label: `${filters.minBeds}+ beds`, clear: () => set({ minBeds: 0 }) })
-  if (filters.minBaths > 0)
-    chips.push({ label: `${filters.minBaths}+ baths`, clear: () => set({ minBaths: 0 }) })
-  if (filters.propertyId.trim())
-    chips.push({ label: `ID: ${filters.propertyId}`, clear: () => set({ propertyId: '' }) })
-
-  // Year built chip — added today
-  if (filters.yearBuiltMin || filters.yearBuiltMax) {
-    const lo = filters.yearBuiltMin || ''
-    const hi = filters.yearBuiltMax || ''
-    chips.push({
-      label: lo && hi ? `Built ${lo}–${hi}` : lo ? `Built ≥ ${lo}` : `Built ≤ ${hi}`,
-      clear: () => set({ yearBuiltMin: '', yearBuiltMax: '' }),
-    })
-  }
-  // Sqft chip — added today
-  if (filters.sqftMin || filters.sqftMax) {
-    const lo = filters.sqftMin ? `${Number(filters.sqftMin).toLocaleString()} sqft` : ''
-    const hi = filters.sqftMax ? `${Number(filters.sqftMax).toLocaleString()} sqft` : ''
+  if (filters.valorMin || filters.valorMax) {
+    const lo = filters.valorMin ? `CA$ ${Number(filters.valorMin).toLocaleString('en-CA')}` : ''
+    const hi = filters.valorMax ? `CA$ ${Number(filters.valorMax).toLocaleString('en-CA')}` : ''
     chips.push({
       label: lo && hi ? `${lo} – ${hi}` : lo ? `≥ ${lo}` : `≤ ${hi}`,
-      clear: () => set({ sqftMin: '', sqftMax: '' }),
+      clear: () => set({ valorMin: '', valorMax: '' }),
     })
   }
-  // One chip per selected feature — added today
+
+  if (filters.residential !== 'all')
+    chips.push({ label: filters.residential, clear: () => set({ residential: 'all' }) })
+
+  if (filters.ref.trim())
+    chips.push({ label: `REF: ${filters.ref}`, clear: () => set({ ref: '' }) })
+
+  if (filters.bedrooms > 0)
+    chips.push({ label: `${filters.bedrooms}+ beds`, clear: () => set({ bedrooms: 0 }) })
+
+  if (filters.bathrooms > 0)
+    chips.push({ label: `${filters.bathrooms}+ baths`, clear: () => set({ bathrooms: 0 }) })
+
+  if (filters.areaMin || filters.areaMax) {
+    const lo = filters.areaMin ? `${Number(filters.areaMin).toLocaleString()} sqft` : ''
+    const hi = filters.areaMax ? `${Number(filters.areaMax).toLocaleString()} sqft` : ''
+    chips.push({
+      label: lo && hi ? `${lo} – ${hi}` : lo ? `≥ ${lo}` : `≤ ${hi}`,
+      clear: () => set({ areaMin: '', areaMax: '' }),
+    })
+  }
+
   filters.features.forEach(feat =>
     chips.push({
-      label: feat.charAt(0).toUpperCase() + feat.slice(1),
+      label: FEATURE_LABELS[feat] ?? feat,
       clear: () => set({ features: filters.features.filter(f => f !== feat) as Feature[] }),
     })
   )
@@ -87,14 +92,14 @@ function ActiveChips({ filters, onChange }: { filters: Filters; onChange: (f: Fi
       {chips.map(chip => (
         <span
           key={chip.label}
-          className="flex items-center gap-1.5 rounded-full bg-[--color-brand]/10 px-3 py-1
-                     text-xs font-medium text-[--color-brand]"
+          className="flex items-center gap-1.5 rounded-full bg-[#1a56db]/10 px-3 py-1
+                     text-xs font-medium text-[#1a56db]"
         >
           {chip.label}
           <button
             onClick={chip.clear}
             aria-label={`Remove ${chip.label} filter`}
-            className="rounded-full hover:bg-[--color-brand]/20 transition-colors p-0.5"
+            className="rounded-full hover:bg-[#1a56db]/20 transition-colors p-0.5"
           >
             <svg className="h-3 w-3" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
@@ -126,8 +131,8 @@ function EmptyState({ onReset }: { onReset: () => void }) {
       </p>
       <button
         onClick={onReset}
-        className="mt-5 rounded-xl bg-[--color-brand] px-5 py-2.5 text-sm font-semibold
-                   text-white hover:bg-[--color-brand-dark] transition-colors"
+        className="mt-5 rounded-xl bg-[#1a56db] px-5 py-2.5 text-sm font-semibold
+                   text-white hover:bg-[#1e429f] transition-colors"
       >
         Reset Filters
       </button>
@@ -138,12 +143,14 @@ function EmptyState({ onReset }: { onReset: () => void }) {
 // ── Featured highlight card ────────────────────────────────────────────────────
 
 function FeaturedCard({ p }: { p: Property }) {
+  const isSale = p.price.type === 'sale'
+
   return (
-    <article className="group relative col-span-full flex cursor-pointer flex-col overflow-hidden
+    <article className="group flex cursor-pointer flex-col overflow-hidden
                         rounded-2xl bg-white shadow-sm transition-all duration-300
-                        hover:-translate-y-0.5 hover:shadow-xl sm:flex-row">
+                        hover:-translate-y-0.5 hover:shadow-xl">
       {/* Image */}
-      <div className="relative h-64 shrink-0 overflow-hidden sm:h-auto sm:w-96">
+      <div className="relative h-56 shrink-0 overflow-hidden">
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
           src={p.img}
@@ -157,8 +164,8 @@ function FeaturedCard({ p }: { p: Property }) {
             ★ Featured
           </span>
           <span className={`rounded-full px-3 py-1 text-[11px] font-bold text-white shadow-md
-            ${p.transaction === 'buy' ? 'bg-emerald-500' : 'bg-blue-500'}`}>
-            {p.transaction === 'buy' ? 'For Sale' : 'For Rent'}
+            ${isSale ? 'bg-emerald-500' : 'bg-blue-500'}`}>
+            {isSale ? 'For Sale' : 'For Rent'}
           </span>
         </div>
         <span className="absolute bottom-3 left-3 rounded-md bg-black/50 px-2 py-0.5
@@ -171,13 +178,13 @@ function FeaturedCard({ p }: { p: Property }) {
       <div className="flex flex-1 flex-col justify-between p-7">
         <div>
           <span className="text-xs font-semibold uppercase tracking-wider text-slate-400">
-            {p.type.charAt(0).toUpperCase() + p.type.slice(1)}
+            {p.propertyDetails.type.charAt(0).toUpperCase() + p.propertyDetails.type.slice(1)}
           </span>
-          <p className="mt-2 text-3xl font-extrabold leading-tight text-[--color-brand]">
+          <p className="mt-2 text-3xl font-extrabold leading-tight text-[#1a56db]">
             {formatPrice(p)}
           </p>
           <h3 className="mt-1.5 text-xl font-semibold text-slate-900 transition-colors
-                         group-hover:text-[--color-brand]">
+                         group-hover:text-[#1a56db]">
             {p.title}
           </h3>
           <p className="mt-2 flex items-center gap-1.5 text-sm text-slate-500">
@@ -186,22 +193,34 @@ function FeaturedCard({ p }: { p: Property }) {
               <path strokeLinecap="round" strokeLinejoin="round"
                     d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0zM19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z" />
             </svg>
-            {p.address}
+            {p.location.address}
           </p>
         </div>
 
-        <div className="mt-6 flex items-center gap-5 border-t border-slate-100 pt-5 text-sm text-slate-700">
-          <span className="font-medium">{p.beds} beds</span>
-          <span className="font-medium">{p.baths} baths</span>
-          {p.garage > 0 && <span className="font-medium">{p.garage} garage</span>}
-          <span className="font-medium">{p.sqft.toLocaleString()} sqft</span>
-          <button className="ml-auto flex items-center gap-1.5 rounded-xl bg-[--color-brand] px-5 py-2.5
-                             text-sm font-semibold text-white hover:bg-[--color-brand-dark] transition-colors">
-            View Details
-            <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
-            </svg>
-          </button>
+        <div className="mt-6 flex items-center gap-3 border-t border-slate-100 pt-5 text-xs text-slate-500">
+          {p.propertyDetails.bedrooms > 0 && (
+            <span className="flex items-center gap-1">
+              <svg className="h-3.5 w-3.5 text-slate-400" viewBox="0 0 24 24" fill="none"
+                   strokeWidth={1.8} stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round"
+                      d="M2 9V6a1 1 0 011-1h18a1 1 0 011 1v3M2 9h20M2 9v9m20-9v9M2 18h20M7 13h10" />
+              </svg>
+              {p.propertyDetails.bedrooms} bed{p.propertyDetails.bedrooms !== 1 ? 's' : ''}
+            </span>
+          )}
+          {p.propertyDetails.bathrooms > 0 && (
+            <span className="flex items-center gap-1">
+              <svg className="h-3.5 w-3.5 text-slate-400" viewBox="0 0 24 24" fill="none"
+                   strokeWidth={1.8} stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round"
+                      d="M4 12h16M4 12V7a2 2 0 012-2h3m-5 7v5a2 2 0 002 2h12a2 2 0 002-2v-5M10 5V4a1 1 0 011-1h2a1 1 0 011 1v1" />
+              </svg>
+              {p.propertyDetails.bathrooms} bath{p.propertyDetails.bathrooms !== 1 ? 's' : ''}
+            </span>
+          )}
+          <span className="ml-auto font-medium text-slate-600">
+            {p.propertyDetails.areaSqFt.toLocaleString()} sqft
+          </span>
         </div>
       </div>
     </article>
@@ -218,8 +237,8 @@ export default function CatalogSection({ filters, onFiltersChange }: CatalogProp
     [filters, sortKey],
   )
 
-  const featured    = results.filter(p => p.featured)
-  const nonFeatured = results.filter(p => !p.featured)
+  const featured    = results.filter(p => p.status.isFeatured)
+  const nonFeatured = results.filter(p => !p.status.isFeatured)
 
   return (
     <section id="listings" className="min-h-screen bg-[--color-surface] scroll-mt-16">
@@ -241,8 +260,8 @@ export default function CatalogSection({ filters, onFiltersChange }: CatalogProp
               value={sortKey}
               onChange={e => setSortKey(e.target.value as SortKey)}
               className="cursor-pointer rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm
-                         font-medium text-slate-700 shadow-sm transition focus:border-[--color-brand]
-                         focus:outline-none focus:ring-1 focus:ring-[--color-brand]"
+                         font-medium text-slate-700 shadow-sm transition focus:border-[#1a56db]
+                         focus:outline-none focus:ring-1 focus:ring-[#1a56db]"
             >
               <option value="newest">Newest first</option>
               <option value="price-asc">Price: Low → High</option>
@@ -262,14 +281,12 @@ export default function CatalogSection({ filters, onFiltersChange }: CatalogProp
         ) : (
           <div className="space-y-6">
 
-            {/* Featured row */}
             {featured.length > 0 && (
-              <div className="grid grid-cols-1 gap-6">
+              <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
                 {featured.map(p => <FeaturedCard key={p.id} p={p} />)}
               </div>
             )}
 
-            {/* Regular grid — expanded to use full width */}
             {nonFeatured.length > 0 && (
               <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
                 {nonFeatured.map(p => <PropertyCard key={p.id} p={p} />)}

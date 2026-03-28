@@ -1,170 +1,235 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import {
   DEFAULT_FILTERS,
+  RESIDENTIAL_OPTIONS,
   type Filters,
   type PropertyType,
   type Feature,
 } from '@/data/properties'
 import CatalogSection from './catalog/CatalogSection'
 
-// ── Static option tables ───────────────────────────────────────────────────────
+// ── Option lists ───────────────────────────────────────────────────────────────
 
-const PRICE_MIN_BUY = [
-  { label: 'No min',  value: '' },
-  { label: '$100k',   value: '100000' },
-  { label: '$200k',   value: '200000' },
-  { label: '$300k',   value: '300000' },
-  { label: '$400k',   value: '400000' },
-  { label: '$500k',   value: '500000' },
-  { label: '$750k',   value: '750000' },
-  { label: '$1M',     value: '1000000' },
-  { label: '$1.5M',   value: '1500000' },
-  { label: '$2M',     value: '2000000' },
-]
-const PRICE_MAX_BUY = [
-  { label: 'No max',  value: '' },
-  { label: '$200k',   value: '200000' },
-  { label: '$300k',   value: '300000' },
-  { label: '$400k',   value: '400000' },
-  { label: '$500k',   value: '500000' },
-  { label: '$750k',   value: '750000' },
-  { label: '$1M',     value: '1000000' },
-  { label: '$1.5M',   value: '1500000' },
-  { label: '$2M',     value: '2000000' },
-  { label: '$2.5M+',  value: '2500000' },
-]
-const PRICE_MIN_RENT = [
-  { label: 'No min',   value: '' },
-  { label: '$500/mo',  value: '500' },
-  { label: '$1k/mo',   value: '1000' },
-  { label: '$1.5k/mo', value: '1500' },
-  { label: '$2k/mo',   value: '2000' },
-  { label: '$2.5k/mo', value: '2500' },
-  { label: '$3k/mo',   value: '3000' },
-  { label: '$4k/mo',   value: '4000' },
-]
-const PRICE_MAX_RENT = [
-  { label: 'No max',   value: '' },
-  { label: '$1k/mo',   value: '1000' },
-  { label: '$1.5k/mo', value: '1500' },
-  { label: '$2k/mo',   value: '2000' },
-  { label: '$2.5k/mo', value: '2500' },
-  { label: '$3k/mo',   value: '3000' },
-  { label: '$4k/mo',   value: '4000' },
-  { label: '$5k+/mo',  value: '5000' },
-]
-// ── Advanced filter option tables (added today) ────────────────────────────────
-// Square footage range options for the advanced filter panel
-const SQFT_MIN_OPTS = [
-  { label: 'Min sqft',    value: '' },
-  { label: '500 sqft',    value: '500' },
-  { label: '750 sqft',    value: '750' },
-  { label: '1,000 sqft',  value: '1000' },
-  { label: '1,250 sqft',  value: '1250' },
-  { label: '1,500 sqft',  value: '1500' },
-  { label: '2,000 sqft',  value: '2000' },
-  { label: '2,500 sqft',  value: '2500' },
-  { label: '3,000 sqft',  value: '3000' },
-]
-const SQFT_MAX_OPTS = [
-  { label: 'Max sqft',    value: '' },
-  { label: '1,000 sqft',  value: '1000' },
-  { label: '1,500 sqft',  value: '1500' },
-  { label: '2,000 sqft',  value: '2000' },
-  { label: '2,500 sqft',  value: '2500' },
-  { label: '3,000 sqft',  value: '3000' },
-  { label: '3,500 sqft',  value: '3500' },
-  { label: '4,000 sqft',  value: '4000' },
-  { label: '5,000+ sqft', value: '5000' },
-]
-// Year built range options — mirrors the yearBuilt field added to Property today
-const YEAR_MIN_OPTS = [
-  { label: 'Any year', value: '' },
-  { label: '1950',     value: '1950' },
-  { label: '1970',     value: '1970' },
-  { label: '1980',     value: '1980' },
-  { label: '1990',     value: '1990' },
-  { label: '2000',     value: '2000' },
-  { label: '2005',     value: '2005' },
-  { label: '2010',     value: '2010' },
-  { label: '2015',     value: '2015' },
-  { label: '2020',     value: '2020' },
-]
-const YEAR_MAX_OPTS = [
-  { label: 'Any year', value: '' },
-  { label: '2000',     value: '2000' },
-  { label: '2005',     value: '2005' },
-  { label: '2010',     value: '2010' },
-  { label: '2015',     value: '2015' },
-  { label: '2019',     value: '2019' },
-  { label: '2020',     value: '2020' },
-  { label: '2022',     value: '2022' },
-  { label: '2025',     value: '2025' },
-]
-// Feature toggle options — each value maps to the Feature union type added today
-const FEATURES_LIST: { value: Feature; label: string; icon: string }[] = [
-  { value: 'balcony', label: 'Balcony', icon: '🌇' },
-  { value: 'parking', label: 'Parking', icon: '🅿️' },
-  { value: 'gym',     label: 'Gym',     icon: '💪' },
-  { value: 'pool',    label: 'Pool',    icon: '🏊' },
+const NEGOCIO_OPTIONS = [
+  { label: 'Todos', value: 'all'  },
+  { label: 'Sale',  value: 'sale' },
+  { label: 'Rent',  value: 'rent' },
+] as const
+
+const TIPO_OPTIONS = [
+  { label: 'Todos',      value: 'all'        },
+  { label: 'Apartment',  value: 'apartment'  },
+  { label: 'House',      value: 'house'      },
+  { label: 'Commercial', value: 'commercial' },
+  { label: 'Land',       value: 'land'       },
+] as const
+
+const FEATURE_OPTIONS: { value: Feature; label: string }[] = [
+  { value: 'balcony',      label: 'Balcony'      },
+  { value: 'parking',      label: 'Parking'      },
+  { value: 'gym',          label: 'Gym'          },
+  { value: 'pool',         label: 'Pool'         },
+  { value: 'garden',       label: 'Garden'       },
+  { value: 'furnished',    label: 'Furnished'    },
+  { value: 'pet-friendly', label: 'Pet Friendly' },
+  { value: 'concierge',    label: 'Concierge'    },
 ]
 
-// ── Shared style helpers ───────────────────────────────────────────────────────
+// ── CA$ display helper (raw digits → "CA$ 1,500,000") ─────────────────────────
 
-const labelCls =
-  'mb-2 block text-[10px] font-bold uppercase tracking-widest text-slate-400'
+function displayCAD(rawDigits: string): string {
+  if (!rawDigits) return ''
+  return 'CA$ ' + Number(rawDigits).toLocaleString('en-CA')
+}
 
-const selectCls =
-  'w-full appearance-none rounded-xl border border-slate-200 bg-white px-3 py-2.5 pr-8 ' +
-  'text-sm text-slate-700 focus:border-[--color-brand] focus:outline-none ' +
-  'focus:ring-1 focus:ring-[--color-brand] cursor-pointer transition'
+// ── Chevron icon ───────────────────────────────────────────────────────────────
 
-function ChevronDown() {
+function Chevron({ open, className = '' }: { open: boolean; className?: string }) {
   return (
     <svg
-      aria-hidden="true"
-      className="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400"
-      fill="none" viewBox="0 0 24 24" strokeWidth={1.8} stroke="currentColor"
+      className={`shrink-0 text-[#1B2A4A] transition-transform duration-200 ${open ? 'rotate-180' : ''} ${className}`}
+      fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor"
     >
       <path strokeLinecap="round" strokeLinejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5" />
     </svg>
   )
 }
 
-function SelectWrap({ children }: { children: React.ReactNode }) {
-  return <div className="relative">{children}<ChevronDown /></div>
-}
+// ── Custom Dropdown ────────────────────────────────────────────────────────────
+// Fix 1: on mobile the outer div is a flex-row (justify-between) so the label
+// stack sits on the left and the chevron is pushed to the far right.
+// On desktop (md+) it reverts to the original flex-col column layout.
 
-function toggleBtnCls(active: boolean) {
+function CustomDropdown({
+  label,
+  value,
+  options,
+  onChange,
+  hasRightBorder = true,
+}: {
+  label: string
+  value: string
+  options: readonly { label: string; value: string }[]
+  onChange: (v: string) => void
+  hasRightBorder?: boolean
+}) {
+  const [open, setOpen] = useState(false)
+  const ref = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    function onMouseDown(e: MouseEvent) {
+      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false)
+    }
+    document.addEventListener('mousedown', onMouseDown)
+    return () => document.removeEventListener('mousedown', onMouseDown)
+  }, [])
+
+  const displayLabel = options.find(o => o.value === value)?.label ?? value
+
   return (
-    'rounded-lg px-3.5 py-2 text-sm font-semibold whitespace-nowrap transition-all ' +
-    (active
-      ? 'bg-[--color-brand] text-white shadow-sm'
-      : 'bg-slate-100 text-slate-600 hover:bg-slate-200 hover:text-slate-800')
+    <div
+      ref={ref}
+      onClick={() => setOpen(v => !v)}
+      className={
+        // Mobile: horizontal row — label+value left, chevron right
+        'relative flex cursor-pointer items-center justify-between px-4 py-3 ' +
+        'border-b border-[#E5E7EB] ' +
+        // Desktop: vertical column — label top, value+chevron below
+        'md:flex-col md:items-stretch md:justify-center md:px-5 md:py-4 ' +
+        'md:border-b-0 ' +
+        (hasRightBorder ? 'md:border-r md:border-[#E5E7EB]' : '')
+      }
+    >
+      {/* Label + value — always present */}
+      <div className="flex min-w-0 flex-col">
+        <span className="text-[10px] font-bold uppercase tracking-widest text-[#999999]">
+          {label}
+        </span>
+
+        {/* Desktop: value inline with chevron */}
+        <div className="mt-0.5 hidden items-center gap-1.5 md:flex">
+          <span className="whitespace-nowrap text-sm font-semibold text-[#1B2A4A]">
+            {displayLabel}
+          </span>
+          <Chevron open={open} className="h-3 w-3" />
+        </div>
+
+        {/* Mobile: value only (chevron is separate, pushed right) */}
+        <span className="mt-0.5 text-sm font-semibold text-[#1B2A4A] md:hidden">
+          {displayLabel}
+        </span>
+      </div>
+
+      {/* Mobile-only chevron — pushed to far right by justify-between */}
+      <Chevron open={open} className="h-4 w-4 md:hidden" />
+
+      {/* Dropdown menu */}
+      {open && (
+        <div className="absolute left-0 top-full z-[100] mt-1 min-w-[180px] overflow-hidden
+                        rounded-xl border border-[#E5E7EB] bg-white shadow-xl">
+          {options.map(opt => (
+            <button
+              key={opt.value}
+              type="button"
+              onClick={e => { e.stopPropagation(); onChange(opt.value); setOpen(false) }}
+              className={
+                'w-full px-4 py-2.5 text-left text-sm transition-colors hover:bg-[#FDF1EB] ' +
+                (value === opt.value
+                  ? 'bg-[#FDF1EB] font-semibold text-[#C9714A]'
+                  : 'text-[#1B2A4A]')
+              }
+            >
+              {opt.label}
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
   )
 }
 
-function segmentBtnCls(active: boolean) {
+// ── Stepper ────────────────────────────────────────────────────────────────────
+// Fix 2: removed items-center so label and controls are left-aligned within
+// each grid cell (matches conectaimovel.com reference).
+
+function Stepper({
+  value,
+  onChange,
+}: {
+  value: number
+  onChange: (v: number) => void
+}) {
   return (
-    'flex-1 rounded-xl py-2.5 text-sm font-semibold transition-all ' +
-    (active
-      ? 'bg-[--color-brand] text-white shadow-sm'
-      : 'border border-slate-200 bg-white text-slate-600 hover:border-slate-300 hover:bg-slate-50')
+    <div className="flex items-center gap-3">
+        <button
+          type="button"
+          onClick={() => onChange(Math.max(0, value - 1))}
+          disabled={value === 0}
+          className="flex h-8 w-8 items-center justify-center rounded-full border-2
+                     border-[#E5E7EB] text-[#1B2A4A] transition-colors
+                     hover:border-[#C9714A] hover:text-[#C9714A]
+                     disabled:cursor-not-allowed disabled:opacity-30"
+        >
+          <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" d="M5 12h14" />
+          </svg>
+        </button>
+
+        <span className="w-7 text-center text-sm font-bold text-[#1B2A4A]">
+          {value}+
+        </span>
+
+        <button
+          type="button"
+          onClick={() => onChange(value + 1)}
+          className="flex h-8 w-8 items-center justify-center rounded-full border-2
+                     border-[#E5E7EB] text-[#1B2A4A] transition-colors
+                     hover:border-[#C9714A] hover:text-[#C9714A]"
+        >
+          <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+          </svg>
+        </button>
+    </div>
   )
 }
 
-function featureBtnCls(active: boolean) {
+// ── AdvancedInput ──────────────────────────────────────────────────────────────
+
+function AdvancedInput({
+  label,
+  type = 'text',
+  placeholder,
+  value,
+  onChange,
+}: {
+  label: string
+  type?: string
+  placeholder: string
+  value: string
+  onChange: (v: string) => void
+}) {
   return (
-    'flex items-center gap-2 rounded-xl border px-3 py-2.5 text-sm font-medium transition-all ' +
-    (active
-      ? 'border-[--color-brand] bg-[--color-brand]/8 text-[--color-brand]'
-      : 'border-slate-200 bg-white text-slate-600 hover:border-slate-300 hover:bg-slate-50')
+    <div>
+      <label className="mb-1.5 block text-[10px] font-bold uppercase tracking-widest text-[#999999]">
+        {label}
+      </label>
+      <input
+        type={type}
+        placeholder={placeholder}
+        value={value}
+        onChange={e => onChange(e.target.value)}
+        className="w-full rounded-xl border border-[#E5E7EB] bg-white px-4 py-3
+                   text-sm text-[#1B2A4A] placeholder-[#BBBBBB]
+                   outline-none transition focus:border-[#C9714A] focus:ring-1 focus:ring-[#C9714A]"
+      />
+    </div>
   )
 }
 
-// ── HeroSection ───────────────────────────────────────────────────────────────
+// ── HeroSection ────────────────────────────────────────────────────────────────
 
 function HeroSection({
   filters,
@@ -176,29 +241,27 @@ function HeroSection({
   const [expanded, setExpanded] = useState(false)
   const set = (patch: Partial<Filters>) => onChange({ ...filters, ...patch })
 
-  const isRent = filters.transaction === 'rent'
-  const priceMinOpts = isRent ? PRICE_MIN_RENT : PRICE_MIN_BUY
-  const priceMaxOpts = isRent ? PRICE_MAX_RENT : PRICE_MAX_BUY
+  const toggleFeature = (f: Feature) =>
+    set({
+      features: filters.features.includes(f)
+        ? (filters.features.filter(x => x !== f) as Feature[])
+        : [...filters.features, f],
+    })
 
-  const toggleType = (t: PropertyType) => {
-    const next = filters.types.includes(t)
-      ? filters.types.filter(x => x !== t)
-      : [...filters.types, t]
-    set({ types: next })
+  const handleSearch = () => {
+    console.log(JSON.stringify(filters, null, 2))
+    document.getElementById('listings')?.scrollIntoView({ behavior: 'smooth' })
   }
 
-  // Toggle a feature on/off (AND logic — property must have all selected features)
-  const toggleFeature = (f: Feature) => {
-    const next = filters.features.includes(f)
-      ? filters.features.filter(x => x !== f)
-      : [...filters.features, f]
-    set({ features: next as Feature[] })
-  }
+  const residentialOpts = [
+    { label: 'Todos', value: 'all' },
+    ...RESIDENTIAL_OPTIONS.map(r => ({ label: r, value: r })),
+  ]
 
   return (
     <section
       id="home"
-      className="relative flex flex-col items-center justify-center overflow-hidden"
+      className="relative flex min-h-[80vh] flex-col items-center justify-center"
       style={{
         backgroundImage:
           'url("https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=1600&q=85")',
@@ -206,348 +269,246 @@ function HeroSection({
         backgroundPosition: 'center',
       }}
     >
-      {/* Dark gradient overlay */}
-      <div
-        aria-hidden="true"
-        className="absolute inset-0 bg-gradient-to-b from-slate-900/75 via-slate-900/65 to-slate-900/80"
-      />
+      {/* Dark overlay */}
+      <div aria-hidden="true" className="absolute inset-0 bg-[#1B2A4A]/72" />
 
       {/* Content */}
-      <div className="relative z-10 w-full max-w-5xl px-4 py-16 text-center sm:px-6 lg:px-8">
+      <div className="relative z-10 w-full max-w-6xl px-4 py-20 text-center sm:px-6 lg:px-8">
 
         {/* Headline */}
-        <h1 className="text-4xl font-extrabold tracking-tight text-white sm:text-5xl lg:text-6xl">
-          Find Your Perfect{' '}
-          <span className="text-[--color-brand]">Home</span>
+        <h1 className="text-4xl font-extrabold leading-tight text-white sm:text-5xl lg:text-6xl">
+          Seja bem vindo!
+          <br />
+          <span className="text-white/85">Seu novo lar está aqui.</span>
         </h1>
-        <p className="mx-auto mt-4 max-w-xl text-lg leading-relaxed text-slate-300">
-          Browse thousands of verified listings with smart filters tailored to your lifestyle.
-        </p>
 
-        {/* ── Filter Card ─────────────────────────────────────────────────── */}
-        <div className="mt-10 overflow-hidden rounded-2xl bg-white text-left shadow-2xl ring-1 ring-white/10">
+        {/* ── Filter area ──────────────────────────────────────────────────── */}
+        <div className="mt-12">
 
-          {/* ── Row 1: Location search ───────────────────────────────────── */}
-          <div className="border-b border-slate-100 px-5 pt-5 pb-4">
-            <div className="relative">
-              <svg
-                aria-hidden="true"
-                className="pointer-events-none absolute left-3.5 top-1/2 h-5 w-5 -translate-y-1/2 text-slate-400"
-                fill="none" viewBox="0 0 24 24" strokeWidth={1.8} stroke="currentColor"
-              >
-                <path strokeLinecap="round" strokeLinejoin="round"
-                  d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0zM19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z" />
-              </svg>
-              <input
-                type="text"
-                placeholder="City, neighborhood, or address"
-                value={filters.location}
-                onChange={e => set({ location: e.target.value })}
-                className="w-full rounded-xl border border-slate-200 bg-slate-50 py-3 pl-11 pr-4
-                           text-sm text-slate-800 placeholder-slate-400
-                           focus:border-[--color-brand] focus:bg-white focus:outline-none
-                           focus:ring-1 focus:ring-[--color-brand] transition"
+          {/* ── Main filter bar ────────────────────────────────────────────── */}
+          <div className="rounded-2xl bg-white shadow-2xl">
+            <div className="flex flex-col md:flex-row md:items-stretch">
+
+              {/* NEGÓCIO */}
+              <CustomDropdown
+                label="NEGÓCIO"
+                value={filters.negocio}
+                options={NEGOCIO_OPTIONS}
+                onChange={v => set({ negocio: v as Filters['negocio'] })}
               />
-            </div>
-          </div>
 
-          {/* ── Row 2: Property type + Transaction ──────────────────────── */}
-          <div className="border-b border-slate-100 px-5 py-4">
-            <div className="flex flex-col gap-5 sm:flex-row sm:items-start sm:justify-between">
+              {/* TIPO */}
+              <CustomDropdown
+                label="TIPO"
+                value={filters.tipo}
+                options={TIPO_OPTIONS}
+                onChange={v => set({ tipo: v as 'all' | PropertyType })}
+              />
 
-              {/* Property type toggles */}
-              <div>
-                <span className={labelCls}>Property Type</span>
-                <div className="flex flex-wrap gap-2">
-                  {(
-                    [
-                      { value: 'house',     label: '🏠 House' },
-                      { value: 'apartment', label: '🏢 Apartment' },
-                      { value: 'condo',     label: '🏙️ Condo' },
-                    ] as { value: PropertyType; label: string }[]
-                  ).map(({ value, label }) => (
-                    <button
-                      key={value}
-                      onClick={() => toggleType(value)}
-                      className={toggleBtnCls(filters.types.includes(value))}
-                    >
-                      {label}
-                    </button>
-                  ))}
-                </div>
+              {/* VALOR MÍN
+                  Fix 1: mobile uses px-4 py-3 (matches field row spec);
+                  desktop reverts to px-5 py-4 with justify-center. */}
+              <div className="flex flex-1 flex-col border-b border-[#E5E7EB]
+                              px-4 py-3 text-left
+                              md:justify-center md:border-b-0 md:border-r md:border-[#E5E7EB]
+                              md:px-5 md:py-4">
+                <span className="text-[10px] font-bold uppercase tracking-widest text-[#999999]">
+                  VALOR MÍN.
+                </span>
+                <input
+                  type="text"
+                  value={displayCAD(filters.valorMin)}
+                  placeholder="CA$ 0"
+                  onChange={e => set({ valorMin: e.target.value.replace(/\D/g, '') })}
+                  className="mt-0.5 w-full bg-transparent text-sm font-semibold text-[#1B2A4A]
+                             placeholder-[#BBBBBB] outline-none"
+                />
               </div>
 
-              {/* Transaction toggles */}
-              <div>
-                <span className={labelCls}>Transaction</span>
-                <div className="flex gap-2">
-                  {(['all', 'buy', 'rent'] as const).map(val => (
-                    <button
-                      key={val}
-                      onClick={() => set({ transaction: val, priceMin: '', priceMax: '' })}
-                      className={toggleBtnCls(filters.transaction === val)}
-                    >
-                      {val === 'all' ? 'All' : val.charAt(0).toUpperCase() + val.slice(1)}
-                    </button>
-                  ))}
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* ── Row 3: Price range + Search CTA ─────────────────────────── */}
-          <div className="px-5 py-4">
-            <div className="flex flex-col gap-4 sm:flex-row sm:items-end">
-
-              {/* Price dropdowns */}
-              <div className="flex-1">
-                <span className={labelCls}>Price Range</span>
-                <div className="grid grid-cols-2 gap-2">
-                  <SelectWrap>
-                    <select
-                      value={filters.priceMin}
-                      onChange={e => set({ priceMin: e.target.value })}
-                      aria-label="Minimum price"
-                      className={selectCls}
-                    >
-                      {priceMinOpts.map((o, i) => (
-                        <option key={i} value={o.value}>{o.label}</option>
-                      ))}
-                    </select>
-                  </SelectWrap>
-                  <SelectWrap>
-                    <select
-                      value={filters.priceMax}
-                      onChange={e => set({ priceMax: e.target.value })}
-                      aria-label="Maximum price"
-                      className={selectCls}
-                    >
-                      {priceMaxOpts.map((o, i) => (
-                        <option key={i} value={o.value}>{o.label}</option>
-                      ))}
-                    </select>
-                  </SelectWrap>
-                </div>
+              {/* VALOR MÁX */}
+              <div className="flex flex-1 flex-col border-b border-[#E5E7EB]
+                              px-4 py-3 text-left
+                              md:justify-center md:border-b-0 md:border-r md:border-[#E5E7EB]
+                              md:px-5 md:py-4">
+                <span className="text-[10px] font-bold uppercase tracking-widest text-[#999999]">
+                  VALOR MÁX.
+                </span>
+                <input
+                  type="text"
+                  value={displayCAD(filters.valorMax)}
+                  placeholder="CA$ Unlimited"
+                  onChange={e => set({ valorMax: e.target.value.replace(/\D/g, '') })}
+                  className="mt-0.5 w-full bg-transparent text-sm font-semibold text-[#1B2A4A]
+                             placeholder-[#BBBBBB] outline-none"
+                />
               </div>
 
-              {/* Action buttons */}
-              <div className="flex shrink-0 gap-2">
-                {/* Advanced Filters toggle */}
-                <button
-                  onClick={() => setExpanded(v => !v)}
-                  aria-expanded={expanded}
-                  className={
-                    'flex items-center gap-2 rounded-xl border px-4 py-2.5 text-sm font-semibold transition-all ' +
-                    (expanded
-                      ? 'border-[--color-brand] bg-[--color-brand]/8 text-[--color-brand]'
-                      : 'border-slate-200 bg-white text-slate-600 hover:border-slate-300 hover:bg-slate-50')
-                  }
+              {/* RESIDENCIAL */}
+              <CustomDropdown
+                label="RESIDENCIAL"
+                value={filters.residential}
+                options={residentialOpts}
+                onChange={v => set({ residential: v })}
+              />
+
+              {/* REF — last field: NO border-b on mobile */}
+              <div className="flex flex-col px-4 py-3 text-left
+                              md:justify-center md:px-5 md:py-4">
+                <span className="text-[10px] font-bold uppercase tracking-widest text-[#999999]">
+                  REF.
+                </span>
+                <input
+                  type="text"
+                  value={filters.ref}
+                  placeholder="PROP-000"
+                  onChange={e => set({ ref: e.target.value })}
+                  className="mt-0.5 w-full bg-transparent text-sm font-semibold text-[#1B2A4A]
+                             placeholder-[#BBBBBB] outline-none"
+                />
+              </div>
+
+              {/* Search CTA */}
+              <button
+                onClick={handleSearch}
+                className="flex shrink-0 items-center justify-center gap-2
+                           bg-[#C9714A] px-7 py-4 text-sm font-bold text-white
+                           transition-colors hover:bg-[#b8613c] whitespace-nowrap
+                           rounded-b-2xl md:rounded-b-none md:rounded-r-2xl"
+              >
+                <svg
+                  className="h-4 w-4 shrink-0"
+                  fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor"
                 >
-                  <svg
-                    aria-hidden="true"
-                    className="h-4 w-4 shrink-0"
-                    fill="none" viewBox="0 0 24 24" strokeWidth={1.8} stroke="currentColor"
-                  >
-                    <path strokeLinecap="round" strokeLinejoin="round"
-                      d="M10.5 6h9.75M10.5 6a1.5 1.5 0 11-3 0m3 0a1.5 1.5 0 10-3 0M3.75 6H7.5m3 12h9.75m-9.75 0a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m-3.75 0H7.5m9-6h3.75m-3.75 0a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m-9.75 0h9.75" />
-                  </svg>
-                  {expanded ? 'Less Filters' : 'Advanced Filters'}
-                </button>
+                  <path strokeLinecap="round" strokeLinejoin="round"
+                    d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 15.803m10.607 0A7.5 7.5 0 0 1 5.196 15.803" />
+                </svg>
+                Pesquisar Imóveis
+              </button>
 
-                {/* Search */}
-                <a
-                  href="#listings"
-                  className="flex items-center gap-2 rounded-xl bg-[--color-brand] px-5 py-2.5
-                             text-sm font-semibold text-white transition-colors
-                             hover:bg-[--color-brand-dark] whitespace-nowrap"
-                >
-                  <svg
-                    aria-hidden="true"
-                    className="h-4 w-4 shrink-0"
-                    fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor"
-                  >
-                    <path strokeLinecap="round" strokeLinejoin="round"
-                      d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 15.803m10.607 0A7.5 7.5 0 0 1 5.196 15.803" />
-                  </svg>
-                  Search
-                </a>
-              </div>
             </div>
           </div>
 
-          {/* ── Advanced filters panel (expands inline) ──────────────────── */}
+          {/* ── Advanced toggle ───────────────────────────────────────────── */}
+          <div className="mt-4 flex justify-center">
+            <button
+              onClick={() => setExpanded(v => !v)}
+              className="flex items-center gap-1.5 text-sm font-semibold
+                         text-white/75 transition-colors hover:text-white"
+            >
+              Filtros Avançados
+              <svg
+                className={`h-4 w-4 transition-transform duration-300 ${expanded ? 'rotate-180' : ''}`}
+                fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor"
+              >
+                <path strokeLinecap="round" strokeLinejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5" />
+              </svg>
+            </button>
+          </div>
+
+          {/* ── Advanced panel ────────────────────────────────────────────── */}
           <div
-            aria-hidden={!expanded}
             className={
               'overflow-hidden transition-all duration-500 ease-in-out ' +
-              (expanded ? 'max-h-[640px] opacity-100' : 'max-h-0 opacity-0')
+              (expanded ? 'max-h-[700px] opacity-100 mt-3' : 'max-h-0 opacity-0')
             }
           >
-            <div className="space-y-6 border-t border-slate-100 bg-slate-50/60 px-5 py-6">
+            <div className="rounded-2xl bg-[#1B2A4A] p-6 shadow-xl">
 
-              {/* Bedrooms + Bathrooms */}
-              <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
+              {/* Steppers + Area — 2-column grid of individual light boxes */}
+              <div className="mb-4 grid grid-cols-2 gap-3">
 
-                <div>
-                  <span className={labelCls}>Bedrooms</span>
-                  <div className="flex gap-2">
-                    {[0, 1, 2, 3, 4].map(n => (
-                      <button
-                        key={n}
-                        onClick={() => set({ minBeds: n })}
-                        className={segmentBtnCls(filters.minBeds === n)}
-                      >
-                        {n === 0 ? 'Any' : `${n}+`}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-
-                <div>
-                  <span className={labelCls}>Bathrooms</span>
-                  <div className="flex gap-2">
-                    {[0, 1, 2, 3].map(n => (
-                      <button
-                        key={n}
-                        onClick={() => set({ minBaths: n })}
-                        className={segmentBtnCls(filters.minBaths === n)}
-                      >
-                        {n === 0 ? 'Any' : `${n}+`}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-              </div>
-
-              {/* Features */}
-              <div>
-                <span className={labelCls}>Features</span>
-                <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
-                  {FEATURES_LIST.map(({ value, label, icon }) => (
-                    <button
-                      key={value}
-                      onClick={() => toggleFeature(value)}
-                      className={featureBtnCls(filters.features.includes(value))}
-                    >
-                      <span className="text-base" aria-hidden="true">{icon}</span>
-                      {label}
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              {/* Sqft + Year Built */}
-              <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
-
-                <div>
-                  <span className={labelCls}>Square Footage</span>
-                  <div className="grid grid-cols-2 gap-2">
-                    <SelectWrap>
-                      <select
-                        value={filters.sqftMin}
-                        onChange={e => set({ sqftMin: e.target.value })}
-                        aria-label="Minimum square footage"
-                        className={selectCls}
-                      >
-                        {SQFT_MIN_OPTS.map((o, i) => (
-                          <option key={i} value={o.value}>{o.label}</option>
-                        ))}
-                      </select>
-                    </SelectWrap>
-                    <SelectWrap>
-                      <select
-                        value={filters.sqftMax}
-                        onChange={e => set({ sqftMax: e.target.value })}
-                        aria-label="Maximum square footage"
-                        className={selectCls}
-                      >
-                        {SQFT_MAX_OPTS.map((o, i) => (
-                          <option key={i} value={o.value}>{o.label}</option>
-                        ))}
-                      </select>
-                    </SelectWrap>
-                  </div>
-                </div>
-
-                <div>
-                  <span className={labelCls}>Year Built</span>
-                  <div className="grid grid-cols-2 gap-2">
-                    <SelectWrap>
-                      <select
-                        value={filters.yearBuiltMin}
-                        onChange={e => set({ yearBuiltMin: e.target.value })}
-                        aria-label="Year built from"
-                        className={selectCls}
-                      >
-                        {YEAR_MIN_OPTS.map((o, i) => (
-                          <option key={i} value={o.value}>{o.label}</option>
-                        ))}
-                      </select>
-                    </SelectWrap>
-                    <SelectWrap>
-                      <select
-                        value={filters.yearBuiltMax}
-                        onChange={e => set({ yearBuiltMax: e.target.value })}
-                        aria-label="Year built to"
-                        className={selectCls}
-                      >
-                        {YEAR_MAX_OPTS.map((o, i) => (
-                          <option key={i} value={o.value}>{o.label}</option>
-                        ))}
-                      </select>
-                    </SelectWrap>
-                  </div>
-                </div>
-              </div>
-
-              {/* Property ID + footer actions */}
-              <div className="flex flex-col gap-4 sm:flex-row sm:items-end">
-
-                <div className="flex-1">
-                  <span className={labelCls}>Property ID</span>
-                  <input
-                    type="text"
-                    placeholder="e.g. RE-0013"
-                    value={filters.propertyId}
-                    onChange={e => set({ propertyId: e.target.value })}
-                    className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2.5
-                               font-mono text-sm text-slate-800 placeholder-slate-400
-                               focus:border-[--color-brand] focus:outline-none
-                               focus:ring-1 focus:ring-[--color-brand] transition"
+                <div className="flex flex-col items-center gap-3 rounded-2xl bg-white p-4 shadow-sm">
+                  <span className="text-[10px] font-bold uppercase tracking-widest text-[#999999]">
+                    BEDROOMS
+                  </span>
+                  <Stepper
+                    value={filters.bedrooms}
+                    onChange={v => set({ bedrooms: v })}
                   />
                 </div>
 
-                <div className="flex shrink-0 gap-2">
-                  <button
-                    onClick={() => onChange(DEFAULT_FILTERS)}
-                    className="rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm
-                               font-semibold text-slate-500 transition-colors hover:bg-slate-100"
-                  >
-                    Reset All
-                  </button>
-                  <button
-                    onClick={() => setExpanded(false)}
-                    className="flex items-center gap-1.5 rounded-xl bg-slate-800 px-4 py-2.5
-                               text-sm font-semibold text-white transition-colors hover:bg-slate-700"
-                  >
-                    <svg
-                      aria-hidden="true"
-                      className="h-4 w-4 shrink-0"
-                      fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor"
-                    >
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M6 18 18 6M6 6l12 12" />
-                    </svg>
-                    Close Filters
-                  </button>
+                <div className="flex flex-col items-center gap-3 rounded-2xl bg-white p-4 shadow-sm">
+                  <span className="text-[10px] font-bold uppercase tracking-widest text-[#999999]">
+                    BATHROOMS
+                  </span>
+                  <Stepper
+                    value={filters.bathrooms}
+                    onChange={v => set({ bathrooms: v })}
+                  />
+                </div>
+
+                <div className="rounded-2xl bg-white p-4 shadow-sm">
+                  <AdvancedInput
+                    label="ÁREA MÍN (sqft)"
+                    placeholder="0"
+                    value={filters.areaMin}
+                    onChange={v => set({ areaMin: v })}
+                  />
+                </div>
+
+                <div className="rounded-2xl bg-white p-4 shadow-sm">
+                  <AdvancedInput
+                    label="ÁREA MÁX (sqft)"
+                    placeholder="Unlimited"
+                    value={filters.areaMax}
+                    onChange={v => set({ areaMax: v })}
+                  />
+                </div>
+
+              </div>
+
+              {/* Features chips — full width, wraps naturally */}
+              <div className="text-left">
+                <span className="mb-3 block text-[10px] font-bold uppercase tracking-widest text-white/60">
+                  FEATURES
+                </span>
+                <div className="flex flex-wrap gap-2">
+                  {FEATURE_OPTIONS.map(({ value, label }) => {
+                    const active = filters.features.includes(value)
+                    return (
+                      <button
+                        key={value}
+                        type="button"
+                        onClick={() => toggleFeature(value)}
+                        className={
+                          'cursor-pointer rounded-full border px-4 py-1.5 text-sm font-medium transition-colors ' +
+                          (active
+                            ? 'border-[#C9714A] bg-[#C9714A] text-white'
+                            : 'border-white/25 bg-white/10 text-white hover:border-[#C9714A]')
+                        }
+                      >
+                        {label}
+                      </button>
+                    )
+                  })}
                 </div>
               </div>
 
+              {/* Clear advanced filters — only shown when something is active */}
+              {(filters.bedrooms > 0 || filters.bathrooms > 0 ||
+                filters.areaMin || filters.areaMax || filters.features.length > 0) && (
+                <div className="mt-5 flex justify-end border-t border-white/10 pt-4">
+                  <button
+                    type="button"
+                    onClick={() => set({ bedrooms: 0, bathrooms: 0, areaMin: '', areaMax: '', features: [] })}
+                    className="flex items-center gap-1.5 rounded-full border border-white/25 px-4 py-1.5
+                               text-sm font-medium text-white/70 transition-colors
+                               hover:border-white/50 hover:text-white"
+                  >
+                    <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                    Clear advanced filters
+                  </button>
+                </div>
+              )}
+
             </div>
           </div>
-          {/* End advanced panel */}
 
         </div>
-        {/* End filter card */}
+        {/* End filter area */}
+
       </div>
     </section>
   )
@@ -555,56 +516,7 @@ function HeroSection({
 
 // ── Map Section (commented out — to be integrated with Mapbox or Google Maps) ──
 /*
-function MapSection() {
-  return (
-    <section id="map" className="border-t border-slate-100 bg-white scroll-mt-16">
-      <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
-        <div className="mb-6">
-          <h2 className="text-lg font-semibold text-slate-800">Explore by Map</h2>
-          <p className="mt-0.5 text-sm text-slate-500">Click a pin to preview a property</p>
-        </div>
-
-        <div className="relative h-72 overflow-hidden rounded-2xl border border-slate-200 bg-slate-100 sm:h-96">
-          <div
-            aria-hidden="true"
-            className="absolute inset-0 opacity-40"
-            style={{
-              backgroundImage:
-                'linear-gradient(rgba(148,163,184,.4) 1px, transparent 1px), linear-gradient(90deg, rgba(148,163,184,.4) 1px, transparent 1px)',
-              backgroundSize: '40px 40px',
-            }}
-          />
-          {[
-            { top: '30%', left: '22%', price: '$485k' },
-            { top: '52%', left: '48%', price: '$3.2k/mo' },
-            { top: '25%', left: '65%', price: '$1.25M' },
-            { top: '60%', left: '74%', price: '$1.4k/mo' },
-            { top: '70%', left: '35%', price: '$620k' },
-          ].map((pin, i) => (
-            <button
-              key={i}
-              style={{ top: pin.top, left: pin.left }}
-              className="absolute -translate-x-1/2 -translate-y-full"
-            >
-              <span className="flex items-center rounded-full bg-[--color-brand] px-2.5 py-1
-                               text-xs font-bold text-white shadow-lg transition-transform hover:scale-110">
-                {pin.price}
-              </span>
-              <span className="mx-auto mt-0.5 block h-2 w-0.5 bg-[--color-brand]" />
-            </button>
-          ))}
-          <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
-            <div className="rounded-xl border border-slate-200 bg-white/80 px-6 py-4 text-center shadow-sm backdrop-blur-sm">
-              <p className="text-sm font-medium text-slate-600">
-                Interactive map — integrate Mapbox or Google Maps here
-              </p>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-  )
-}
+function MapSection() { ... }
 */
 
 // ── Home Client ────────────────────────────────────────────────────────────────
@@ -615,7 +527,6 @@ export default function HomeClient() {
   return (
     <>
       <HeroSection filters={filters} onChange={setFilters} />
-      {/* <MapSection /> — commented out until map integration is ready */}
       <CatalogSection filters={filters} onFiltersChange={setFilters} />
     </>
   )

@@ -94,24 +94,24 @@ export default function Footer() {
         <div className="grid grid-cols-1 gap-12 py-14 sm:grid-cols-2 lg:grid-cols-4">
 
           {/* Section 1 — Brand ─────────────────────────────────────────────── */}
-          <div className="flex flex-col gap-4">
+          <div className="flex flex-col items-center gap-4 sm:items-start">
             {/* Logo */}
             <a href="#home" aria-label="EstatFind home" className="flex items-center gap-2 w-fit">
-              <svg className="h-7 w-7 text-[--color-brand]" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+              <svg className="h-7 w-7 text-[#1a56db]" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                 <path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z" />
               </svg>
               <span className="text-xl font-bold tracking-tight text-white">
-                Estate<span className="text-[--color-brand]">Find</span>
+                Estate<span className="text-[#1a56db]">Find</span>
               </span>
             </a>
 
-            <p className="max-w-xs text-sm leading-relaxed text-slate-400">
+            <p className="max-w-xs text-center text-sm leading-relaxed text-slate-400 sm:text-left">
               Your trusted partner in finding the perfect property. Browse verified listings across Texas, tailored to your lifestyle.
             </p>
           </div>
 
           {/* Section 2 — Explore (Next.js Link) ──────────────────────────────── */}
-          <div>
+          <div className="hidden sm:block">
             <h3 className="mb-5 text-sm font-semibold uppercase tracking-widest text-white">
               Explore
             </h3>
@@ -127,7 +127,7 @@ export default function Footer() {
           </div>
 
           {/* Section 3 — Company ─────────────────────────────────────────────── */}
-          <div>
+          <div className="hidden sm:block">
             <h3 className="mb-5 text-sm font-semibold uppercase tracking-widest text-white">
               Company
             </h3>
@@ -143,13 +143,13 @@ export default function Footer() {
           </div>
 
           {/* Section 4 — Contact & Social ────────────────────────────────────── */}
-          <div>
+          <div className="flex flex-col items-center sm:items-start">
             <h3 className="mb-5 text-sm font-semibold uppercase tracking-widest text-white">
               Contact
             </h3>
 
             <address className="not-italic">
-              <ul className="flex flex-col gap-3" role="list">
+              <ul className="flex flex-col items-center gap-3 sm:items-start" role="list">
                 <li className="flex items-start gap-2.5">
                   <svg className="mt-0.5 h-4 w-4 shrink-0 text-slate-500" fill="none"
                        viewBox="0 0 24 24" strokeWidth={1.8} stroke="currentColor" aria-hidden="true">
@@ -186,14 +186,14 @@ export default function Footer() {
             </address>
 
             {/* Social icons */}
-            <div className="mt-6 flex items-center gap-3" aria-label="Social media links">
+            <div className="mt-6 flex items-center justify-center gap-3 sm:justify-start" aria-label="Social media links">
               {SOCIALS.map(({ label, href, icon }) => (
                 <a
                   key={label}
                   href={href}
                   aria-label={label}
                   className="flex h-9 w-9 items-center justify-center rounded-lg bg-slate-800
-                             text-slate-400 transition-all duration-200 hover:bg-[--color-brand]
+                             text-slate-400 transition-all duration-200 hover:bg-[#1a56db]
                              hover:text-white hover:scale-110"
                 >
                   {icon}
@@ -204,12 +204,13 @@ export default function Footer() {
         </div>
 
         {/* ── Bottom bar ─────────────────────────────────────────────────────── */}
-        <div className="flex flex-col gap-3 border-t border-slate-800 py-6 sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex flex-col items-center gap-3 border-t border-slate-800 py-6
+                        sm:flex-row sm:items-center sm:justify-between">
           <p className="text-xs text-slate-500">
             © {year} EstatFind, Inc. All rights reserved.
           </p>
 
-          <nav aria-label="Legal links">
+          <nav aria-label="Legal links" className="hidden sm:block">
             <ul className="flex flex-wrap items-center gap-x-5 gap-y-1" role="list">
               {LEGAL_LINKS.map(({ label, href }) => (
                 <li key={label}>
