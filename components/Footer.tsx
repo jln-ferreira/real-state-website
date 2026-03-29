@@ -61,11 +61,8 @@ const NAV_LINKS = [
 // ── Company links for section 3 ───────────────────────────────────────────────
 
 const COMPANY_LINKS = [
-  { label: 'About Us',       href: '#' },
-  { label: 'Careers',        href: '#' },
-  { label: 'Blog',           href: '#' },
-  { label: 'Press',          href: '#' },
-  { label: 'Privacy Policy', href: '#' },
+  { label: 'About Us', href: '#' },
+  { label: 'Blog',     href: '#' },
 ]
 
 // ── Legal links for bottom bar ────────────────────────────────────────────────

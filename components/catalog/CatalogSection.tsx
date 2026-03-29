@@ -2,7 +2,6 @@
 
 import { useState, useMemo } from 'react'
 import {
-  PROPERTIES,
   DEFAULT_FILTERS,
   applyFilters,
   sortProperties,
@@ -15,6 +14,7 @@ import {
 import PropertyCard from './PropertyCard'
 
 interface CatalogProps {
+  properties: Property[]
   filters: Filters
   onFiltersChange: (f: Filters) => void
 }
@@ -229,12 +229,12 @@ function FeaturedCard({ p }: { p: Property }) {
 
 // ── CatalogSection ─────────────────────────────────────────────────────────────
 
-export default function CatalogSection({ filters, onFiltersChange }: CatalogProps) {
+export default function CatalogSection({ properties, filters, onFiltersChange }: CatalogProps) {
   const [sortKey, setSortKey] = useState<SortKey>('newest')
 
   const results = useMemo(
-    () => sortProperties(applyFilters(PROPERTIES, filters), sortKey),
-    [filters, sortKey],
+    () => sortProperties(applyFilters(properties, filters), sortKey),
+    [properties, filters, sortKey],
   )
 
   const featured    = results.filter(p => p.status.isFeatured)
@@ -249,7 +249,7 @@ export default function CatalogSection({ filters, onFiltersChange }: CatalogProp
           <div>
             <h2 className="text-2xl font-bold text-slate-900">Property Listings</h2>
             <p className="mt-1 text-sm text-slate-500">
-              {results.length} of {PROPERTIES.length} properties
+              {results.length} of {properties.length} properties
             </p>
           </div>
 

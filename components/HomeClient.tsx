@@ -7,6 +7,7 @@ import {
   type Filters,
   type PropertyType,
   type Feature,
+  type Property,
 } from '@/data/properties'
 import CatalogSection from './catalog/CatalogSection'
 
@@ -521,13 +522,13 @@ function MapSection() { ... }
 
 // ── Home Client ────────────────────────────────────────────────────────────────
 
-export default function HomeClient() {
+export default function HomeClient({ initialProperties }: { initialProperties: Property[] }) {
   const [filters, setFilters] = useState<Filters>(DEFAULT_FILTERS)
 
   return (
     <>
       <HeroSection filters={filters} onChange={setFilters} />
-      <CatalogSection filters={filters} onFiltersChange={setFilters} />
+      <CatalogSection properties={initialProperties} filters={filters} onFiltersChange={setFilters} />
     </>
   )
 }
