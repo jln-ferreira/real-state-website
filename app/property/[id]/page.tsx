@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import { useParams, notFound } from 'next/navigation'
 import Link from 'next/link'
-import { PROPERTIES } from '@/data/properties'
+import { PROPERTIES, sqftToM2 } from '@/data/properties'
 import Layout from '@/components/Layout'
 
 // ── Icons ──────────────────────────────────────────────────────────────────────
@@ -146,7 +146,7 @@ export default function PropertyDetailPage() {
     <div className="min-h-screen bg-[#F8F9FC]">
 
       {/* ── Sub-header bar ─────────────────────────────────────────────────── */}
-      <div className="sticky top-16 z-20 border-b border-neutral-100 bg-white px-4 sm:px-6 lg:px-8">
+      <div className="sticky top-16 z-40 border-b border-neutral-100 bg-white px-4 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto flex items-center justify-between h-12">
           <Link
             href="/"
@@ -156,9 +156,6 @@ export default function PropertyDetailPage() {
             Voltar
           </Link>
           <div className="flex items-center gap-2">
-            <button className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-neutral-200 text-sm text-neutral-600 hover:bg-neutral-50 transition-colors">
-              <HeartIcon className="w-4 h-4" /> Favoritar
-            </button>
             <button className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-neutral-200 text-sm text-neutral-600 hover:bg-neutral-50 transition-colors">
               <ShareIcon className="w-4 h-4" /> Compartilhar
             </button>
@@ -184,7 +181,7 @@ export default function PropertyDetailPage() {
               </span>
             </div>
             <span className="absolute bottom-3 right-3 text-[10px] text-white/70 font-medium tracking-widest uppercase">
-              EstateFind
+              Casa Baccarat
             </span>
           </div>
 
@@ -252,7 +249,7 @@ export default function PropertyDetailPage() {
                   </span>
                 )}
                 <span className="flex items-center gap-1 bg-neutral-100 text-neutral-700 px-2 py-0.5 rounded-lg font-medium">
-                  <RulerIcon className="w-3.5 h-3.5" /> {property.propertyDetails.areaSqFt.toLocaleString()} sqft
+                  <RulerIcon className="w-3.5 h-3.5" /> {sqftToM2(property.propertyDetails.areaSqFt).toLocaleString()} m²
                 </span>
               </div>
             </div>
@@ -389,12 +386,6 @@ export default function PropertyDetailPage() {
                           {p.price.type === 'rent' ? 'RENT' : 'SALE'}
                         </span>
                       </div>
-                      <button
-                        onClick={e => e.preventDefault()}
-                        className="absolute top-3 right-3 w-7 h-7 rounded-full bg-white/90 flex items-center justify-center hover:bg-white transition-colors z-20"
-                      >
-                        <HeartIcon className="w-3.5 h-3.5 text-neutral-400" />
-                      </button>
                     </div>
                     <div className="p-3 flex-1 flex flex-col">
                       <div className="flex items-center gap-1 text-neutral-500 text-[11px] mb-1">
@@ -416,7 +407,7 @@ export default function PropertyDetailPage() {
                         )}
                         <span className="flex items-center gap-1.5">
                           <RulerIcon className="w-3 h-3" />
-                          <strong className="text-neutral-800">{p.propertyDetails.areaSqFt.toLocaleString()}</strong> sqft
+                          <strong className="text-neutral-800">{sqftToM2(p.propertyDetails.areaSqFt).toLocaleString()}</strong> m²
                         </span>
                       </div>
                       <div className="pt-2 border-t border-neutral-100 mt-auto">

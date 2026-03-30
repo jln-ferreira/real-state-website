@@ -52,25 +52,24 @@ const SOCIALS: { label: string; href: string; icon: React.ReactNode }[] = [
 // ── Nav links for section 2 (Next.js Link) ────────────────────────────────────
 
 const NAV_LINKS = [
-  { label: 'Home',     href: '#home' },
-  { label: 'Map',      href: '#map' },
-  { label: 'Listings', href: '#listings' },
-  { label: 'Contact',  href: '#contact' },
+  { label: 'Início',   href: '#home' },
+  { label: 'Anúncios', href: '#listings' },
+  { label: 'Contato',  href: '#contact' },
 ]
 
 // ── Company links for section 3 ───────────────────────────────────────────────
 
 const COMPANY_LINKS = [
-  { label: 'About Us', href: '#' },
-  { label: 'Blog',     href: '#' },
+  { label: 'Sobre Nós', href: '#' },
+  { label: 'Blog',      href: '#' },
 ]
 
 // ── Legal links for bottom bar ────────────────────────────────────────────────
 
 const LEGAL_LINKS = [
-  { label: 'Privacy Policy', href: '#' },
-  { label: 'Terms of Service', href: '#' },
-  { label: 'Cookie Policy', href: '#' },
+  { label: 'Política de Privacidade', href: '#' },
+  { label: 'Termos de Uso', href: '#' },
+  { label: 'Política de Cookies', href: '#' },
 ]
 
 // ── Shared link style ─────────────────────────────────────────────────────────
@@ -93,24 +92,24 @@ export default function Footer() {
           {/* Section 1 — Brand ─────────────────────────────────────────────── */}
           <div className="flex flex-col items-center gap-4 sm:items-start">
             {/* Logo */}
-            <a href="#home" aria-label="EstatFind home" className="flex items-center gap-2 w-fit">
+            <a href="#home" aria-label="Casa Baccarat início" className="flex items-center gap-2 w-fit">
               <svg className="h-7 w-7 text-[#1a56db]" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                 <path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z" />
               </svg>
               <span className="text-xl font-bold tracking-tight text-white">
-                Estate<span className="text-[#1a56db]">Find</span>
+                Casa <span className="text-[#1a56db]">Baccarat</span>
               </span>
             </a>
 
             <p className="max-w-xs text-center text-sm leading-relaxed text-slate-400 sm:text-left">
-              Your trusted partner in finding the perfect property. Browse verified listings across Texas, tailored to your lifestyle.
+              Seu parceiro confiável na busca pelo imóvel perfeito. Explore anúncios verificados em todo o Texas, adaptados ao seu estilo de vida.
             </p>
           </div>
 
           {/* Section 2 — Explore (Next.js Link) ──────────────────────────────── */}
           <div className="hidden sm:block">
             <h3 className="mb-5 text-sm font-semibold uppercase tracking-widest text-white">
-              Explore
+              Explorar
             </h3>
             <ul className="flex flex-col gap-3" role="list">
               {NAV_LINKS.map(({ label, href }) => (
@@ -126,7 +125,7 @@ export default function Footer() {
           {/* Section 3 — Company ─────────────────────────────────────────────── */}
           <div className="hidden sm:block">
             <h3 className="mb-5 text-sm font-semibold uppercase tracking-widest text-white">
-              Company
+              Empresa
             </h3>
             <ul className="flex flex-col gap-3" role="list">
               {COMPANY_LINKS.map(({ label, href }) => (
@@ -142,7 +141,7 @@ export default function Footer() {
           {/* Section 4 — Contact & Social ────────────────────────────────────── */}
           <div className="flex flex-col items-center sm:items-start">
             <h3 className="mb-5 text-sm font-semibold uppercase tracking-widest text-white">
-              Contact
+              Contato
             </h3>
 
             <address className="not-italic">
@@ -153,8 +152,8 @@ export default function Footer() {
                     <path strokeLinecap="round" strokeLinejoin="round"
                           d="M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25h-15a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25m19.5 0v.243a2.25 2.25 0 01-1.07 1.916l-7.5 4.615a2.25 2.25 0 01-2.36 0L3.32 8.91a2.25 2.25 0 01-1.07-1.916V6.75" />
                   </svg>
-                  <a href="mailto:hello@estatefind.com" className={linkCls}>
-                    hello@estatefind.com
+                  <a href="mailto:hello@casabaccarat.com" className={linkCls}>
+                    hello@casabaccarat.com
                   </a>
                 </li>
 
@@ -176,7 +175,7 @@ export default function Footer() {
                           d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0zM19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z" />
                   </svg>
                   <span className="text-sm text-slate-400">
-                    Austin, TX — Serving all of Texas
+                    Austin, TX — Atendendo todo o Texas
                   </span>
                 </li>
               </ul>
@@ -204,7 +203,7 @@ export default function Footer() {
         <div className="flex flex-col items-center gap-3 border-t border-slate-800 py-6
                         sm:flex-row sm:items-center sm:justify-between">
           <p className="text-xs text-slate-500">
-            © {year} EstatFind, Inc. All rights reserved.
+            © {year} Casa Baccarat. Todos os direitos reservados.
           </p>
 
           <nav aria-label="Legal links" className="hidden sm:block">

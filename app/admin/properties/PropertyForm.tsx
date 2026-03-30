@@ -4,7 +4,7 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import type { Property } from '@/data/properties'
 
-const TABS = ['Basic Info', 'Price', 'Location', 'Details', 'Features', 'Media', 'Status & Agent'] as const
+const TABS = ['Info Básica', 'Preço', 'Localização', 'Detalhes', 'Características', 'Mídia', 'Status & Agente'] as const
 type Tab = typeof TABS[number]
 
 const ALL_FEATURES = [
@@ -55,23 +55,23 @@ export default function PropertyForm({ property: initial }: { property?: Propert
 
   function validate(): boolean {
     const e: Record<string, string> = {}
-    if (!form.title.trim()) e.title = 'Title is required'
-    if (!form.description.trim()) e.description = 'Description is required'
-    if (!form.location.address.trim()) e['location.address'] = 'Address is required'
-    if (!form.location.city.trim()) e['location.city'] = 'City is required'
-    if (!form.location.province.trim()) e['location.province'] = 'Province is required'
-    if (!form.location.residential.trim()) e['location.residential'] = 'Residential is required'
-    if (!form.media.thumbnail.trim()) e['media.thumbnail'] = 'Thumbnail URL is required'
-    if (form.price.amount <= 0) e['price.amount'] = 'Price must be greater than 0'
-    if (!form.agent.name.trim()) e['agent.name'] = 'Agent name is required'
-    if (!form.agent.phone.trim()) e['agent.phone'] = 'Agent phone is required'
-    if (!form.agent.email.trim()) e['agent.email'] = 'Agent email is required'
+    if (!form.title.trim()) e.title = 'Título é obrigatório'
+    if (!form.description.trim()) e.description = 'Descrição é obrigatória'
+    if (!form.location.address.trim()) e['location.address'] = 'Endereço é obrigatório'
+    if (!form.location.city.trim()) e['location.city'] = 'Cidade é obrigatória'
+    if (!form.location.province.trim()) e['location.province'] = 'Província é obrigatória'
+    if (!form.location.residential.trim()) e['location.residential'] = 'Residencial é obrigatório'
+    if (!form.media.thumbnail.trim()) e['media.thumbnail'] = 'URL da miniatura é obrigatória'
+    if (form.price.amount <= 0) e['price.amount'] = 'O preço deve ser maior que 0'
+    if (!form.agent.name.trim()) e['agent.name'] = 'Nome do agente é obrigatório'
+    if (!form.agent.phone.trim()) e['agent.phone'] = 'Telefone do agente é obrigatório'
+    if (!form.agent.email.trim()) e['agent.email'] = 'E-mail do agente é obrigatório'
     setErrors(e)
     return Object.keys(e).length === 0
   }
 
   async function handleSave() {
-    if (!validate()) { showToast('Please fix the errors before saving.', 'error'); return }
+    if (!validate()) { showToast('Corrija os erros antes de salvar.', 'error'); return }
     setIsSaving(true)
     setSaveState('saving')
     const payload = { ...form, img: form.media.thumbnail }
@@ -105,16 +105,16 @@ export default function PropertyForm({ property: initial }: { property?: Propert
       }
       if (res.ok) {
         setSaveState('saved')
-        showToast('Property saved ✓', 'success')
+        showToast('Imóvel salvo ✓', 'success')
         setTimeout(() => setSaveState('idle'), 2000)
       } else {
         setSaveState('error')
-        showToast('Failed to save. Please try again.', 'error')
+        showToast('Falha ao salvar. Tente novamente.', 'error')
         setTimeout(() => setSaveState('idle'), 2000)
       }
     } catch {
       setSaveState('error')
-      showToast('Failed to save. Please try again.', 'error')
+      showToast('Falha ao salvar. Tente novamente.', 'error')
       setTimeout(() => setSaveState('idle'), 2000)
     } finally {
       setIsSaving(false)
@@ -175,7 +175,7 @@ export default function PropertyForm({ property: initial }: { property?: Propert
   )
 
   return (
-    <div className="max-w-3xl">
+    <div className="w-full max-w-3xl">
       {/* Toast */}
       {toast && (
         <div className={`fixed top-4 right-4 z-50 px-4 py-3 rounded-xl shadow-lg text-sm font-medium text-white ${toast.type === 'success' ? 'bg-green-600' : 'bg-red-600'}`}>
@@ -185,15 +185,15 @@ export default function PropertyForm({ property: initial }: { property?: Propert
 
       {/* Breadcrumb */}
       <p className="text-xs text-neutral-400 mb-4">
-        Admin / <a href="/admin/properties" className="hover:underline">Properties</a>
-        {isEdit ? ` / ${form.title || form.id}` : ' / New Property'}
+        Admin / <a href="/admin/properties" className="hover:underline">Imóveis</a>
+        {isEdit ? ` / ${form.title || form.id}` : ' / Novo Imóvel'}
       </p>
 
       {/* Header */}
-      <div className="flex items-start justify-between gap-4 mb-6">
+      <div className="flex flex-wrap items-start justify-between gap-4 mb-6">
         <div>
           <div className="flex items-center gap-3">
-            <h1 className="text-xl font-bold text-neutral-900">{isEdit ? form.title : 'New Property'}</h1>
+            <h1 className="text-xl font-bold text-neutral-900">{isEdit ? form.title : 'Novo Imóvel'}</h1>
             {isEdit && <span className="px-2.5 py-0.5 text-xs font-bold text-[#1E3A5F] bg-[#1E3A5F]/10 rounded-lg">{form.id}</span>}
           </div>
           {form.timestamps?.updatedAt && (
@@ -203,7 +203,7 @@ export default function PropertyForm({ property: initial }: { property?: Propert
         <div className="flex items-center gap-2 flex-shrink-0">
           <button onClick={() => router.push('/admin/properties')}
             className="px-4 py-2 border border-neutral-200 rounded-xl text-sm font-medium hover:bg-neutral-50 transition-colors">
-            Discard
+            Descartar
           </button>
           <button onClick={handleSave} disabled={isSaving}
             className={`px-4 py-2 rounded-xl text-sm font-semibold text-white transition-colors flex items-center gap-2 disabled:opacity-60
@@ -214,7 +214,7 @@ export default function PropertyForm({ property: initial }: { property?: Propert
                 <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
               </svg>
             )}
-            {saveState === 'saving' ? 'Saving...' : saveState === 'saved' ? 'Saved ✓' : 'Save changes'}
+            {saveState === 'saving' ? 'Salvando...' : saveState === 'saved' ? 'Salvo ✓' : 'Salvar alterações'}
           </button>
         </div>
       </div>
@@ -231,36 +231,36 @@ export default function PropertyForm({ property: initial }: { property?: Propert
 
       <div className="space-y-4">
 
-        {activeTab === 'Basic Info' && (
+        {activeTab === 'Info Básica' && (
           <>
-            <Input label="Title" required value={form.title} onChange={v => set('title', v)} error={errors.title} placeholder="e.g. Modern Downtown Loft" />
+            <Input label="Título" required value={form.title} onChange={v => set('title', v)} error={errors.title} placeholder="ex. Loft Moderno no Centro" />
             <div>
-              <label className="block text-xs font-semibold text-neutral-600 mb-1">Description <span className="text-red-500">*</span></label>
+              <label className="block text-xs font-semibold text-neutral-600 mb-1">Descrição <span className="text-red-500">*</span></label>
               <div className="relative">
                 <textarea rows={6} value={form.description} onChange={e => set('description', e.target.value)}
-                  placeholder="Describe the property..."
+                  placeholder="Descreva o imóvel..."
                   className={`w-full px-3 py-2.5 bg-neutral-100 rounded-lg text-sm border-0 outline-none focus:ring-2 resize-none ${errors.description ? 'ring-2 ring-red-300' : 'focus:ring-[#1E3A5F]/20'}`} />
                 <span className="absolute bottom-2 right-3 text-xs text-neutral-400">{form.description.length}</span>
               </div>
               {errors.description && <p className="text-xs text-red-500 mt-1">{errors.description}</p>}
             </div>
             <div>
-              <label className="block text-xs font-semibold text-neutral-600 mb-1">Property Type <span className="text-red-500">*</span></label>
+              <label className="block text-xs font-semibold text-neutral-600 mb-1">Tipo de Imóvel <span className="text-red-500">*</span></label>
               <select value={form.propertyDetails.type} onChange={e => set('propertyDetails', { ...form.propertyDetails, type: e.target.value as any })}
                 className="w-full px-3 py-2.5 bg-neutral-100 rounded-lg text-sm border-0 outline-none focus:ring-2 focus:ring-[#1E3A5F]/20">
-                <option value="apartment">Apartment</option>
-                <option value="house">House</option>
-                <option value="commercial">Commercial</option>
-                <option value="land">Land</option>
+                <option value="apartment">Apartamento</option>
+                <option value="house">Casa</option>
+                <option value="commercial">Comercial</option>
+                <option value="land">Terreno</option>
               </select>
             </div>
           </>
         )}
 
-        {activeTab === 'Price' && (
+        {activeTab === 'Preço' && (
           <>
             <div>
-              <label className="block text-xs font-semibold text-neutral-600 mb-1">Transaction Type <span className="text-red-500">*</span></label>
+              <label className="block text-xs font-semibold text-neutral-600 mb-1">Tipo de Transação <span className="text-red-500">*</span></label>
               <div className="flex gap-2">
                 {(['sale', 'rent'] as const).map(t => (
                   <button key={t} type="button" onClick={() => set('price', { ...form.price, type: t })}
@@ -271,7 +271,7 @@ export default function PropertyForm({ property: initial }: { property?: Propert
               </div>
             </div>
             <div>
-              <label className="block text-xs font-semibold text-neutral-600 mb-1">Price <span className="text-red-500">*</span></label>
+              <label className="block text-xs font-semibold text-neutral-600 mb-1">Preço <span className="text-red-500">*</span></label>
               <div className="flex gap-2">
                 <span className="px-3 py-2.5 bg-neutral-100 rounded-lg text-sm text-neutral-500 flex-shrink-0">{form.price.currency}</span>
                 <input type="number" value={form.price.amount || ''} placeholder="0"
@@ -281,9 +281,10 @@ export default function PropertyForm({ property: initial }: { property?: Propert
               {errors['price.amount'] && <p className="text-xs text-red-500 mt-1">{errors['price.amount']}</p>}
             </div>
             <div>
-              <label className="block text-xs font-semibold text-neutral-600 mb-1">Currency</label>
+              <label className="block text-xs font-semibold text-neutral-600 mb-1">Moeda</label>
               <select value={form.price.currency} onChange={e => set('price', { ...form.price, currency: e.target.value as any })}
                 className="w-full px-3 py-2.5 bg-neutral-100 rounded-lg text-sm border-0 outline-none focus:ring-2 focus:ring-[#1E3A5F]/20">
+                <option value="BRL">BRL</option>
                 <option value="CAD">CAD</option>
                 <option value="USD">USD</option>
               </select>
@@ -291,23 +292,23 @@ export default function PropertyForm({ property: initial }: { property?: Propert
           </>
         )}
 
-        {activeTab === 'Location' && (
+        {activeTab === 'Localização' && (
           <>
-            <div className="grid grid-cols-2 gap-4">
-              <Input label="Address" required value={form.location.address} onChange={v => set('location', { ...form.location, address: v })} error={errors['location.address']} />
-              <Input label="City" required value={form.location.city} onChange={v => set('location', { ...form.location, city: v })} error={errors['location.city']} />
-              <Input label="Province" required value={form.location.province} onChange={v => set('location', { ...form.location, province: v })} error={errors['location.province']} />
-              <Input label="Postal Code" value={form.location.postalCode ?? ''} onChange={v => set('location', { ...form.location, postalCode: v })} />
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <Input label="Endereço" required value={form.location.address} onChange={v => set('location', { ...form.location, address: v })} error={errors['location.address']} />
+              <Input label="Cidade" required value={form.location.city} onChange={v => set('location', { ...form.location, city: v })} error={errors['location.city']} />
+              <Input label="Província" required value={form.location.province} onChange={v => set('location', { ...form.location, province: v })} error={errors['location.province']} />
+              <Input label="Código Postal" value={form.location.postalCode ?? ''} onChange={v => set('location', { ...form.location, postalCode: v })} />
             </div>
-            <Input label="Residential / Community" required value={form.location.residential} onChange={v => set('location', { ...form.location, residential: v })} error={errors['location.residential']} />
-            <div className="grid grid-cols-2 gap-4">
+            <Input label="Residencial / Comunidade" required value={form.location.residential} onChange={v => set('location', { ...form.location, residential: v })} error={errors['location.residential']} />
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <Input label="Latitude" type="number" value={form.location.coordinates?.lat ?? ''} onChange={v => set('location', { ...form.location, coordinates: { lat: parseFloat(v) || 0, lng: form.location.coordinates?.lng ?? 0 } })} />
               <Input label="Longitude" type="number" value={form.location.coordinates?.lng ?? ''} onChange={v => set('location', { ...form.location, coordinates: { lat: form.location.coordinates?.lat ?? 0, lng: parseFloat(v) || 0 } })} />
             </div>
           </>
         )}
 
-        {activeTab === 'Details' && (
+        {activeTab === 'Detalhes' && (
           <>
             {(['bedrooms', 'bathrooms'] as const).map(key => (
               <div key={key}>
@@ -321,14 +322,14 @@ export default function PropertyForm({ property: initial }: { property?: Propert
                 </div>
               </div>
             ))}
-            <Input label="Area (sqft)" required type="number" value={form.propertyDetails.areaSqFt || ''} onChange={v => set('propertyDetails', { ...form.propertyDetails, areaSqFt: parseFloat(v) || 0 })} />
-            <Input label="Year Built" type="number" value={form.propertyDetails.yearBuilt ?? ''} onChange={v => set('propertyDetails', { ...form.propertyDetails, yearBuilt: parseInt(v) || undefined })} placeholder="e.g. 2018" />
+            <Input label="Área (m²)" required type="number" value={form.propertyDetails.areaSqFt || ''} onChange={v => set('propertyDetails', { ...form.propertyDetails, areaSqFt: parseFloat(v) || 0 })} />
+            <Input label="Ano de Construção" type="number" value={form.propertyDetails.yearBuilt ?? ''} onChange={v => set('propertyDetails', { ...form.propertyDetails, yearBuilt: parseInt(v) || undefined })} placeholder="ex. 2018" />
           </>
         )}
 
-        {activeTab === 'Features' && (
+        {activeTab === 'Características' && (
           <>
-            <p className="text-xs text-neutral-500">Click to toggle features</p>
+            <p className="text-xs text-neutral-500">Clique para selecionar características</p>
             <div className="flex flex-wrap gap-2">
               {ALL_FEATURES.map(f => (
                 <button key={f} type="button" onClick={() => toggleFeature(f)}
@@ -346,18 +347,18 @@ export default function PropertyForm({ property: initial }: { property?: Propert
             <div className="flex gap-2">
               <input type="text" value={customFeature} onChange={e => setCustomFeature(e.target.value)}
                 onKeyDown={e => { if (e.key === 'Enter') { e.preventDefault(); addCustomFeature() } }}
-                placeholder="Add custom feature..."
+                placeholder="Adicionar característica personalizada..."
                 className="flex-1 px-3 py-2.5 bg-neutral-100 rounded-lg text-sm border-0 outline-none focus:ring-2 focus:ring-[#1E3A5F]/20" />
               <button type="button" onClick={addCustomFeature}
-                className="px-4 py-2.5 bg-[#1E3A5F] text-white rounded-lg text-sm font-medium hover:bg-[#141d3a] transition-colors">Add</button>
+                className="px-4 py-2.5 bg-[#1E3A5F] text-white rounded-lg text-sm font-medium hover:bg-[#141d3a] transition-colors">Adicionar</button>
             </div>
           </>
         )}
 
-        {activeTab === 'Media' && (
+        {activeTab === 'Mídia' && (
           <>
             <div>
-              <label className="block text-xs font-semibold text-neutral-600 mb-1">Thumbnail URL <span className="text-red-500">*</span></label>
+              <label className="block text-xs font-semibold text-neutral-600 mb-1">URL da Miniatura <span className="text-red-500">*</span></label>
               <div className="flex gap-3 items-start">
                 <input type="text" value={form.media.thumbnail} placeholder="https://..."
                   onChange={e => set('media', { ...form.media, thumbnail: e.target.value })}
@@ -370,7 +371,7 @@ export default function PropertyForm({ property: initial }: { property?: Propert
               {errors['media.thumbnail'] && <p className="text-xs text-red-500 mt-1">{errors['media.thumbnail']}</p>}
             </div>
             <div>
-              <label className="block text-xs font-semibold text-neutral-600 mb-2">Images</label>
+              <label className="block text-xs font-semibold text-neutral-600 mb-2">Imagens</label>
               <div className="space-y-2">
                 {form.media.images.map((img, i) => (
                   <div key={i} className="flex gap-2 items-center">
@@ -395,40 +396,40 @@ export default function PropertyForm({ property: initial }: { property?: Propert
                 <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
                 </svg>
-                Add image URL
+                Adicionar URL de imagem
               </button>
             </div>
           </>
         )}
 
-        {activeTab === 'Status & Agent' && (
+        {activeTab === 'Status & Agente' && (
           <>
             <div className="bg-white rounded-xl border border-neutral-100 px-4 divide-y divide-neutral-100">
-              <Toggle label="Active listing" description="Visible in public search results" checked={form.status.isActive} onChange={v => set('status', { ...form.status, isActive: v })} />
-              <Toggle label="Featured property" description="Highlighted on the homepage" checked={form.status.isFeatured} onChange={v => set('status', { ...form.status, isFeatured: v })} />
-              <Toggle label="Special promotion" description="Marked with a special badge" checked={form.status.isSpecial ?? false} onChange={v => set('status', { ...form.status, isSpecial: v })} />
+              <Toggle label="Anúncio ativo" description="Visível nos resultados de busca públicos" checked={form.status.isActive} onChange={v => set('status', { ...form.status, isActive: v })} />
+              <Toggle label="Imóvel em destaque" description="Destacado na página inicial" checked={form.status.isFeatured} onChange={v => set('status', { ...form.status, isFeatured: v })} />
+              <Toggle label="Promoção especial" description="Marcado com um selo especial" checked={form.status.isSpecial ?? false} onChange={v => set('status', { ...form.status, isSpecial: v })} />
             </div>
             <div>
-              <p className="text-xs font-bold text-neutral-500 uppercase tracking-wider mb-3">Agent Info</p>
+              <p className="text-xs font-bold text-neutral-500 uppercase tracking-wider mb-3">Informações do Agente</p>
               <div className="space-y-3">
-                <div className="grid grid-cols-2 gap-3">
-                  <Input label="Agent Name" required value={form.agent.name} onChange={v => set('agent', { ...form.agent, name: v })} error={errors['agent.name']} />
-                  <Input label="Agent Phone" required value={form.agent.phone} onChange={v => set('agent', { ...form.agent, phone: v })} error={errors['agent.phone']} />
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <Input label="Nome do Agente" required value={form.agent.name} onChange={v => set('agent', { ...form.agent, name: v })} error={errors['agent.name']} />
+                  <Input label="Telefone do Agente" required value={form.agent.phone} onChange={v => set('agent', { ...form.agent, phone: v })} error={errors['agent.phone']} />
                 </div>
-                <Input label="Agent Email" required value={form.agent.email} onChange={v => set('agent', { ...form.agent, email: v })} error={errors['agent.email']} />
+                <Input label="E-mail do Agente" required value={form.agent.email} onChange={v => set('agent', { ...form.agent, email: v })} error={errors['agent.email']} />
               </div>
             </div>
             {isEdit && (
               <div className="mt-8 border-2 border-red-200 rounded-2xl p-6">
-                <h3 className="text-sm font-semibold text-red-600 mb-1">Danger Zone</h3>
-                <p className="text-sm font-medium text-neutral-700 mb-0.5">Delete this property</p>
-                <p className="text-xs text-neutral-500 mb-4">This permanently removes the listing. This cannot be undone.</p>
-                <label className="block text-xs font-semibold text-neutral-600 mb-1">Type <strong className="font-mono">{form.id}</strong> to confirm</label>
+                <h3 className="text-sm font-semibold text-red-600 mb-1">Zona de Perigo</h3>
+                <p className="text-sm font-medium text-neutral-700 mb-0.5">Excluir este imóvel</p>
+                <p className="text-xs text-neutral-500 mb-4">Isso remove permanentemente o anúncio. Esta ação não pode ser desfeita.</p>
+                <label className="block text-xs font-semibold text-neutral-600 mb-1">Digite <strong className="font-mono">{form.id}</strong> para confirmar</label>
                 <input type="text" value={deleteConfirm} onChange={e => setDeleteConfirm(e.target.value)}
                   className="w-full px-3 py-2.5 bg-neutral-100 rounded-lg text-sm border-0 outline-none focus:ring-2 focus:ring-red-300 font-mono mb-3" />
                 <button type="button" onClick={handleDelete} disabled={deleteConfirm !== form.id || isDeleting}
                   className="px-4 py-2.5 bg-red-600 text-white rounded-xl text-sm font-semibold disabled:opacity-40 hover:bg-red-700 transition-colors">
-                  {isDeleting ? 'Deleting...' : 'Delete Property'}
+                  {isDeleting ? 'Excluindo...' : 'Excluir Imóvel'}
                 </button>
               </div>
             )}

@@ -1,11 +1,13 @@
 'use client'
 
 import { useState, useMemo } from 'react'
+import Link from 'next/link'
 import {
   DEFAULT_FILTERS,
   applyFilters,
   sortProperties,
   formatPrice,
+  sqftToM2,
   type Filters,
   type SortKey,
   type Property,
@@ -22,12 +24,12 @@ interface CatalogProps {
 // ── Label maps (used by ActiveChips) ──────────────────────────────────────────
 
 const TIPO_LABELS: Record<string, string> = {
-  house: 'House', apartment: 'Apartment', commercial: 'Commercial', land: 'Land',
+  house: 'Casa', apartment: 'Apartamento', commercial: 'Comercial', land: 'Terreno',
 }
 
 const FEATURE_LABELS: Record<Feature, string> = {
-  balcony: 'Balcony', parking: 'Parking', gym: 'Gym', pool: 'Pool',
-  garden: 'Garden', furnished: 'Furnished', 'pet-friendly': 'Pet Friendly', concierge: 'Concierge',
+  balcony: 'Varanda', parking: 'Estacionamento', gym: 'Academia', pool: 'Piscina',
+  garden: 'Jardim', furnished: 'Mobiliado', 'pet-friendly': 'Aceita Pets', concierge: 'Portaria',
 }
 
 // ── Active filter chips ────────────────────────────────────────────────────────
@@ -38,7 +40,7 @@ function ActiveChips({ filters, onChange }: { filters: Filters; onChange: (f: Fi
 
   if (filters.negocio !== 'all')
     chips.push({
-      label: filters.negocio === 'sale' ? 'For Sale' : 'For Rent',
+      label: filters.negocio === 'sale' ? 'À Venda' : 'Para Alugar',
       clear: () => set({ negocio: 'all' }),
     })
 
@@ -64,14 +66,14 @@ function ActiveChips({ filters, onChange }: { filters: Filters; onChange: (f: Fi
     chips.push({ label: `REF: ${filters.ref}`, clear: () => set({ ref: '' }) })
 
   if (filters.bedrooms > 0)
-    chips.push({ label: `${filters.bedrooms}+ beds`, clear: () => set({ bedrooms: 0 }) })
+    chips.push({ label: `${filters.bedrooms}+ quartos`, clear: () => set({ bedrooms: 0 }) })
 
   if (filters.bathrooms > 0)
-    chips.push({ label: `${filters.bathrooms}+ baths`, clear: () => set({ bathrooms: 0 }) })
+    chips.push({ label: `${filters.bathrooms}+ banheiros`, clear: () => set({ bathrooms: 0 }) })
 
   if (filters.areaMin || filters.areaMax) {
-    const lo = filters.areaMin ? `${Number(filters.areaMin).toLocaleString()} sqft` : ''
-    const hi = filters.areaMax ? `${Number(filters.areaMax).toLocaleString()} sqft` : ''
+    const lo = filters.areaMin ? `${Number(filters.areaMin).toLocaleString()} m²` : ''
+    const hi = filters.areaMax ? `${Number(filters.areaMax).toLocaleString()} m²` : ''
     chips.push({
       label: lo && hi ? `${lo} – ${hi}` : lo ? `≥ ${lo}` : `≤ ${hi}`,
       clear: () => set({ areaMin: '', areaMax: '' }),
@@ -98,7 +100,7 @@ function ActiveChips({ filters, onChange }: { filters: Filters; onChange: (f: Fi
           {chip.label}
           <button
             onClick={chip.clear}
-            aria-label={`Remove ${chip.label} filter`}
+            aria-label={`Remover filtro ${chip.label}`}
             className="rounded-full hover:bg-[#1a56db]/20 transition-colors p-0.5"
           >
             <svg className="h-3 w-3" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor">
@@ -111,7 +113,7 @@ function ActiveChips({ filters, onChange }: { filters: Filters; onChange: (f: Fi
         onClick={() => onChange(DEFAULT_FILTERS)}
         className="text-xs text-slate-400 hover:text-slate-700 underline underline-offset-2 transition-colors"
       >
-        Clear all
+        Limpar tudo
       </button>
     </div>
   )
@@ -125,16 +127,16 @@ function EmptyState({ onReset }: { onReset: () => void }) {
       <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-slate-100 text-3xl">
         🏠
       </div>
-      <h3 className="text-lg font-semibold text-slate-800">No properties found</h3>
+      <h3 className="text-lg font-semibold text-slate-800">Nenhum imóvel encontrado</h3>
       <p className="mt-1 max-w-xs text-sm text-slate-500">
-        No listings match your current filters. Try adjusting your search criteria.
+        Nenhum anúncio corresponde aos seus filtros atuais. Tente ajustar os critérios de busca.
       </p>
       <button
         onClick={onReset}
         className="mt-5 rounded-xl bg-[#1a56db] px-5 py-2.5 text-sm font-semibold
                    text-white hover:bg-[#1e429f] transition-colors"
       >
-        Reset Filters
+        Redefinir Filtros
       </button>
     </div>
   )
@@ -146,6 +148,7 @@ function FeaturedCard({ p }: { p: Property }) {
   const isSale = p.price.type === 'sale'
 
   return (
+    <Link href={`/property/${p.id}`} className="block">
     <article className="group flex cursor-pointer flex-col overflow-hidden
                         rounded-2xl bg-white shadow-sm transition-all duration-300
                         hover:-translate-y-0.5 hover:shadow-xl">
@@ -161,11 +164,11 @@ function FeaturedCard({ p }: { p: Property }) {
              className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent" />
         <div className="absolute top-3 left-3 flex flex-col gap-1.5">
           <span className="rounded-full bg-amber-400 px-3 py-1 text-[11px] font-bold text-white shadow-md">
-            ★ Featured
+            ★ Destaque
           </span>
           <span className={`rounded-full px-3 py-1 text-[11px] font-bold text-white shadow-md
             ${isSale ? 'bg-emerald-500' : 'bg-blue-500'}`}>
-            {isSale ? 'For Sale' : 'For Rent'}
+            {isSale ? 'À Venda' : 'Para Alugar'}
           </span>
         </div>
         <span className="absolute bottom-3 left-3 rounded-md bg-black/50 px-2 py-0.5
@@ -205,7 +208,7 @@ function FeaturedCard({ p }: { p: Property }) {
                 <path strokeLinecap="round" strokeLinejoin="round"
                       d="M2 9V6a1 1 0 011-1h18a1 1 0 011 1v3M2 9h20M2 9v9m20-9v9M2 18h20M7 13h10" />
               </svg>
-              {p.propertyDetails.bedrooms} bed{p.propertyDetails.bedrooms !== 1 ? 's' : ''}
+              {p.propertyDetails.bedrooms} quarto{p.propertyDetails.bedrooms !== 1 ? 's' : ''}
             </span>
           )}
           {p.propertyDetails.bathrooms > 0 && (
@@ -215,15 +218,16 @@ function FeaturedCard({ p }: { p: Property }) {
                 <path strokeLinecap="round" strokeLinejoin="round"
                       d="M4 12h16M4 12V7a2 2 0 012-2h3m-5 7v5a2 2 0 002 2h12a2 2 0 002-2v-5M10 5V4a1 1 0 011-1h2a1 1 0 011 1v1" />
               </svg>
-              {p.propertyDetails.bathrooms} bath{p.propertyDetails.bathrooms !== 1 ? 's' : ''}
+              {p.propertyDetails.bathrooms} banheiro{p.propertyDetails.bathrooms !== 1 ? 's' : ''}
             </span>
           )}
           <span className="ml-auto font-medium text-slate-600">
-            {p.propertyDetails.areaSqFt.toLocaleString()} sqft
+            {sqftToM2(p.propertyDetails.areaSqFt).toLocaleString()} m²
           </span>
         </div>
       </div>
     </article>
+    </Link>
   )
 }
 
@@ -247,15 +251,15 @@ export default function CatalogSection({ properties, filters, onFiltersChange }:
         {/* Page heading */}
         <div className="mb-8 flex flex-wrap items-end justify-between gap-4">
           <div>
-            <h2 className="text-2xl font-bold text-slate-900">Property Listings</h2>
+            <h2 className="text-2xl font-bold text-slate-900">Anúncios de Imóveis</h2>
             <p className="mt-1 text-sm text-slate-500">
-              {results.length} of {properties.length} properties
+              {results.length} de {properties.length} imóveis
             </p>
           </div>
 
           {/* Sort */}
           <div className="flex items-center gap-2">
-            <span className="hidden text-sm text-slate-500 sm:inline">Sort:</span>
+            <span className="hidden text-sm text-slate-500 sm:inline">Ordenar:</span>
             <select
               value={sortKey}
               onChange={e => setSortKey(e.target.value as SortKey)}
@@ -263,9 +267,9 @@ export default function CatalogSection({ properties, filters, onFiltersChange }:
                          font-medium text-slate-700 shadow-sm transition focus:border-[#1a56db]
                          focus:outline-none focus:ring-1 focus:ring-[#1a56db]"
             >
-              <option value="newest">Newest first</option>
-              <option value="price-asc">Price: Low → High</option>
-              <option value="price-desc">Price: High → Low</option>
+              <option value="newest">Mais recente</option>
+              <option value="price-asc">Preço: Menor → Maior</option>
+              <option value="price-desc">Preço: Maior → Menor</option>
             </select>
           </div>
         </div>

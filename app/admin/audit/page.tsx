@@ -22,24 +22,24 @@ export default async function AuditPage() {
   return (
     <div>
       <div className="mb-6">
-        <h1 className="text-xl font-bold text-neutral-900">Audit Log</h1>
-        <p className="text-sm text-neutral-500 mt-0.5">All admin actions on properties</p>
+        <h1 className="text-xl font-bold text-neutral-900">Log de Auditoria</h1>
+        <p className="text-sm text-neutral-500 mt-0.5">Todas as ações administrativas em imóveis</p>
       </div>
-      <div className="bg-white rounded-2xl shadow-sm overflow-hidden border border-neutral-100">
-        <table className="w-full">
+      <div className="bg-white rounded-2xl shadow-sm overflow-hidden border border-neutral-100 overflow-x-auto">
+        <table className="w-full min-w-[600px]">
           <thead>
             <tr className="border-b border-neutral-100 bg-neutral-50">
-              <th className="text-left px-4 py-3 text-xs font-semibold text-neutral-500 uppercase tracking-wider">Timestamp</th>
-              <th className="text-left px-4 py-3 text-xs font-semibold text-neutral-500 uppercase tracking-wider">Action</th>
-              <th className="text-left px-4 py-3 text-xs font-semibold text-neutral-500 uppercase tracking-wider">Property ID</th>
-              <th className="text-left px-4 py-3 text-xs font-semibold text-neutral-500 uppercase tracking-wider hidden md:table-cell">Field</th>
-              <th className="text-left px-4 py-3 text-xs font-semibold text-neutral-500 uppercase tracking-wider hidden lg:table-cell">Old Value</th>
-              <th className="text-left px-4 py-3 text-xs font-semibold text-neutral-500 uppercase tracking-wider hidden lg:table-cell">New Value</th>
+              <th className="text-left px-4 py-3 text-xs font-semibold text-neutral-500 uppercase tracking-wider">Data/Hora</th>
+              <th className="text-left px-4 py-3 text-xs font-semibold text-neutral-500 uppercase tracking-wider">Ação</th>
+              <th className="text-left px-4 py-3 text-xs font-semibold text-neutral-500 uppercase tracking-wider">ID do Imóvel</th>
+              <th className="text-left px-4 py-3 text-xs font-semibold text-neutral-500 uppercase tracking-wider hidden md:table-cell">Campo</th>
+              <th className="text-left px-4 py-3 text-xs font-semibold text-neutral-500 uppercase tracking-wider hidden lg:table-cell">Valor Anterior</th>
+              <th className="text-left px-4 py-3 text-xs font-semibold text-neutral-500 uppercase tracking-wider hidden lg:table-cell">Novo Valor</th>
             </tr>
           </thead>
           <tbody>
             {log.length === 0 ? (
-              <tr><td colSpan={6} className="text-center py-12 text-sm text-neutral-400">No actions recorded yet</td></tr>
+              <tr><td colSpan={6} className="text-center py-12 text-sm text-neutral-400">Nenhuma ação registrada ainda</td></tr>
             ) : log.map((row: any) => (
               <tr key={row.id} className="border-b border-neutral-100 hover:bg-neutral-50 transition-colors">
                 <td className="px-4 py-3 text-xs text-neutral-500 whitespace-nowrap">{formatDate(row.timestamp)}</td>

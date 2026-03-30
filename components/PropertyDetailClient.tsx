@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import Link from 'next/link'
 import type { Property } from '@/data/properties'
-import { PROPERTIES } from '@/data/properties'
+import { PROPERTIES, sqftToM2 } from '@/data/properties'
 
 // ── Icons ──────────────────────────────────────────────────────────────────────
 
@@ -112,7 +112,7 @@ export default function PropertyDetailClient({ property }: { property: Property 
     name:    '',
     phone:   '',
     email:   '',
-    message: `Hi, I'm interested in ${property.title} (${property.id}) that I found on your site.`,
+    message: `Olá, tenho interesse no imóvel ${property.title} (${property.id}) que encontrei no seu site.`,
   })
 
   function openLightbox(i: number) {
@@ -140,9 +140,6 @@ export default function PropertyDetailClient({ property }: { property: Property 
           </Link>
           <div className="flex items-center gap-2">
             <button className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-neutral-200 text-sm text-neutral-600 hover:bg-neutral-50 transition-colors">
-              <HeartIcon className="w-4 h-4" /> Favoritar
-            </button>
-            <button className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-neutral-200 text-sm text-neutral-600 hover:bg-neutral-50 transition-colors">
               <ShareIcon className="w-4 h-4" /> Compartilhar
             </button>
           </div>
@@ -167,7 +164,7 @@ export default function PropertyDetailClient({ property }: { property: Property 
               </span>
             </div>
             <span className="absolute bottom-3 right-3 text-[10px] text-white/70 font-medium tracking-widest uppercase">
-              EstateFind
+              Casa Baccarat
             </span>
           </div>
 
@@ -235,7 +232,7 @@ export default function PropertyDetailClient({ property }: { property: Property 
                   </span>
                 )}
                 <span className="flex items-center gap-1 bg-neutral-100 text-neutral-700 px-2 py-0.5 rounded-lg font-medium">
-                  <RulerIcon className="w-3.5 h-3.5" /> {property.propertyDetails.areaSqFt.toLocaleString()} sqft
+                  <RulerIcon className="w-3.5 h-3.5" /> {sqftToM2(property.propertyDetails.areaSqFt).toLocaleString()} m²
                 </span>
               </div>
             </div>
@@ -243,7 +240,7 @@ export default function PropertyDetailClient({ property }: { property: Property 
             {/* Description */}
             <div className="px-4">
               <h2 className="text-sm font-bold text-neutral-900 uppercase tracking-wide mb-3">
-                Property Description
+                Descrição do Imóvel
               </h2>
               <div className="text-sm text-neutral-600 leading-relaxed prose prose-sm max-w-none">
                 <p>{property.description}</p>
@@ -269,7 +266,7 @@ export default function PropertyDetailClient({ property }: { property: Property 
                 className="w-full flex items-center justify-center gap-3 px-6 py-3 rounded-xl bg-green-500 hover:bg-green-600 text-white font-semibold transition-colors"
               >
                 <WhatsAppIcon className="w-5 h-5" />
-                Start WhatsApp conversation
+                Iniciar conversa pelo WhatsApp
               </a>
             )}
 
@@ -283,7 +280,7 @@ export default function PropertyDetailClient({ property }: { property: Property 
               <div className="p-4 rounded-2xl border border-neutral-200 bg-white shadow-sm">
                 <div className="flex flex-wrap items-center gap-1.5 mb-2">
                   <span className="px-2.5 py-0.5 text-xs font-bold rounded-md uppercase bg-[#1E3A5F] text-white">
-                    {property.price.type === 'rent' ? 'RENT' : 'SALE'}
+                    {property.price.type === 'rent' ? 'ALUGUEL' : 'VENDA'}
                   </span>
                   <span className="px-2.5 py-0.5 text-xs font-medium bg-neutral-100 text-neutral-600 rounded-md capitalize">
                     {property.propertyDetails.type}
@@ -292,7 +289,7 @@ export default function PropertyDetailClient({ property }: { property: Property 
 
                 <div className="space-y-1 mb-3">
                   <p className="text-[10px] text-neutral-500 uppercase tracking-wide">
-                    {property.price.type === 'rent' ? 'Monthly Rent' : 'Sale Price'}
+                    {property.price.type === 'rent' ? 'Aluguel Mensal' : 'Preço de Venda'}
                   </p>
                   <p className="text-2xl font-bold text-[#1E3A5F]">
                     {property.price.currency} {property.price.amount.toLocaleString()}
@@ -305,7 +302,7 @@ export default function PropertyDetailClient({ property }: { property: Property 
                 <form className="space-y-2" onSubmit={handleSubmit}>
                   <input
                     type="text"
-                    placeholder="Your name *"
+                    placeholder="Seu nome *"
                     required
                     value={formData.name}
                     onChange={e => setFormData(d => ({ ...d, name: e.target.value }))}
@@ -323,14 +320,14 @@ export default function PropertyDetailClient({ property }: { property: Property 
                   </div>
                   <input
                     type="email"
-                    placeholder="Your email"
+                    placeholder="Seu e-mail"
                     value={formData.email}
                     onChange={e => setFormData(d => ({ ...d, email: e.target.value }))}
                     className="w-full px-3 py-2.5 rounded-lg bg-neutral-100 border-0 text-sm focus:ring-2 focus:ring-[#1E3A5F]/30 outline-none"
                   />
                   <textarea
                     rows={3}
-                    placeholder="Hi, I'm interested in this property..."
+                    placeholder="Olá, tenho interesse neste imóvel..."
                     value={formData.message}
                     onChange={e => setFormData(d => ({ ...d, message: e.target.value }))}
                     className="w-full px-3 py-2.5 rounded-lg bg-neutral-100 border-0 text-sm resize-none focus:ring-2 focus:ring-[#1E3A5F]/30 outline-none"
@@ -339,7 +336,7 @@ export default function PropertyDetailClient({ property }: { property: Property 
                     type="submit"
                     className="w-full py-2.5 bg-[#1E3A5F] text-white font-semibold rounded-lg hover:bg-[#141d3a] transition-colors"
                   >
-                    Send message
+                    Enviar mensagem
                   </button>
                 </form>
               </div>
@@ -352,7 +349,7 @@ export default function PropertyDetailClient({ property }: { property: Property 
         {similarProperties.length > 0 && (
           <section className="mt-8">
             <h2 className="text-sm font-bold text-neutral-900 uppercase tracking-wide mb-3">
-              Similar Properties
+              Imóveis Similares
             </h2>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
               {similarProperties.map(p => (
@@ -371,15 +368,9 @@ export default function PropertyDetailClient({ property }: { property: Property 
                           {p.id}
                         </span>
                         <span className="px-1.5 py-px bg-[#1E3A5F] text-white text-[9px] font-bold uppercase rounded">
-                          {p.price.type === 'rent' ? 'RENT' : 'SALE'}
+                          {p.price.type === 'rent' ? 'ALUGUEL' : 'VENDA'}
                         </span>
                       </div>
-                      <button
-                        onClick={e => e.preventDefault()}
-                        className="absolute top-3 right-3 w-7 h-7 rounded-full bg-white/90 flex items-center justify-center hover:bg-white transition-colors z-20"
-                      >
-                        <HeartIcon className="w-3.5 h-3.5 text-neutral-400" />
-                      </button>
                     </div>
                     <div className="p-3 flex-1 flex flex-col">
                       <div className="flex items-center gap-1 text-neutral-500 text-[11px] mb-1">
@@ -401,7 +392,7 @@ export default function PropertyDetailClient({ property }: { property: Property 
                         )}
                         <span className="flex items-center gap-1.5">
                           <RulerIcon className="w-3 h-3" />
-                          <strong className="text-neutral-800">{p.propertyDetails.areaSqFt.toLocaleString()}</strong> sqft
+                          <strong className="text-neutral-800">{sqftToM2(p.propertyDetails.areaSqFt).toLocaleString()}</strong> m²
                         </span>
                       </div>
                       <div className="pt-2 border-t border-neutral-100 mt-auto">

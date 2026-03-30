@@ -3,10 +3,9 @@
 import { useEffect } from 'react'
 
 const NAV_LINKS = [
-  { label: 'Home',     href: '#home' },
-  { label: 'Map',      href: '#map' },
-  { label: 'Listings', href: '#listings' },
-  { label: 'Contact',  href: '#contact' },
+  { label: 'Início',   href: '#home' },
+  { label: 'Anúncios', href: '#listings' },
+  { label: 'Contato',  href: '#contact' },
 ]
 
 interface MobileMenuProps {
@@ -50,7 +49,7 @@ export default function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
       <div
         role="dialog"
         aria-modal="true"
-        aria-label="Navigation menu"
+        aria-label="Menu de navegação"
         className={[
           'fixed top-0 right-0 z-50 h-full w-72 bg-white shadow-2xl',
           'flex flex-col transition-transform duration-300 ease-in-out',
@@ -60,11 +59,11 @@ export default function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
         {/* Panel header */}
         <div className="flex items-center justify-between px-6 py-5 border-b border-slate-100">
           <span className="text-lg font-bold tracking-tight text-slate-900">
-            Estate<span className="text-[#1a56db]">Find</span>
+            Casa <span className="text-[#1a56db]">Baccarat</span>
           </span>
           <button
             onClick={onClose}
-            aria-label="Close menu"
+            aria-label="Fechar menu"
             className="rounded-lg p-2 text-slate-500 hover:bg-slate-100 hover:text-slate-900 transition-colors"
           >
             <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
@@ -99,7 +98,7 @@ export default function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
             className="block w-full rounded-xl bg-[#1a56db] px-4 py-3 text-center
                        text-sm font-semibold text-white hover:bg-[#1e429f] transition-colors"
           >
-            Browse Listings
+            Ver Imóveis
           </a>
         </div>
       </div>

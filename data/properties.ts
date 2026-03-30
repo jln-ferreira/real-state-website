@@ -11,7 +11,7 @@ export interface Property {
   description: string
   price: {
     amount:   number
-    currency: 'CAD' | 'USD'
+    currency: 'BRL' | 'CAD' | 'USD'
     type:     PriceType
   }
   location: {
@@ -54,6 +54,10 @@ export interface Property {
 export function formatPrice(p: Property): string {
   const n = p.price.amount.toLocaleString('en-CA')
   return p.price.type === 'rent' ? `CA$ ${n}/mo` : `CA$ ${n}`
+}
+
+export function sqftToM2(sqft: number): number {
+  return Math.round(sqft * 0.0929)
 }
 
 // ── Mock dataset ──────────────────────────────────────────────────────────────
@@ -469,8 +473,8 @@ export function applyFilters(properties: Property[], f: Filters): Property[] {
     if (f.ref && !p.id.toLowerCase().includes(f.ref.toLowerCase())) return false
     if (f.bedrooms  > 0 && p.propertyDetails.bedrooms  < f.bedrooms)  return false
     if (f.bathrooms > 0 && p.propertyDetails.bathrooms < f.bathrooms) return false
-    if (f.areaMin && p.propertyDetails.areaSqFt < Number(f.areaMin)) return false
-    if (f.areaMax && p.propertyDetails.areaSqFt > Number(f.areaMax)) return false
+    if (f.areaMin && sqftToM2(p.propertyDetails.areaSqFt) < Number(f.areaMin)) return false
+    if (f.areaMax && sqftToM2(p.propertyDetails.areaSqFt) > Number(f.areaMax)) return false
     if (f.features.length > 0 && !f.features.every(feat => p.features.includes(feat))) return false
     return true
   })

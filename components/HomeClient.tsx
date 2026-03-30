@@ -14,28 +14,28 @@ import CatalogSection from './catalog/CatalogSection'
 // ── Option lists ───────────────────────────────────────────────────────────────
 
 const NEGOCIO_OPTIONS = [
-  { label: 'Todos', value: 'all'  },
-  { label: 'Sale',  value: 'sale' },
-  { label: 'Rent',  value: 'rent' },
+  { label: 'Todos',   value: 'all'  },
+  { label: 'Venda',   value: 'sale' },
+  { label: 'Aluguel', value: 'rent' },
 ] as const
 
 const TIPO_OPTIONS = [
-  { label: 'Todos',      value: 'all'        },
-  { label: 'Apartment',  value: 'apartment'  },
-  { label: 'House',      value: 'house'      },
-  { label: 'Commercial', value: 'commercial' },
-  { label: 'Land',       value: 'land'       },
+  { label: 'Todos',       value: 'all'        },
+  { label: 'Apartamento', value: 'apartment'  },
+  { label: 'Casa',        value: 'house'      },
+  { label: 'Comercial',   value: 'commercial' },
+  { label: 'Terreno',     value: 'land'       },
 ] as const
 
 const FEATURE_OPTIONS: { value: Feature; label: string }[] = [
-  { value: 'balcony',      label: 'Balcony'      },
-  { value: 'parking',      label: 'Parking'      },
-  { value: 'gym',          label: 'Gym'          },
-  { value: 'pool',         label: 'Pool'         },
-  { value: 'garden',       label: 'Garden'       },
-  { value: 'furnished',    label: 'Furnished'    },
-  { value: 'pet-friendly', label: 'Pet Friendly' },
-  { value: 'concierge',    label: 'Concierge'    },
+  { value: 'balcony',      label: 'Varanda'           },
+  { value: 'parking',      label: 'Estacionamento'    },
+  { value: 'gym',          label: 'Academia'          },
+  { value: 'pool',         label: 'Piscina'           },
+  { value: 'garden',       label: 'Jardim'            },
+  { value: 'furnished',    label: 'Mobiliado'         },
+  { value: 'pet-friendly', label: 'Aceita Pets'       },
+  { value: 'concierge',    label: 'Portaria'          },
 ]
 
 // ── CA$ display helper (raw digits → "CA$ 1,500,000") ─────────────────────────
@@ -337,7 +337,7 @@ function HeroSection({
                 <input
                   type="text"
                   value={displayCAD(filters.valorMax)}
-                  placeholder="CA$ Unlimited"
+                  placeholder="CA$ Ilimitado"
                   onChange={e => set({ valorMax: e.target.value.replace(/\D/g, '') })}
                   className="mt-0.5 w-full bg-transparent text-sm font-semibold text-[#1B2A4A]
                              placeholder-[#BBBBBB] outline-none"
@@ -420,7 +420,7 @@ function HeroSection({
 
                 <div className="flex flex-col items-center gap-3 rounded-2xl bg-white p-4 shadow-sm">
                   <span className="text-[10px] font-bold uppercase tracking-widest text-[#999999]">
-                    BEDROOMS
+                    QUARTOS
                   </span>
                   <Stepper
                     value={filters.bedrooms}
@@ -430,7 +430,7 @@ function HeroSection({
 
                 <div className="flex flex-col items-center gap-3 rounded-2xl bg-white p-4 shadow-sm">
                   <span className="text-[10px] font-bold uppercase tracking-widest text-[#999999]">
-                    BATHROOMS
+                    BANHEIROS
                   </span>
                   <Stepper
                     value={filters.bathrooms}
@@ -440,7 +440,7 @@ function HeroSection({
 
                 <div className="rounded-2xl bg-white p-4 shadow-sm">
                   <AdvancedInput
-                    label="ÁREA MÍN (sqft)"
+                    label="ÁREA MÍN (m²)"
                     placeholder="0"
                     value={filters.areaMin}
                     onChange={v => set({ areaMin: v })}
@@ -449,8 +449,8 @@ function HeroSection({
 
                 <div className="rounded-2xl bg-white p-4 shadow-sm">
                   <AdvancedInput
-                    label="ÁREA MÁX (sqft)"
-                    placeholder="Unlimited"
+                    label="ÁREA MÁX (m²)"
+                    placeholder="Ilimitado"
                     value={filters.areaMax}
                     onChange={v => set({ areaMax: v })}
                   />
@@ -461,7 +461,7 @@ function HeroSection({
               {/* Features chips — full width, wraps naturally */}
               <div className="text-left">
                 <span className="mb-3 block text-[10px] font-bold uppercase tracking-widest text-white/60">
-                  FEATURES
+                  CARACTERÍSTICAS
                 </span>
                 <div className="flex flex-wrap gap-2">
                   {FEATURE_OPTIONS.map(({ value, label }) => {
@@ -499,7 +499,7 @@ function HeroSection({
                     <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
                     </svg>
-                    Clear advanced filters
+                    Limpar filtros avançados
                   </button>
                 </div>
               )}

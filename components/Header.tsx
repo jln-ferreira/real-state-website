@@ -4,10 +4,9 @@ import { useState } from 'react'
 import MobileMenu from './MobileMenu'
 
 const NAV_LINKS = [
-  { label: 'Home',     href: '#home' },
-  { label: 'Map',      href: '#map' },
-  { label: 'Listings', href: '#listings' },
-  { label: 'Contact',  href: '#contact' },
+  { label: 'Início',   href: '#home' },
+  { label: 'Anúncios', href: '#listings' },
+  { label: 'Contato',  href: '#contact' },
 ]
 
 export default function Header() {
@@ -37,7 +36,7 @@ export default function Header() {
               <path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z" />
             </svg>
             <span className="text-xl font-bold tracking-tight text-slate-900">
-              Estate<span className="text-[#1a56db]">Find</span>
+              Casa <span className="text-[#1a56db]">Baccarat</span>
             </span>
           </a>
 
@@ -60,14 +59,14 @@ export default function Header() {
               className="ml-3 rounded-xl bg-[#1a56db] px-4 py-2 text-sm font-semibold
                          text-white hover:bg-[#1e429f] transition-colors shadow-sm"
             >
-              Browse Listings
+              Ver Imóveis
             </a>
           </nav>
 
           {/* Mobile hamburger */}
           <button
             onClick={() => setMenuOpen(true)}
-            aria-label="Open menu"
+            aria-label="Abrir menu"
             className="md:hidden rounded-lg p-2 text-slate-700 hover:bg-slate-100 transition-colors"
           >
             <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" strokeWidth={1.8} stroke="currentColor">

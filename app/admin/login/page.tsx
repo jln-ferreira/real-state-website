@@ -12,7 +12,7 @@ function SubmitButton() {
       disabled={pending}
       className="w-full py-2.5 bg-[#1E3A5F] text-white font-semibold rounded-xl text-sm hover:bg-[#141d3a] transition-colors disabled:opacity-60"
     >
-      {pending ? 'Signing in...' : 'Sign in'}
+      {pending ? 'Entrando...' : 'Entrar'}
     </button>
   )
 }
@@ -28,13 +28,13 @@ export default function LoginPage() {
           <svg className="h-7 w-7 text-[#1E3A5F]" fill="currentColor" viewBox="0 0 24 24">
             <path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z" />
           </svg>
-          <span className="text-xl font-bold text-[#1E3A5F]">EstateFind Admin</span>
+          <span className="text-xl font-bold text-[#1E3A5F]">Casa Baccarat Admin</span>
         </div>
-        <p className="text-sm text-neutral-500 mb-6">Sign in to manage listings</p>
+        <p className="text-sm text-neutral-500 mb-6">Entrar para gerenciar anúncios</p>
 
         <form action={formAction} className="space-y-4">
           <div>
-            <label className="block text-sm font-medium text-neutral-700 mb-1">Username</label>
+            <label className="block text-sm font-medium text-neutral-700 mb-1">Usuário</label>
             <input
               name="username"
               type="text"
@@ -44,7 +44,7 @@ export default function LoginPage() {
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-neutral-700 mb-1">Password</label>
+            <label className="block text-sm font-medium text-neutral-700 mb-1">Senha</label>
             <div className="relative">
               <input
                 name="password"
