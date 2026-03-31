@@ -1,0 +1,24 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(find C:Usersjln-fProjectsreal-estate-catalog -type f ! -path */node_modules/* ! -path */.next/*)",
+      "Bash(npx tsc:*)",
+      "Bash(git init:*)",
+      "Bash(git add:*)",
+      "Bash(git -C \"C:/Users/jln-f/Projects/real-estate-catalog\" remote add origin https://github.com/jln-ferreira/real-state-website.git)",
+      "Bash(git -C \"C:/Users/jln-f/Projects/real-estate-catalog\" push -u origin master)",
+      "Bash(find C:/Users/jln-f/Projects/real-estate-catalog/.claude/worktrees/agent-a118e003/app -name *.tsx -o -name *.ts)",
+      "Bash(find C:/Users/jln-f/Projects/real-estate-catalog/app -name *.tsx -o -name *.ts)",
+      "Bash(find C:/Users/jln-f/Projects/real-estate-catalog/components -name *.tsx)",
+      "Bash(npm install:*)",
+      "Bash(mkdir -p \"C:/Users/jln-f/Projects/real-estate-catalog/.claude/worktrees/agent-a118e003/app/api/auth/[...nextauth]\")",
+      "Bash(mkdir -p \"C:/Users/jln-f/Projects/real-estate-catalog/.claude/worktrees/agent-a118e003/app/api/admin/properties/[id]/duplicate\")",
+      "Bash(mkdir -p \"C:/Users/jln-f/Projects/real-estate-catalog/.claude/worktrees/agent-a118e003/app/admin/properties/[id]\")",
+      "Bash(mkdir -p \"C:/Users/jln-f/Projects/real-estate-catalog/.claude/worktrees/agent-a118e003/app/property/[id]\")",
+      "Bash(node -e \"require\\(''@libsql/client''\\)\")",
+      "Bash(wc:*)",
+      "Bash(npm run:*)",
+      "Bash(ls .env*)"
+    ]
+  }
+}

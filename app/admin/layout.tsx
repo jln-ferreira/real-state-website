@@ -6,8 +6,33 @@ import { usePathname } from 'next/navigation'
 import { signOut } from 'next-auth/react'
 
 const NAV_ITEMS = [
-  { label: 'Painel',           href: '/admin' },
-  { label: 'Log de Auditoria', href: '/admin/audit' },
+  {
+    label: 'Imóveis',
+    href: '/admin/properties',
+    icon: (
+      <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" strokeWidth={1.8} stroke="currentColor">
+        <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 12l8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25" />
+      </svg>
+    ),
+  },
+  {
+    label: 'Blog',
+    href: '/admin/blog',
+    icon: (
+      <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" strokeWidth={1.8} stroke="currentColor">
+        <path strokeLinecap="round" strokeLinejoin="round" d="M12 7.5h1.5m-1.5 3h1.5m-7.5 3h7.5m-7.5 3h7.5m3-9h3.375c.621 0 1.125.504 1.125 1.125V18a2.25 2.25 0 01-2.25 2.25M16.5 7.5V18a2.25 2.25 0 002.25 2.25M16.5 7.5V4.875c0-.621-.504-1.125-1.125-1.125H4.125C3.504 3.75 3 4.254 3 4.875V18a2.25 2.25 0 002.25 2.25h13.5M6 7.5h3v3H6v-3z" />
+      </svg>
+    ),
+  },
+  {
+    label: 'Log de Auditoria',
+    href: '/admin/audit',
+    icon: (
+      <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" strokeWidth={1.8} stroke="currentColor">
+        <path strokeLinecap="round" strokeLinejoin="round" d="M9 12h3.75M9 15h3.75M9 18h3.75m3 .75H18a2.25 2.25 0 002.25-2.25V6.108c0-1.135-.845-2.098-1.976-2.192a48.424 48.424 0 00-1.123-.08m-5.801 0c-.065.21-.1.433-.1.664 0 .414.336.75.75.75h4.5a.75.75 0 00.75-.75 2.25 2.25 0 00-.1-.664m-5.8 0A2.251 2.251 0 0113.5 2.25H15c1.012 0 1.867.668 2.15 1.586m-5.8 0c-.376.023-.75.05-1.124.08C9.095 4.01 8.25 4.973 8.25 6.108V8.25m0 0H4.875c-.621 0-1.125.504-1.125 1.125v11.25c0 .621.504 1.125 1.125 1.125h9.75c.621 0 1.125-.504 1.125-1.125V9.375c0-.621-.504-1.125-1.125-1.125H8.25zM6.75 12h.008v.008H6.75V12zm0 3h.008v.008H6.75V15zm0 3h.008v.008H6.75V18z" />
+      </svg>
+    ),
+  },
 ]
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
@@ -19,39 +44,43 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   }
 
   return (
-    <div className="flex h-screen overflow-hidden bg-neutral-50">
+    <div className="flex h-screen overflow-hidden bg-[#F7F7FA]">
 
       {/* ── Mobile overlay ─────────────────────────────────────────────────── */}
       {open && (
         <div
           aria-hidden="true"
           onClick={() => setOpen(false)}
-          className="fixed inset-0 z-30 bg-black/40 md:hidden"
+          className="fixed inset-0 z-30 bg-black/30 md:hidden"
         />
       )}
 
-      {/* ── Sidebar ────────────────────────────────────────────────────────── */}
+      {/* ── Sidebar — light theme ───────────────────────────────────────────── */}
       <aside className={[
-        'fixed inset-y-0 left-0 z-40 w-64 flex-shrink-0 bg-[#1E3A5F] text-white flex flex-col',
+        'fixed inset-y-0 left-0 z-40 w-60 flex-shrink-0 bg-white flex flex-col',
         'transition-transform duration-300 ease-in-out',
         'md:static md:translate-x-0',
         open ? 'translate-x-0' : '-translate-x-full',
-      ].join(' ')}>
-
-        <div className="p-6 border-b border-white/10 flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <svg className="h-6 w-6 text-white" fill="currentColor" viewBox="0 0 24 24">
-              <path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z" />
-            </svg>
+      ].join(' ')}
+      style={{ borderRight: '1px solid #E6E6EF' }}
+      >
+        {/* Logo */}
+        <div className="px-5 py-5 flex items-center justify-between"
+             style={{ borderBottom: '1px solid #E6E6EF' }}>
+          <div className="flex items-center gap-2.5">
+            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-[#6D6D85]">
+              <svg className="h-4 w-4 text-white" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z" />
+              </svg>
+            </div>
             <div>
-              <p className="font-bold text-sm leading-tight">Casa Baccarat</p>
-              <p className="text-[10px] text-white/50 leading-tight">Painel Admin</p>
+              <p className="font-bold text-sm text-[#2E2E3A] leading-tight">Casa Baccarat</p>
+              <p className="text-[10px] text-[#A3A3C2] leading-tight">Painel Admin</p>
             </div>
           </div>
-          {/* Close button — mobile only */}
           <button
             onClick={() => setOpen(false)}
-            className="md:hidden text-white/60 hover:text-white transition-colors"
+            className="md:hidden text-[#A3A3C2] hover:text-[#6D6D85] transition-colors"
             aria-label="Fechar menu"
           >
             <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
@@ -60,26 +89,45 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           </button>
         </div>
 
-        <nav className="flex-1 px-3 py-4 space-y-1">
-          <p className="text-[10px] font-bold uppercase tracking-widest text-white/40 px-3 mb-2">Menu</p>
-          {NAV_ITEMS.map(item => (
-            <Link
-              key={item.href}
-              href={item.href}
-              onClick={() => setOpen(false)}
-              className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-white/70 hover:bg-white/5 hover:text-white text-sm transition-colors"
-            >
-              {item.label}
-            </Link>
-          ))}
+        {/* Nav */}
+        <nav className="flex-1 px-3 py-4 space-y-0.5 overflow-y-auto">
+          <p className="text-[10px] font-bold uppercase tracking-widest text-[#A3A3C2] px-3 mb-3">
+            Menu
+          </p>
+          {NAV_ITEMS.map(item => {
+            const active = pathname.startsWith(item.href)
+            return (
+              <Link
+                key={item.href}
+                href={item.href}
+                onClick={() => setOpen(false)}
+                className={[
+                  'flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm transition-colors duration-150',
+                  active
+                    ? 'bg-[#6D6D85]/10 text-[#4F4F6B] font-semibold'
+                    : 'text-[#6D6D85] hover:bg-[#F7F7FA] hover:text-[#4F4F6B]',
+                ].join(' ')}
+              >
+                <span className={active ? 'text-[#6D6D85]' : 'text-[#A3A3C2]'}>
+                  {item.icon}
+                </span>
+                {item.label}
+              </Link>
+            )
+          })}
         </nav>
 
-        <div className="p-4 border-t border-white/10 flex items-center gap-3">
-          <div className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center text-sm font-bold flex-shrink-0">A</div>
-          <span className="text-sm font-medium flex-1">Admin</span>
+        {/* User area */}
+        <div className="p-4 flex items-center gap-3"
+             style={{ borderTop: '1px solid #E6E6EF', background: '#F7F7FA' }}>
+          <div className="w-8 h-8 rounded-full bg-[#6D6D85]/15 flex items-center justify-center
+                          text-sm font-bold text-[#4F4F6B] flex-shrink-0">
+            A
+          </div>
+          <span className="text-sm font-medium text-[#2E2E3A] flex-1">Admin</span>
           <button
             onClick={() => signOut({ callbackUrl: '/admin/login' })}
-            className="text-white/60 hover:text-white transition-colors text-xs"
+            className="text-[#A3A3C2] hover:text-[#6D6D85] transition-colors text-xs"
           >
             Sair
           </button>
@@ -90,25 +138,30 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       <div className="flex-1 flex flex-col overflow-hidden min-w-0">
 
         {/* Mobile top bar */}
-        <header className="md:hidden flex items-center gap-3 px-4 py-3 bg-white border-b border-neutral-100 flex-shrink-0">
+        <header className="md:hidden flex items-center gap-3 px-4 py-3 bg-white flex-shrink-0"
+                style={{ borderBottom: '1px solid #E6E6EF' }}>
           <button
             onClick={() => setOpen(true)}
             aria-label="Abrir menu"
-            className="p-2 rounded-lg text-neutral-600 hover:bg-neutral-100 transition-colors"
+            className="p-2 rounded-xl text-[#6D6D85] hover:bg-[#F7F7FA] transition-colors"
           >
             <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
             </svg>
           </button>
           <div className="flex items-center gap-2">
-            <svg className="h-5 w-5 text-[#1E3A5F]" fill="currentColor" viewBox="0 0 24 24">
-              <path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z" />
-            </svg>
-            <span className="font-bold text-sm text-[#1E3A5F]">Casa Baccarat Admin</span>
+            <div className="flex h-6 w-6 items-center justify-center rounded-md bg-[#6D6D85]">
+              <svg className="h-3.5 w-3.5 text-white" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z" />
+              </svg>
+            </div>
+            <span className="font-bold text-sm text-[#2E2E3A]">Casa Baccarat Admin</span>
           </div>
         </header>
 
-        <div className="flex-1 overflow-y-auto p-4 sm:p-6">{children}</div>
+        <div className="flex-1 overflow-y-auto p-4 sm:p-6">
+          <div key={pathname} className="animate-page-in">{children}</div>
+        </div>
       </div>
     </div>
   )

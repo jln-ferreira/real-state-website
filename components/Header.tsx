@@ -1,63 +1,99 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import Link from 'next/link'
+import { usePathname } from 'next/navigation'
 import MobileMenu from './MobileMenu'
 
 const NAV_LINKS = [
-  { label: 'Início',   href: '#home' },
-  { label: 'Anúncios', href: '#listings' },
-  { label: 'Contato',  href: '#contact' },
+  { label: 'Início',   hash: 'home'     },
+  { label: 'Anúncios', hash: 'listings'  },
+  { label: 'Contato',  hash: 'contact'   },
 ]
 
 export default function Header() {
   const [menuOpen, setMenuOpen] = useState(false)
+  const [scrolled, setScrolled] = useState(false)
+  const pathname = usePathname()
+  const isHome   = pathname === '/'
 
-  const handleNavClick = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 12)
+    // Set initial state in case the page loads mid-scroll
+    onScroll()
+    window.addEventListener('scroll', onScroll, { passive: true })
+    return () => window.removeEventListener('scroll', onScroll)
+  }, [])
+
+  function handleHashNav(e: React.MouseEvent<HTMLAnchorElement>, hash: string) {
+    if (!isHome) return
     e.preventDefault()
-    if (href === '#home') {
+    if (hash === 'home') {
       window.scrollTo({ top: 0, behavior: 'smooth' })
     } else {
-      document.querySelector(href)?.scrollIntoView({ behavior: 'smooth' })
+      document.getElementById(hash)?.scrollIntoView({ behavior: 'smooth' })
+    }
+  }
+
+  function handleLogoClick(e: React.MouseEvent<HTMLAnchorElement>) {
+    if (isHome) {
+      e.preventDefault()
+      window.scrollTo({ top: 0, behavior: 'smooth' })
     }
   }
 
   return (
     <>
-      <header className="fixed top-0 inset-x-0 z-30 bg-white shadow-sm border-b border-slate-100">
+      <header
+        className={[
+          'fixed top-0 inset-x-0 z-30 bg-white',
+          'transition-[padding,box-shadow] duration-300 ease-in-out',
+          scrolled
+            ? 'py-0 shadow-[0_1px_0_0_#E6E6EF]'
+            : 'py-3 shadow-[0_4px_24px_rgba(0,0,0,0.06)]',
+        ].join(' ')}
+      >
         <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
 
           {/* Logo */}
           <a
-            href="#home"
-            onClick={e => handleNavClick(e, '#home')}
+            href="/"
+            onClick={handleLogoClick}
             className="flex items-center gap-2 shrink-0"
           >
-            <svg className="h-7 w-7 text-[#1a56db]" fill="currentColor" viewBox="0 0 24 24">
+            <svg className="h-7 w-7 text-[#6D6D85]" fill="currentColor" viewBox="0 0 24 24">
               <path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z" />
             </svg>
-            <span className="text-xl font-bold tracking-tight text-slate-900">
-              Casa <span className="text-[#1a56db]">Baccarat</span>
+            <span className="text-xl font-bold tracking-tight text-[#2E2E3A]">
+              Casa <span className="text-[#6D6D85]">Baccarat</span>
             </span>
           </a>
 
           {/* Desktop nav */}
           <nav className="hidden md:flex items-center gap-1">
-            {NAV_LINKS.map(({ label, href }) => (
+            {NAV_LINKS.map(({ label, hash }) => (
               <a
-                key={href}
-                href={href}
-                onClick={e => handleNavClick(e, href)}
-                className="rounded-lg px-3 py-2 text-sm font-medium text-slate-600
-                           hover:text-[#1a56db] hover:bg-slate-50 transition-colors"
+                key={hash}
+                href={isHome ? `#${hash}` : `/#${hash}`}
+                onClick={e => handleHashNav(e, hash)}
+                className="rounded-lg px-3 py-2 text-sm font-medium text-[#6D6D85]
+                           hover:text-[#4F4F6B] hover:bg-[#F7F7FA] transition-colors"
               >
                 {label}
               </a>
             ))}
+            <Link
+              href="/blog"
+              className="rounded-lg px-3 py-2 text-sm font-medium text-[#6D6D85]
+                         hover:text-[#4F4F6B] hover:bg-[#F7F7FA] transition-colors"
+            >
+              Blog
+            </Link>
             <a
-              href="#listings"
-              onClick={e => handleNavClick(e, '#listings')}
-              className="ml-3 rounded-xl bg-[#1a56db] px-4 py-2 text-sm font-semibold
-                         text-white hover:bg-[#1e429f] transition-colors shadow-sm"
+              href={isHome ? '#listings' : '/#listings'}
+              onClick={e => handleHashNav(e, 'listings')}
+              className="ml-3 rounded-xl bg-[#6D6D85] px-4 py-2 text-sm font-semibold
+                         text-white hover:bg-[#585874] transition-colors duration-200 shadow-sm"
             >
               Ver Imóveis
             </a>
@@ -67,7 +103,7 @@ export default function Header() {
           <button
             onClick={() => setMenuOpen(true)}
             aria-label="Abrir menu"
-            className="md:hidden rounded-lg p-2 text-slate-700 hover:bg-slate-100 transition-colors"
+            className="md:hidden rounded-lg p-2 text-[#6D6D85] hover:bg-[#F7F7FA] transition-colors"
           >
             <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" strokeWidth={1.8} stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
@@ -76,7 +112,7 @@ export default function Header() {
         </div>
       </header>
 
-      <MobileMenu isOpen={menuOpen} onClose={() => setMenuOpen(false)} />
+      <MobileMenu isOpen={menuOpen} onClose={() => setMenuOpen(false)} isHome={isHome} />
     </>
   )
 }

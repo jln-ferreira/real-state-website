@@ -35,7 +35,7 @@ export default function PropertyForm({ property: initial }: { property?: Propert
   const router = useRouter()
   const isEdit = !!initial
   const [form, setForm] = useState<Property>(initial ?? emptyProperty())
-  const [activeTab, setActiveTab] = useState<Tab>('Basic Info')
+  const [activeTab, setActiveTab] = useState<Tab>('Info Básica')
   const [isSaving, setIsSaving] = useState(false)
   const [saveState, setSaveState] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle')
   const [errors, setErrors] = useState<Record<string, string>>({})

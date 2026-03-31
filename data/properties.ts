@@ -436,8 +436,7 @@ export const RESIDENTIAL_OPTIONS: string[] = [
 export interface Filters {
   negocio:     'all' | PriceType
   tipo:        'all' | PropertyType
-  valorMin:    string   // raw digit string, e.g. "500000"
-  valorMax:    string
+  valorMax:    string   // raw digit string, e.g. "1500000"
   residential: string   // 'all' | specific residential name
   ref:         string
   bedrooms:    number   // 0 = any
@@ -450,7 +449,6 @@ export interface Filters {
 export const DEFAULT_FILTERS: Filters = {
   negocio:     'all',
   tipo:        'all',
-  valorMin:    '',
   valorMax:    '',
   residential: 'all',
   ref:         '',
@@ -467,7 +465,6 @@ export function applyFilters(properties: Property[], f: Filters): Property[] {
   return properties.filter(p => {
     if (f.negocio !== 'all' && p.price.type !== f.negocio) return false
     if (f.tipo    !== 'all' && p.propertyDetails.type !== f.tipo) return false
-    if (f.valorMin && p.price.amount < Number(f.valorMin)) return false
     if (f.valorMax && p.price.amount > Number(f.valorMax)) return false
     if (f.residential !== 'all' && p.location.residential !== f.residential) return false
     if (f.ref && !p.id.toLowerCase().includes(f.ref.toLowerCase())) return false

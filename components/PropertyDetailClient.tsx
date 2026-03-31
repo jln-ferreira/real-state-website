@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import Link from 'next/link'
 import type { Property } from '@/data/properties'
 import { PROPERTIES, sqftToM2 } from '@/data/properties'
@@ -114,15 +114,53 @@ export default function PropertyDetailClient({ property }: { property: Property 
     email:   '',
     message: `Olá, tenho interesse no imóvel ${property.title} (${property.id}) que encontrei no seu site.`,
   })
+  const [shareOpen,   setShareOpen]   = useState(false)
+  const [linkCopied,  setLinkCopied]  = useState(false)
+  const [formStatus,  setFormStatus]  = useState<'idle' | 'sending' | 'success' | 'error'>('idle')
+  const shareRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    function handleClickOutside(e: MouseEvent) {
+      if (shareRef.current && !shareRef.current.contains(e.target as Node)) {
+        setShareOpen(false)
+      }
+    }
+    if (shareOpen) document.addEventListener('mousedown', handleClickOutside)
+    return () => document.removeEventListener('mousedown', handleClickOutside)
+  }, [shareOpen])
+
+  function getPageUrl() {
+    return typeof window !== 'undefined' ? window.location.href : ''
+  }
+
+  function copyLink() {
+    navigator.clipboard.writeText(getPageUrl()).then(() => {
+      setLinkCopied(true)
+      setTimeout(() => setLinkCopied(false), 2000)
+    })
+  }
+
+  const shareText = encodeURIComponent(`${property.title} — Casa Baccarat`)
+  const shareUrl  = encodeURIComponent(getPageUrl())
 
   function openLightbox(i: number) {
     setLightboxIndex(i)
     setLightboxOpen(true)
   }
 
-  function handleSubmit(e: React.FormEvent) {
+  async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
-    console.log('Contact form submitted:', formData)
+    setFormStatus('sending')
+    try {
+      const res = await fetch('/api/contact', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ ...formData, propertyId: property.id }),
+      })
+      setFormStatus(res.ok ? 'success' : 'error')
+    } catch {
+      setFormStatus('error')
+    }
   }
 
   return (
@@ -138,10 +176,71 @@ export default function PropertyDetailClient({ property }: { property: Property 
             <ArrowLeftIcon className="w-4 h-4" />
             Voltar
           </Link>
-          <div className="flex items-center gap-2">
-            <button className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-neutral-200 text-sm text-neutral-600 hover:bg-neutral-50 transition-colors">
+          <div className="relative flex items-center gap-2" ref={shareRef}>
+            <button
+              onClick={() => setShareOpen(o => !o)}
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-neutral-200 text-sm text-neutral-600 hover:bg-neutral-50 transition-colors"
+            >
               <ShareIcon className="w-4 h-4" /> Compartilhar
             </button>
+
+            {shareOpen && (
+              <div className="absolute right-0 top-full mt-2 w-52 bg-white rounded-xl shadow-lg border border-neutral-100 py-1 z-50">
+                <a
+                  href={`https://wa.me/?text=${shareText}%20${shareUrl}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-3 px-4 py-2.5 text-sm text-neutral-700 hover:bg-neutral-50"
+                  onClick={() => setShareOpen(false)}
+                >
+                  <span className="text-[#25D366] w-4 h-4 shrink-0">
+                    <svg viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.025.507 3.94 1.404 5.617L0 24l6.532-1.384A11.945 11.945 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.818a9.818 9.818 0 01-5.017-1.373l-.36-.213-3.732.979.995-3.641-.234-.374A9.818 9.818 0 1112 21.818z"/></svg>
+                  </span>
+                  WhatsApp
+                </a>
+                <a
+                  href={`https://www.facebook.com/sharer/sharer.php?u=${shareUrl}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-3 px-4 py-2.5 text-sm text-neutral-700 hover:bg-neutral-50"
+                  onClick={() => setShareOpen(false)}
+                >
+                  <span className="text-[#1877F2] w-4 h-4 shrink-0">
+                    <svg viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4"><path d="M24 12.073C24 5.405 18.627 0 12 0S0 5.405 0 12.073c0 6.023 4.388 11.018 10.125 11.927v-8.437H7.078v-3.49h3.047V9.428c0-3.018 1.793-4.684 4.533-4.684 1.313 0 2.686.236 2.686.236v2.964h-1.513c-1.491 0-1.956.93-1.956 1.883v2.246h3.328l-.532 3.49h-2.796V24C19.612 23.091 24 18.096 24 12.073z"/></svg>
+                  </span>
+                  Facebook
+                </a>
+                <a
+                  href={`https://twitter.com/intent/tweet?text=${shareText}&url=${shareUrl}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-3 px-4 py-2.5 text-sm text-neutral-700 hover:bg-neutral-50"
+                  onClick={() => setShareOpen(false)}
+                >
+                  <span className="text-neutral-900 w-4 h-4 shrink-0">
+                    <svg viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.746l7.73-8.835L1.254 2.25H8.08l4.259 5.631L18.244 2.25zm-1.161 17.52h1.833L7.084 4.126H5.117L17.083 19.77z"/></svg>
+                  </span>
+                  X (Twitter)
+                </a>
+                <a
+                  href={`mailto:?subject=${shareText}&body=Confira este imóvel: ${getPageUrl()}`}
+                  className="flex items-center gap-3 px-4 py-2.5 text-sm text-neutral-700 hover:bg-neutral-50"
+                  onClick={() => setShareOpen(false)}
+                >
+                  <svg className="w-4 h-4 text-neutral-500 shrink-0" fill="none" viewBox="0 0 24 24" strokeWidth={1.8} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25h-15a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25m19.5 0v.243a2.25 2.25 0 01-1.07 1.916l-7.5 4.615a2.25 2.25 0 01-2.36 0L3.32 8.91a2.25 2.25 0 01-1.07-1.916V6.75" /></svg>
+                  E-mail
+                </a>
+                <div className="border-t border-neutral-100 mt-1 pt-1">
+                  <button
+                    onClick={copyLink}
+                    className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-neutral-700 hover:bg-neutral-50"
+                  >
+                    <svg className="w-4 h-4 text-neutral-500 shrink-0" fill="none" viewBox="0 0 24 24" strokeWidth={1.8} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="M13.19 8.688a4.5 4.5 0 011.242 7.244l-4.5 4.5a4.5 4.5 0 01-6.364-6.364l1.757-1.757m13.35-.622l1.757-1.757a4.5 4.5 0 00-6.364-6.364l-4.5 4.5a4.5 4.5 0 001.242 7.244" /></svg>
+                    {linkCopied ? 'Link copiado!' : 'Copiar link'}
+                  </button>
+                </div>
+              </div>
+            )}
           </div>
         </div>
       </div>
@@ -299,46 +398,67 @@ export default function PropertyDetailClient({ property }: { property: Property 
                   </p>
                 </div>
 
-                <form className="space-y-2" onSubmit={handleSubmit}>
-                  <input
-                    type="text"
-                    placeholder="Seu nome *"
-                    required
-                    value={formData.name}
-                    onChange={e => setFormData(d => ({ ...d, name: e.target.value }))}
-                    className="w-full px-3 py-2.5 rounded-lg bg-neutral-100 border-0 text-sm focus:ring-2 focus:ring-[#1E3A5F]/30 outline-none"
-                  />
-                  <div className="flex gap-2">
-                    <span className="px-3 py-2.5 rounded-lg bg-neutral-100 text-sm text-neutral-500">🇨🇦</span>
-                    <input
-                      type="tel"
-                      placeholder="(000) 000-0000"
-                      value={formData.phone}
-                      onChange={e => setFormData(d => ({ ...d, phone: e.target.value }))}
-                      className="flex-1 px-3 py-2.5 rounded-lg bg-neutral-100 border-0 text-sm focus:ring-2 focus:ring-[#1E3A5F]/30 outline-none"
-                    />
+                {formStatus === 'success' ? (
+                  <div className="py-6 text-center space-y-2">
+                    <div className="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center mx-auto">
+                      <svg className="w-5 h-5 text-green-600" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" /></svg>
+                    </div>
+                    <p className="text-sm font-semibold text-neutral-900">Mensagem enviada!</p>
+                    <p className="text-xs text-neutral-500">Entraremos em contato em breve.</p>
+                    <button
+                      onClick={() => { setFormStatus('idle'); setFormData(d => ({ ...d, name: '', phone: '', email: '' })) }}
+                      className="text-xs text-[#1E3A5F] underline underline-offset-2 mt-1"
+                    >
+                      Enviar outra mensagem
+                    </button>
                   </div>
-                  <input
-                    type="email"
-                    placeholder="Seu e-mail"
-                    value={formData.email}
-                    onChange={e => setFormData(d => ({ ...d, email: e.target.value }))}
-                    className="w-full px-3 py-2.5 rounded-lg bg-neutral-100 border-0 text-sm focus:ring-2 focus:ring-[#1E3A5F]/30 outline-none"
-                  />
-                  <textarea
-                    rows={3}
-                    placeholder="Olá, tenho interesse neste imóvel..."
-                    value={formData.message}
-                    onChange={e => setFormData(d => ({ ...d, message: e.target.value }))}
-                    className="w-full px-3 py-2.5 rounded-lg bg-neutral-100 border-0 text-sm resize-none focus:ring-2 focus:ring-[#1E3A5F]/30 outline-none"
-                  />
-                  <button
-                    type="submit"
-                    className="w-full py-2.5 bg-[#1E3A5F] text-white font-semibold rounded-lg hover:bg-[#141d3a] transition-colors"
-                  >
-                    Enviar mensagem
-                  </button>
-                </form>
+                ) : (
+                  <form className="space-y-2" onSubmit={handleSubmit}>
+                    <input
+                      type="text"
+                      placeholder="Seu nome *"
+                      required
+                      value={formData.name}
+                      onChange={e => setFormData(d => ({ ...d, name: e.target.value }))}
+                      className="w-full px-3 py-2.5 rounded-lg bg-neutral-100 border-0 text-sm focus:ring-2 focus:ring-[#1E3A5F]/30 outline-none"
+                    />
+                    <div className="flex gap-2">
+                      <span className="px-3 py-2.5 rounded-lg bg-neutral-100 text-sm text-neutral-500">Tel</span>
+                      <input
+                        type="tel"
+                        placeholder=""
+                        value={formData.phone}
+                        onChange={e => setFormData(d => ({ ...d, phone: e.target.value }))}
+                        className="flex-1 px-3 py-2.5 rounded-lg bg-neutral-100 border-0 text-sm focus:ring-2 focus:ring-[#1E3A5F]/30 outline-none"
+                      />
+                    </div>
+                    <input
+                      type="email"
+                      placeholder="Seu e-mail *"
+                      required
+                      value={formData.email}
+                      onChange={e => setFormData(d => ({ ...d, email: e.target.value }))}
+                      className="w-full px-3 py-2.5 rounded-lg bg-neutral-100 border-0 text-sm focus:ring-2 focus:ring-[#1E3A5F]/30 outline-none"
+                    />
+                    <textarea
+                      rows={3}
+                      placeholder="Olá, tenho interesse neste imóvel..."
+                      value={formData.message}
+                      onChange={e => setFormData(d => ({ ...d, message: e.target.value }))}
+                      className="w-full px-3 py-2.5 rounded-lg bg-neutral-100 border-0 text-sm resize-none focus:ring-2 focus:ring-[#1E3A5F]/30 outline-none"
+                    />
+                    {formStatus === 'error' && (
+                      <p className="text-xs text-red-500">Algo deu errado. Tente novamente.</p>
+                    )}
+                    <button
+                      type="submit"
+                      disabled={formStatus === 'sending'}
+                      className="w-full py-2.5 bg-[#1E3A5F] text-white font-semibold rounded-lg hover:bg-[#141d3a] transition-colors disabled:opacity-60"
+                    >
+                      {formStatus === 'sending' ? 'Enviando...' : 'Enviar mensagem'}
+                    </button>
+                  </form>
+                )}
               </div>
 
             </div>

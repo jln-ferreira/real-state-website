@@ -61,7 +61,7 @@ const NAV_LINKS = [
 
 const COMPANY_LINKS = [
   { label: 'Sobre Nós', href: '#' },
-  { label: 'Blog',      href: '#' },
+  { label: 'Blog',      href: '/blog' },
 ]
 
 // ── Legal links for bottom bar ────────────────────────────────────────────────
@@ -93,11 +93,11 @@ export default function Footer() {
           <div className="flex flex-col items-center gap-4 sm:items-start">
             {/* Logo */}
             <a href="#home" aria-label="Casa Baccarat início" className="flex items-center gap-2 w-fit">
-              <svg className="h-7 w-7 text-[#1a56db]" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+              <svg className="h-7 w-7 text-[#6D6D85]" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                 <path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z" />
               </svg>
               <span className="text-xl font-bold tracking-tight text-white">
-                Casa <span className="text-[#1a56db]">Baccarat</span>
+                Casa <span className="text-[#6D6D85]">Baccarat</span>
               </span>
             </a>
 
@@ -130,9 +130,9 @@ export default function Footer() {
             <ul className="flex flex-col gap-3" role="list">
               {COMPANY_LINKS.map(({ label, href }) => (
                 <li key={label}>
-                  <a href={href} className={linkCls}>
+                  <Link href={href} className={linkCls}>
                     {label}
-                  </a>
+                  </Link>
                 </li>
               ))}
             </ul>
@@ -189,7 +189,7 @@ export default function Footer() {
                   href={href}
                   aria-label={label}
                   className="flex h-9 w-9 items-center justify-center rounded-lg bg-slate-800
-                             text-slate-400 transition-all duration-200 hover:bg-[#1a56db]
+                             text-slate-400 transition-all duration-200 hover:bg-[#6D6D85]
                              hover:text-white hover:scale-110"
                 >
                   {icon}
