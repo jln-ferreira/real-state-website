@@ -11,10 +11,11 @@ export function getDb(): Client {
   return _db
 }
 
-/** @deprecated use getDb() */
 export const db = new Proxy({} as Client, {
   get(_t, prop) {
-    return (getDb() as unknown as Record<string | symbol, unknown>)[prop]
+    const client = getDb()
+    const value = (client as unknown as Record<string | symbol, unknown>)[prop]
+    return typeof value === 'function' ? (value as (...a: unknown[]) => unknown).bind(client) : value
   },
 })
 
