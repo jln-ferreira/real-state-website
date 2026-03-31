@@ -7,8 +7,8 @@ export default async function Home() {
   let properties: Property[] = []
   try {
     properties = await getProperties()
-  } catch {
-    // DB unavailable — render with empty list
+  } catch (err) {
+    console.error('Failed to load properties from DB:', err)
   }
   return (
     <Layout>

@@ -1,9 +1,35 @@
 import { db } from './db'
 import type { Property } from '@/data/properties'
 
+async function ensureTable() {
+  await db.execute(`
+    CREATE TABLE IF NOT EXISTS properties (
+      id TEXT PRIMARY KEY,
+      data TEXT NOT NULL,
+      created_at TEXT NOT NULL DEFAULT (datetime('now')),
+      updated_at TEXT NOT NULL DEFAULT (datetime('now'))
+    )
+  `)
+}
+
 export async function getProperties(): Promise<Property[]> {
+  await ensureTable()
   const result = await db.execute('SELECT data FROM properties ORDER BY created_at DESC')
-  return result.rows.map(row => JSON.parse(row.data as string))
+  const properties = result.rows.map(row => JSON.parse(row.data as string) as Property)
+
+  // Auto-seed static properties on first run
+  if (properties.length === 0) {
+    const { PROPERTIES } = await import('@/data/properties')
+    for (const p of PROPERTIES) {
+      await db.execute({
+        sql: 'INSERT OR IGNORE INTO properties (id, data) VALUES (?, ?)',
+        args: [p.id, JSON.stringify(p)],
+      })
+    }
+    return PROPERTIES
+  }
+
+  return properties
 }
 
 export async function getPropertyById(id: string): Promise<Property | null> {

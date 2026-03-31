@@ -201,7 +201,7 @@ function AdvancedInput({
 
 // ── HeroSection ────────────────────────────────────────────────────────────────
 
-function HeroSection({ filters, onChange }: { filters: Filters; onChange: (f: Filters) => void }) {
+function HeroSection({ filters, onChange, totalCount }: { filters: Filters; onChange: (f: Filters) => void; totalCount: number }) {
   const [expanded, setExpanded] = useState(false)
   const set = (patch: Partial<Filters>) => onChange({ ...filters, ...patch })
 
@@ -270,7 +270,7 @@ function HeroSection({ filters, onChange }: { filters: Filters; onChange: (f: Fi
                 </svg>
               </button>
               <span className="text-sm text-[#A3A3C2]">
-                Mais de 250 imóveis disponíveis
+                {totalCount > 0 ? `${totalCount} imóveis disponíveis` : 'Imóveis disponíveis'}
               </span>
             </div>
           </div>
@@ -298,7 +298,7 @@ function HeroSection({ filters, onChange }: { filters: Filters; onChange: (f: Fi
               <p className="text-[10px] font-bold uppercase tracking-widest text-[#A3A3C2]">
                 Imóveis verificados
               </p>
-              <p className="mt-0.5 text-2xl font-extrabold text-[#2E2E3A]">250+</p>
+              <p className="mt-0.5 text-2xl font-extrabold text-[#2E2E3A]">{totalCount > 0 ? `${totalCount}+` : '—'}</p>
             </div>
             {/* Floating badge */}
             <div className="absolute top-5 right-5 rounded-xl bg-[#6D6D85] px-3 py-1.5">
@@ -517,7 +517,7 @@ export default function HomeClient({ initialProperties }: { initialProperties: P
 
   return (
     <>
-      <HeroSection filters={filters} onChange={setFilters} />
+      <HeroSection filters={filters} onChange={setFilters} totalCount={initialProperties.length} />
       <CatalogSection properties={initialProperties} filters={filters} onFiltersChange={setFilters} />
     </>
   )
