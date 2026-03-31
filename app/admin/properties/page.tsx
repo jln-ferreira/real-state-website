@@ -1,14 +1,13 @@
 import { getProperties } from '@/lib/properties'
-import { PROPERTIES } from '@/data/properties'
+import type { Property } from '@/data/properties'
 import PropertiesClient from './PropertiesClient'
 
 export default async function AdminPropertiesPage() {
-  let properties
+  let properties: Property[] = []
   try {
     properties = await getProperties()
-    if (properties.length === 0) properties = PROPERTIES
   } catch {
-    properties = PROPERTIES
+    properties = []
   }
   return <PropertiesClient initialProperties={properties} />
 }

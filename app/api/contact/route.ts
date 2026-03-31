@@ -14,8 +14,8 @@ export async function POST(req: Request) {
 
   await saveContactMessage(parsed.data)
 
-  await resend.emails.send({
-    from: 'Casa Baccarat <contato@casabaccarat.com>',
+  const { data: emailData, error: emailError } = await resend.emails.send({
+    from: 'Casa Baccarat <onboarding@resend.dev>',
     to: process.env.CONTACT_EMAIL!,
     replyTo: email,
     subject: `Nova mensagem de contato — ${propertyId}`,
@@ -29,5 +29,11 @@ export async function POST(req: Request) {
     `,
   })
 
+  if (emailError) {
+    console.error('Resend error:', emailError)
+    return NextResponse.json({ error: 'Falha ao enviar e-mail', detail: emailError }, { status: 500 })
+  }
+
+  console.log('Email sent:', emailData?.id)
   return NextResponse.json({ ok: true }, { status: 201 })
 }
