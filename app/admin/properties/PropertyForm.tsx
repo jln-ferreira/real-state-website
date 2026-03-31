@@ -7,10 +7,23 @@ import type { Property } from '@/data/properties'
 const TABS = ['Info Básica', 'Preço', 'Localização', 'Detalhes', 'Características', 'Mídia', 'Status & Agente'] as const
 type Tab = typeof TABS[number]
 
-const ALL_FEATURES = [
-  'balcony', 'parking', 'gym', 'pool', 'garden', 'furnished',
-  'pet-friendly', 'concierge', 'fireplace', 'rooftop',
-  'ev charging', 'storage', 'elevator', 'security', '24h security',
+const ALL_FEATURES: { value: string; label: string }[] = [
+  { value: 'baccarat',    label: 'Exclusivo Baccarat' },
+  { value: 'balcony',     label: 'Varanda'            },
+  { value: 'parking',     label: 'Estacionamento'     },
+  { value: 'gym',         label: 'Academia'           },
+  { value: 'pool',        label: 'Piscina'            },
+  { value: 'garden',      label: 'Jardim'             },
+  { value: 'furnished',   label: 'Mobiliado'          },
+  { value: 'pet-friendly',label: 'Aceita Pets'        },
+  { value: 'concierge',   label: 'Portaria'           },
+  { value: 'fireplace',   label: 'Lareira'            },
+  { value: 'rooftop',     label: 'Cobertura'          },
+  { value: 'ev charging', label: 'Carregador Elétrico'},
+  { value: 'storage',     label: 'Depósito'           },
+  { value: 'elevator',    label: 'Elevador'           },
+  { value: 'security',    label: 'Segurança'          },
+  { value: '24h security',label: 'Segurança 24h'      },
 ]
 
 function emptyProperty(): Property {
@@ -197,7 +210,7 @@ export default function PropertyForm({ property: initial }: { property?: Propert
             {isEdit && <span className="px-2.5 py-0.5 text-xs font-bold text-[#1E3A5F] bg-[#1E3A5F]/10 rounded-lg">{form.id}</span>}
           </div>
           {form.timestamps?.updatedAt && (
-            <p className="text-xs text-neutral-400 mt-0.5">Last updated: {new Date(form.timestamps.updatedAt).toLocaleString()}</p>
+            <p className="text-xs text-neutral-400 mt-0.5">Última atualização: {new Date(form.timestamps.updatedAt).toLocaleString('pt-BR')}</p>
           )}
         </div>
         <div className="flex items-center gap-2 flex-shrink-0">
@@ -262,10 +275,10 @@ export default function PropertyForm({ property: initial }: { property?: Propert
             <div>
               <label className="block text-xs font-semibold text-neutral-600 mb-1">Tipo de Transação <span className="text-red-500">*</span></label>
               <div className="flex gap-2">
-                {(['sale', 'rent'] as const).map(t => (
+                {([['sale', 'Venda'], ['rent', 'Aluguel']] as const).map(([t, label]) => (
                   <button key={t} type="button" onClick={() => set('price', { ...form.price, type: t })}
-                    className={`px-5 py-2 rounded-lg text-sm font-medium capitalize transition-colors ${form.price.type === t ? 'bg-[#1E3A5F] text-white' : 'bg-neutral-100 text-neutral-600 hover:bg-neutral-200'}`}>
-                    {t}
+                    className={`px-5 py-2 rounded-lg text-sm font-medium transition-colors ${form.price.type === t ? 'bg-[#1E3A5F] text-white' : 'bg-neutral-100 text-neutral-600 hover:bg-neutral-200'}`}>
+                    {label}
                   </button>
                 ))}
               </div>
@@ -310,9 +323,9 @@ export default function PropertyForm({ property: initial }: { property?: Propert
 
         {activeTab === 'Detalhes' && (
           <>
-            {(['bedrooms', 'bathrooms'] as const).map(key => (
+            {([['bedrooms', 'Quartos'], ['bathrooms', 'Banheiros']] as const).map(([key, label]) => (
               <div key={key}>
-                <label className="block text-xs font-semibold text-neutral-600 mb-1 capitalize">{key} <span className="text-red-500">*</span></label>
+                <label className="block text-xs font-semibold text-neutral-600 mb-1">{label} <span className="text-red-500">*</span></label>
                 <div className="flex items-center gap-3">
                   <button type="button" onClick={() => set('propertyDetails', { ...form.propertyDetails, [key]: Math.max(0, form.propertyDetails[key] - 1) })}
                     className="w-9 h-9 rounded-lg bg-neutral-100 hover:bg-neutral-200 flex items-center justify-center text-neutral-600 font-bold transition-colors">−</button>
@@ -331,15 +344,15 @@ export default function PropertyForm({ property: initial }: { property?: Propert
           <>
             <p className="text-xs text-neutral-500">Clique para selecionar características</p>
             <div className="flex flex-wrap gap-2">
-              {ALL_FEATURES.map(f => (
-                <button key={f} type="button" onClick={() => toggleFeature(f)}
-                  className={`px-3 py-1.5 rounded-full text-xs font-medium border transition-colors capitalize ${form.features.includes(f) ? 'bg-[#1E3A5F] text-white border-[#1E3A5F]' : 'bg-white text-neutral-600 border-neutral-200 hover:border-[#1E3A5F]'}`}>
-                  {f}
+              {ALL_FEATURES.map(({ value, label }) => (
+                <button key={value} type="button" onClick={() => toggleFeature(value)}
+                  className={`px-3 py-1.5 rounded-full text-xs font-medium border transition-colors ${form.features.includes(value) ? 'bg-[#1E3A5F] text-white border-[#1E3A5F]' : 'bg-white text-neutral-600 border-neutral-200 hover:border-[#1E3A5F]'}`}>
+                  {label}
                 </button>
               ))}
-              {form.features.filter(f => !ALL_FEATURES.includes(f)).map(f => (
+              {form.features.filter(f => !ALL_FEATURES.find(x => x.value === f)).map(f => (
                 <button key={f} type="button" onClick={() => toggleFeature(f)}
-                  className="px-3 py-1.5 rounded-full text-xs font-medium border bg-[#1E3A5F] text-white border-[#1E3A5F] capitalize">
+                  className="px-3 py-1.5 rounded-full text-xs font-medium border bg-[#1E3A5F] text-white border-[#1E3A5F]">
                   {f}
                 </button>
               ))}

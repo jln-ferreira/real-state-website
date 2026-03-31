@@ -1,7 +1,7 @@
 // ── Types ─────────────────────────────────────────────────────────────────────
 
 export type PropertyType = 'house' | 'apartment' | 'commercial' | 'land'
-export type Feature      = 'balcony' | 'parking' | 'gym' | 'pool' | 'garden' | 'furnished' | 'pet-friendly' | 'concierge'
+export type Feature      = 'balcony' | 'parking' | 'gym' | 'pool' | 'garden' | 'furnished' | 'pet-friendly' | 'concierge' | 'baccarat'
 export type PriceType    = 'sale' | 'rent'
 
 export interface Property {

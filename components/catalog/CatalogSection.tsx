@@ -30,6 +30,7 @@ const TIPO_LABELS: Record<string, string> = {
 const FEATURE_LABELS: Record<Feature, string> = {
   balcony: 'Varanda', parking: 'Estacionamento', gym: 'Academia', pool: 'Piscina',
   garden: 'Jardim', furnished: 'Mobiliado', 'pet-friendly': 'Aceita Pets', concierge: 'Portaria',
+  baccarat: 'Exclusivo Baccarat',
 }
 
 // ── Active filter chips ────────────────────────────────────────────────────────

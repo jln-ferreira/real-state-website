@@ -34,6 +34,7 @@ const FEATURE_OPTIONS: { value: Feature; label: string }[] = [
   { value: 'pool',         label: 'Piscina'        },
   { value: 'garden',       label: 'Jardim'         },
   { value: 'furnished',    label: 'Mobiliado'      },
+  { value: 'baccarat',     label: 'Exclusivo Baccarat' },
   { value: 'pet-friendly', label: 'Aceita Pets'    },
   { value: 'concierge',    label: 'Portaria'       },
 ]

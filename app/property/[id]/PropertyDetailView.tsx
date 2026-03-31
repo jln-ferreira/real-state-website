@@ -106,6 +106,25 @@ function ChevronRightIcon({ className }: { className?: string }) {
   )
 }
 
+const FEATURE_LABELS: Record<string, string> = {
+  balcony:      'Varanda',
+  parking:      'Estacionamento',
+  gym:          'Academia',
+  pool:         'Piscina',
+  garden:       'Jardim',
+  furnished:    'Mobiliado',
+  'pet-friendly': 'Aceita Pets',
+  concierge:    'Portaria',
+  baccarat:     'Exclusivo Baccarat',
+  fireplace:    'Lareira',
+  rooftop:      'Cobertura',
+  'ev charging':'Carregador Elétrico',
+  storage:      'Depósito',
+  elevator:     'Elevador',
+  security:     'Segurança',
+  '24h security':'Segurança 24h',
+}
+
 // ── View ───────────────────────────────────────────────────────────────────────
 
 export default function PropertyDetailView({ property, similarProperties }: { property: Property; similarProperties: Property[] }) {
@@ -354,8 +373,8 @@ export default function PropertyDetailView({ property, similarProperties }: { pr
                   <ul className="mt-3 space-y-1 not-prose">
                     {property.features.map(f => (
                       <li key={f} className="flex items-start gap-2">
-                        <span className="mt-1.5 w-1.5 h-1.5 rounded-full bg-[#C4785A] flex-shrink-0" />
-                        <span className="capitalize">{f}</span>
+                        <span className="mt-1.5 w-1.5 h-1.5 rounded-full bg-[#6D6D85] flex-shrink-0" />
+                        <span>{FEATURE_LABELS[f] ?? f}</span>
                       </li>
                     ))}
                   </ul>
@@ -398,7 +417,7 @@ export default function PropertyDetailView({ property, similarProperties }: { pr
                   <p className="text-2xl font-bold text-[#1E3A5F]">
                     {property.price.currency} {property.price.amount.toLocaleString()}
                     {property.price.type === 'rent' && (
-                      <span className="text-sm font-normal text-neutral-400">/mo</span>
+                      <span className="text-sm font-normal text-neutral-400">/mês</span>
                     )}
                   </p>
                 </div>
@@ -524,7 +543,7 @@ export default function PropertyDetailView({ property, similarProperties }: { pr
                         <span className="text-base font-bold text-[#1E3A5F]">
                           {p.price.currency} {p.price.amount.toLocaleString()}
                           {p.price.type === 'rent' && (
-                            <span className="text-xs font-normal text-neutral-400">/mo</span>
+                            <span className="text-xs font-normal text-neutral-400">/mês</span>
                           )}
                         </span>
                       </div>
