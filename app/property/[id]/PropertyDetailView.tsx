@@ -277,9 +277,9 @@ export default function PropertyDetailView({ property, similarProperties }: { pr
         {/* ── Desktop gallery ──────────────────────────────────────────────── */}
         <div className="hidden md:grid grid-cols-4 gap-2 rounded-2xl overflow-hidden">
           {/* Main large photo */}
-          <div className="col-span-2 row-span-2 relative h-[360px] cursor-pointer" onClick={() => openLightbox(0)}>
+          <div className="col-span-2 row-span-2 relative h-[360px] cursor-pointer bg-neutral-100" onClick={() => openLightbox(0)}>
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={images[0]} alt={property.title} className="w-full h-full object-cover" />
+            <img src={images[0]} alt={property.title} className="w-full h-full object-contain" />
             <div className="absolute top-4 left-4 flex gap-2 z-10">
               <span className="px-3 py-1 text-xs font-bold text-white bg-[#1E3A5F] rounded-md">
                 Ref: {property.id}
@@ -295,17 +295,17 @@ export default function PropertyDetailView({ property, similarProperties }: { pr
 
           {/* Thumbnails 1–3 */}
           {images.slice(1, 4).map((img, i) => (
-            <div key={i} className="relative h-[176px] overflow-hidden cursor-pointer" onClick={() => openLightbox(i + 1)}>
+            <div key={i} className="relative h-[176px] overflow-hidden cursor-pointer bg-neutral-100" onClick={() => openLightbox(i + 1)}>
               {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={img} alt="" className="w-full h-full object-cover hover:opacity-95 transition-opacity" />
+              <img src={img} alt="" className="w-full h-full object-contain hover:opacity-95 transition-opacity" />
             </div>
           ))}
 
           {/* Last thumbnail with +N overlay */}
           {images[4] && (
-            <div className="relative h-[176px] overflow-hidden cursor-pointer" onClick={() => openLightbox(4)}>
+            <div className="relative h-[176px] overflow-hidden cursor-pointer bg-neutral-900" onClick={() => openLightbox(4)}>
               {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={images[4]} alt="" className="w-full h-full object-cover brightness-50" />
+              <img src={images[4]} alt="" className="w-full h-full object-contain opacity-50" />
               <span className="absolute inset-0 flex items-center justify-center text-white text-lg font-semibold">
                 +{images.length - 4} fotos
               </span>

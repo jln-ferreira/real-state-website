@@ -60,7 +60,7 @@ const NAV_LINKS = [
 // ── Company links for section 3 ───────────────────────────────────────────────
 
 const COMPANY_LINKS = [
-  { label: 'Sobre Nós', href: '#' },
+  { label: 'Sobre Nós', href: '/sobre-nos' },
   { label: 'Blog',      href: '/blog' },
 ]
 
