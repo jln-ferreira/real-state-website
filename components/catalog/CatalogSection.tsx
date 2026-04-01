@@ -228,6 +228,32 @@ function FeaturedCard({ p }: { p: Property }) {
 
 export default function CatalogSection({ properties, filters, onFiltersChange }: CatalogProps) {
   const [sortKey, setSortKey] = useState<SortKey>('newest')
+  const [downloading, setDownloading] = useState(false)
+
+  async function handleDownload() {
+    setDownloading(true)
+    try {
+      const res = await fetch('/api/catalog', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ ids: results.map(p => p.id) }),
+      })
+      if (!res.ok) throw new Error('Failed')
+      const blob = await res.blob()
+      const url  = URL.createObjectURL(blob)
+      const a    = document.createElement('a')
+      a.href     = url
+      a.download = `catalogo-${new Date().toISOString().split('T')[0]}.pdf`
+      document.body.appendChild(a)
+      a.click()
+      document.body.removeChild(a)
+      URL.revokeObjectURL(url)
+    } catch {
+      alert('Erro ao gerar catálogo. Tente novamente.')
+    } finally {
+      setDownloading(false)
+    }
+  }
 
   const results = useMemo(
     () => sortProperties(applyFilters(properties, filters), sortKey),
@@ -250,7 +276,7 @@ export default function CatalogSection({ properties, filters, onFiltersChange }:
             </p>
           </div>
 
-          {/* Sort */}
+          {/* Sort + Download */}
           <div className="flex items-center gap-2">
             <span className="hidden text-sm text-[#A3A3C2] sm:inline">Ordenar:</span>
             <select
@@ -264,6 +290,30 @@ export default function CatalogSection({ properties, filters, onFiltersChange }:
               <option value="price-asc">Preço: Menor → Maior</option>
               <option value="price-desc">Preço: Maior → Menor</option>
             </select>
+            <button
+              onClick={handleDownload}
+              disabled={downloading || results.length === 0}
+              className="flex items-center gap-2 rounded-xl border border-[#E6E6EF] bg-white px-3 py-2 text-sm
+                         font-medium text-[#6D6D85] shadow-sm transition hover:border-[#6D6D85] hover:text-[#4F4F6B]
+                         disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {downloading ? (
+                <>
+                  <svg className="h-4 w-4 animate-spin" fill="none" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                  </svg>
+                  Gerando...
+                </>
+              ) : (
+                <>
+                  <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" strokeWidth={1.8} stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3" />
+                  </svg>
+                  Baixar Catálogo
+                </>
+              )}
+            </button>
           </div>
         </div>
 
