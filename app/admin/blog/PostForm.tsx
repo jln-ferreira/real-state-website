@@ -1,13 +1,13 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import type { Post } from '@/data/posts'
 
 const TABS = ['Informações', 'Conteúdo'] as const
 type Tab = typeof TABS[number]
 
-const SUGGESTED_CATEGORIES = ['Dicas', 'Mercado', 'Finanças', 'Guias']
+import { getPostCategories } from '@/data/posts'
 
 function slugify(str: string) {
   return str
@@ -22,15 +22,16 @@ function slugify(str: string) {
 
 function emptyPost(): Post {
   return {
-    slug:      '',
-    title:     '',
-    excerpt:   '',
-    content:   '',
-    image:     '',
-    date:      new Date().toISOString().split('T')[0],
-    category:  '',
-    readTime:  '',
-    published: true,
+    slug:       '',
+    title:      '',
+    excerpt:    '',
+    content:    '',
+    image:      '',
+    date:       new Date().toISOString().split('T')[0],
+    category:   '',
+    categories: [],
+    readTime:   '',
+    published:  true,
   }
 }
 
@@ -38,14 +39,59 @@ export default function PostForm({ post: initial }: { post?: Post }) {
   const router = useRouter()
   const isEdit = !!initial
 
-  const [form,          setForm]          = useState<Post>(initial ?? emptyPost())
-  const [activeTab,     setActiveTab]     = useState<Tab>('Informações')
-  const [saveState,     setSaveState]     = useState<'idle' | 'saving' | 'saved' | 'error'>('idle')
-  const [errors,        setErrors]        = useState<Record<string, string>>({})
-  const [showPreview,   setShowPreview]   = useState(false)
-  const [deleteConfirm, setDeleteConfirm] = useState('')
-  const [isDeleting,    setIsDeleting]    = useState(false)
-  const [toast,         setToast]         = useState<{ msg: string; type: 'success' | 'error' } | null>(null)
+  const [form,            setForm]            = useState<Post>(() => {
+    const base = initial ?? emptyPost()
+    return { ...base, categories: base.categories ?? (base.category ? [base.category] : []) }
+  })
+  const [activeTab,       setActiveTab]       = useState<Tab>('Informações')
+  const [saveState,       setSaveState]       = useState<'idle' | 'saving' | 'saved' | 'error'>('idle')
+  const [errors,          setErrors]          = useState<Record<string, string>>({})
+  const [showPreview,     setShowPreview]     = useState(false)
+  const [deleteConfirm,   setDeleteConfirm]   = useState('')
+  const [isDeleting,      setIsDeleting]      = useState(false)
+  const [toast,           setToast]           = useState<{ msg: string; type: 'success' | 'error' } | null>(null)
+  const [allCategories,   setAllCategories]   = useState<string[]>([])
+  const [customCatInput,  setCustomCatInput]  = useState('')
+
+  useEffect(() => {
+    fetch('/api/admin/categories')
+      .then(r => r.json())
+      .then(setAllCategories)
+      .catch(() => setAllCategories(['Dicas', 'Mercado', 'Finanças', 'Guias']))
+  }, [])
+
+  const DEFAULTS = ['Dicas', 'Mercado', 'Finanças', 'Guias']
+
+  function toggleCategory(cat: string) {
+    setForm(prev => {
+      const cats = prev.categories ?? []
+      const next = cats.includes(cat) ? cats.filter(c => c !== cat) : [...cats, cat]
+      return { ...prev, categories: next, category: next[0] ?? '' }
+    })
+  }
+
+  async function addCustomCategory() {
+    const value = customCatInput.trim()
+    if (!value || allCategories.includes(value)) { setCustomCatInput(''); return }
+    setCustomCatInput('')
+    await fetch('/api/admin/categories', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ value }),
+    })
+    setAllCategories(prev => [...prev, value])
+    toggleCategory(value)
+  }
+
+  async function deleteCategory(cat: string) {
+    if (DEFAULTS.includes(cat)) return
+    await fetch(`/api/admin/categories/${encodeURIComponent(cat)}`, { method: 'DELETE' })
+    setAllCategories(prev => prev.filter(c => c !== cat))
+    setForm(prev => {
+      const cats = (prev.categories ?? []).filter(c => c !== cat)
+      return { ...prev, categories: cats, category: cats[0] ?? '' }
+    })
+  }
 
   function set<K extends keyof Post>(key: K, value: Post[K]) {
     setForm(f => ({ ...f, [key]: value }))
@@ -65,7 +111,7 @@ export default function PostForm({ post: initial }: { post?: Post }) {
     if (!form.excerpt.trim())  e.excerpt  = 'Resumo é obrigatório'
     if (!form.content.trim())  e.content  = 'Conteúdo é obrigatório'
     if (!form.image.trim())    e.image    = 'URL da imagem é obrigatória'
-    if (!form.category.trim()) e.category = 'Categoria é obrigatória'
+    if (!form.categories?.length) e.category = 'Selecione pelo menos uma categoria'
     if (!form.date.trim())     e.date     = 'Data é obrigatória'
     if (!form.readTime.trim()) e.readTime = 'Tempo de leitura é obrigatório'
     setErrors(e)
@@ -240,18 +286,42 @@ export default function PostForm({ post: initial }: { post?: Post }) {
 
               {/* Category */}
               <div>
-                <label className={labelCls}>Categoria *</label>
-                <input
-                  type="text"
-                  list="post-categories"
-                  value={form.category}
-                  onChange={e => set('category', e.target.value)}
-                  className={inputCls}
-                  placeholder="Ex: Dicas"
-                />
-                <datalist id="post-categories">
-                  {SUGGESTED_CATEGORIES.map(c => <option key={c} value={c} />)}
-                </datalist>
+                <label className={labelCls}>Categorias *</label>
+                <div className="flex flex-wrap gap-1.5 mb-2">
+                  {allCategories.map(cat => {
+                    const active = (form.categories ?? []).includes(cat)
+                    const isCustom = !DEFAULTS.includes(cat)
+                    return (
+                      <span key={cat} className={`inline-flex items-center rounded-full text-xs font-medium border transition-colors ${active ? 'bg-[#6D6D85] text-white border-[#6D6D85]' : 'bg-white text-neutral-600 border-neutral-200'}`}>
+                        <button type="button" onClick={() => toggleCategory(cat)} className="pl-3 py-1.5">
+                          {cat}
+                        </button>
+                        {isCustom && (
+                          <button type="button" onClick={() => deleteCategory(cat)}
+                            className={`pr-2.5 py-1.5 transition-colors ${active ? 'hover:text-red-300' : 'hover:text-red-500'}`}
+                            title="Remover categoria">
+                            ×
+                          </button>
+                        )}
+                        {!isCustom && <span className="pr-3" />}
+                      </span>
+                    )
+                  })}
+                </div>
+                <div className="flex gap-2">
+                  <input
+                    type="text"
+                    value={customCatInput}
+                    onChange={e => setCustomCatInput(e.target.value)}
+                    onKeyDown={e => { if (e.key === 'Enter') { e.preventDefault(); addCustomCategory() } }}
+                    placeholder="Nova categoria..."
+                    className={`${inputCls} flex-1`}
+                  />
+                  <button type="button" onClick={addCustomCategory}
+                    className="px-4 py-2.5 bg-[#6D6D85] text-white rounded-lg text-sm font-medium hover:bg-[#585874] transition-colors whitespace-nowrap">
+                    Adicionar
+                  </button>
+                </div>
                 {errors.category && <p className={errCls}>{errors.category}</p>}
               </div>
             </div>

@@ -55,15 +55,16 @@ export const PropertySchema = z.object({
 export const PartialPropertySchema = PropertySchema.partial().required({ id: true })
 
 export const PostSchema = z.object({
-  slug:      z.string().regex(/^[a-z0-9-]+$/, 'Slug deve conter apenas letras minúsculas, números e hífens'),
-  title:     z.string().min(1, 'Título é obrigatório'),
-  excerpt:   z.string().min(1, 'Resumo é obrigatório'),
-  content:   z.string().min(1, 'Conteúdo é obrigatório'),
-  image:     z.string().min(1, 'Imagem é obrigatória'),
-  date:      z.string().min(1, 'Data é obrigatória'),
-  category:  z.string().min(1, 'Categoria é obrigatória'),
-  readTime:  z.string().min(1, 'Tempo de leitura é obrigatório'),
-  published: z.boolean().default(true),
+  slug:       z.string().regex(/^[a-z0-9-]+$/, 'Slug deve conter apenas letras minúsculas, números e hífens'),
+  title:      z.string().min(1, 'Título é obrigatório'),
+  excerpt:    z.string().min(1, 'Resumo é obrigatório'),
+  content:    z.string().min(1, 'Conteúdo é obrigatório'),
+  image:      z.string().min(1, 'Imagem é obrigatória'),
+  date:       z.string().min(1, 'Data é obrigatória'),
+  category:   z.string().optional().default(''),
+  categories: z.array(z.string()).optional().default([]),
+  readTime:   z.string().min(1, 'Tempo de leitura é obrigatório'),
+  published:  z.boolean().default(true),
 })
 
 export const ContactSchema = z.object({

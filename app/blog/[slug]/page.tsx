@@ -4,7 +4,7 @@ import Link from 'next/link'
 import Layout from '@/components/Layout'
 import ScrollReveal from '@/components/blog/ScrollReveal'
 import { getPost, getPosts } from '@/lib/posts'
-import { getPostBySlug, getCategories, formatDate } from '@/data/posts'
+import { getPostBySlug, formatDate, getPostCategories } from '@/data/posts'
 import type { Post } from '@/data/posts'
 
 export async function generateMetadata(
@@ -44,7 +44,7 @@ export default async function BlogPostPage(
   let allPosts: Post[] = []
   try { allPosts = await getPosts() } catch { allPosts = [] }
   const recent     = allPosts.filter((p: Post) => p.slug !== slug).slice(0, 4)
-  const categories = getCategories()
+  const categories = getPostCategories(post)
 
   return (
     <Layout>
@@ -62,9 +62,11 @@ export default async function BlogPostPage(
 
           <div className="absolute inset-0 flex flex-col justify-end">
             <div className="mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8 pb-10">
-              <span className={`inline-block px-2.5 py-1 rounded-full text-xs font-semibold mb-4 ${categoryClass(post.category)}`}>
-                {post.category}
-              </span>
+              <div className="flex flex-wrap gap-1.5 mb-4">
+                {getPostCategories(post).map(cat => (
+                  <span key={cat} className={`inline-block px-2.5 py-1 rounded-full text-xs font-semibold ${categoryClass(cat)}`}>{cat}</span>
+                ))}
+              </div>
               <h1 className="text-2xl sm:text-4xl font-extrabold text-white leading-tight max-w-3xl mb-4">
                 {post.title}
               </h1>

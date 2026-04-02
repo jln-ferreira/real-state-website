@@ -4,7 +4,7 @@ import { useState, useMemo } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import type { Post } from '@/data/posts'
-import { formatDate } from '@/data/posts'
+import { formatDate, getPostCategories } from '@/data/posts'
 import SwipeableItem from '@/components/admin/SwipeableItem'
 import type { SwipeAction } from '@/components/admin/SwipeableItem'
 
@@ -27,7 +27,7 @@ export default function PostsClient({ initialPosts }: { initialPosts: Post[] }) 
   const [swipeOpenId,    setSwipeOpenId]    = useState<string | null>(null)
   const [statFilter,     setStatFilter]     = useState<'published' | 'draft' | null>(null)
 
-  const categories = [...new Set(posts.map(p => p.category))]
+  const categories = [...new Set(posts.flatMap(p => getPostCategories(p)))]
 
   function toggleStat(val: 'published' | 'draft') {
     setStatFilter(prev => prev === val ? null : val)
@@ -36,7 +36,7 @@ export default function PostsClient({ initialPosts }: { initialPosts: Post[] }) 
   const filtered = useMemo(() => posts.filter(p => {
     const s = search.toLowerCase()
     const matchSearch   = !s || p.title.toLowerCase().includes(s) || p.slug.toLowerCase().includes(s)
-    const matchCategory = categoryFilter === 'all' || p.category === categoryFilter
+    const matchCategory = categoryFilter === 'all' || getPostCategories(p).includes(categoryFilter)
     const matchStatus   = statusFilter === 'all'
       || (statusFilter === 'published' && p.published !== false)
       || (statusFilter === 'draft'     && p.published === false)
@@ -212,9 +212,11 @@ export default function PostsClient({ initialPosts }: { initialPosts: Post[] }) 
                   <p className="font-semibold text-sm text-neutral-900 line-clamp-1">{p.title}</p>
                   <div className="flex flex-wrap items-center gap-x-2 gap-y-0.5 mt-0.5">
                     <span className="text-xs font-mono text-neutral-400 truncate max-w-[120px]">{p.slug}</span>
-                    <span className={`px-1.5 py-0.5 rounded text-[10px] font-medium ${CATEGORY_COLORS[p.category] ?? 'bg-neutral-100 text-neutral-600'}`}>
-                      {p.category}
-                    </span>
+                    {getPostCategories(p).map(cat => (
+                      <span key={cat} className={`px-1.5 py-0.5 rounded text-[10px] font-medium ${CATEGORY_COLORS[cat] ?? 'bg-neutral-100 text-neutral-600'}`}>
+                        {cat}
+                      </span>
+                    ))}
                     <span className={`flex items-center gap-1 text-[10px] ${p.published !== false ? 'text-green-600' : 'text-neutral-400'}`}>
                       <span className={`w-1.5 h-1.5 rounded-full inline-block ${p.published !== false ? 'bg-green-500' : 'bg-neutral-300'}`} />
                       {p.published !== false ? 'Publicado' : 'Rascunho'}
@@ -259,9 +261,13 @@ export default function PostsClient({ initialPosts }: { initialPosts: Post[] }) 
                   </div>
                 </td>
                 <td className="px-4 py-3 hidden sm:table-cell">
-                  <span className={`px-2 py-0.5 rounded text-xs font-medium ${CATEGORY_COLORS[p.category] ?? 'bg-neutral-100 text-neutral-600'}`}>
-                    {p.category}
-                  </span>
+                  <div className="flex flex-wrap gap-1">
+                    {getPostCategories(p).map(cat => (
+                      <span key={cat} className={`px-2 py-0.5 rounded text-xs font-medium ${CATEGORY_COLORS[cat] ?? 'bg-neutral-100 text-neutral-600'}`}>
+                        {cat}
+                      </span>
+                    ))}
+                  </div>
                 </td>
                 <td className="px-4 py-3 hidden md:table-cell">
                   <span className="text-sm text-neutral-500">{formatDate(p.date)}</span>

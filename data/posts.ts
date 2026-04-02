@@ -5,9 +5,17 @@ export interface Post {
   content: string
   image: string
   date: string         // ISO string e.g. "2025-03-15"
-  category: string
+  category: string     // legacy — use categories[]
+  categories?: string[]
   readTime: string
   published?: boolean  // defaults to true
+}
+
+/** Returns the post's categories, handling both old (string) and new (array) format */
+export function getPostCategories(post: Post): string[] {
+  if (post.categories && post.categories.length > 0) return post.categories
+  if (post.category) return [post.category]
+  return []
 }
 
 export const POSTS: Post[] = [

@@ -2,7 +2,7 @@ import type { Metadata } from 'next'
 import Link from 'next/link'
 import Layout from '@/components/Layout'
 import { getPosts } from '@/lib/posts'
-import { POSTS, formatDate } from '@/data/posts'
+import { POSTS, formatDate, getPostCategories } from '@/data/posts'
 import type { Post } from '@/data/posts'
 
 export const metadata: Metadata = {
@@ -71,9 +71,11 @@ export default async function BlogPage() {
                 className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/25 to-transparent lg:bg-gradient-to-r" />
-              <span className={`absolute top-4 left-4 px-2.5 py-1 rounded-full text-xs font-semibold ${categoryClass(featured.category)}`}>
-                {featured.category}
-              </span>
+              <div className="absolute top-4 left-4 flex flex-wrap gap-1">
+                {getPostCategories(featured).map(cat => (
+                  <span key={cat} className={`px-2.5 py-1 rounded-full text-xs font-semibold ${categoryClass(cat)}`}>{cat}</span>
+                ))}
+              </div>
             </div>
 
             {/* Content */}
@@ -119,9 +121,11 @@ export default async function BlogPage() {
                     loading="lazy"
                     className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
                   />
-                  <span className={`absolute top-3 left-3 px-2 py-0.5 rounded-full text-[11px] font-semibold ${categoryClass(post.category)}`}>
-                    {post.category}
-                  </span>
+                  <div className="absolute top-3 left-3 flex flex-wrap gap-1">
+                    {getPostCategories(post).map(cat => (
+                      <span key={cat} className={`px-2 py-0.5 rounded-full text-[11px] font-semibold ${categoryClass(cat)}`}>{cat}</span>
+                    ))}
+                  </div>
                 </div>
 
                 {/* Content */}

@@ -55,6 +55,12 @@ export async function initDb() {
     )
   `)
   await db.execute(`
+    CREATE TABLE IF NOT EXISTS blog_categories (
+      value TEXT PRIMARY KEY,
+      created_at TEXT NOT NULL DEFAULT (datetime('now'))
+    )
+  `)
+  await db.execute(`
     CREATE TABLE IF NOT EXISTS custom_features (
       value TEXT PRIMARY KEY,
       label TEXT NOT NULL,
