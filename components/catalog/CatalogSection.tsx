@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useEffect, useRef } from 'react'
 import Link from 'next/link'
 import {
   DEFAULT_FILTERS,
@@ -229,6 +229,16 @@ function FeaturedCard({ p }: { p: Property }) {
 export default function CatalogSection({ properties, filters, onFiltersChange }: CatalogProps) {
   const [sortKey, setSortKey] = useState<SortKey>('newest')
   const [downloading, setDownloading] = useState(false)
+  const [isMobile, setIsMobile] = useState(false)
+  const [visibleCount, setVisibleCount] = useState(7)
+  const sentinelRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    const update = () => setIsMobile(window.innerWidth < 768)
+    update()
+    window.addEventListener('resize', update)
+    return () => window.removeEventListener('resize', update)
+  }, [])
 
   async function handleDownload() {
     setDownloading(true)
@@ -260,8 +270,30 @@ export default function CatalogSection({ properties, filters, onFiltersChange }:
     [properties, filters, sortKey],
   )
 
-  const featured    = results.filter(p => p.status.isFeatured)
-  const nonFeatured = results.filter(p => !p.status.isFeatured)
+  // Reset mobile pagination when filters or sort change
+  useEffect(() => { setVisibleCount(7) }, [filters, sortKey])
+
+  // Infinite scroll (mobile only) — load more when sentinel is visible
+  useEffect(() => {
+    if (!isMobile) return
+    const el = sentinelRef.current
+    if (!el) return
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting)
+          setVisibleCount(c => Math.min(c + 7, results.length))
+      },
+      { rootMargin: '0px' },
+    )
+    observer.observe(el)
+    return () => observer.disconnect()
+  }, [isMobile, results.length])
+
+  const visibleResults = isMobile ? results.slice(0, visibleCount) : results
+  const hasMore = isMobile && visibleCount < results.length
+
+  const featured    = visibleResults.filter(p => p.status.isFeatured)
+  const nonFeatured = visibleResults.filter(p => !p.status.isFeatured)
 
   return (
     <section id="listings" className="min-h-screen bg-[#F7F7FA] scroll-mt-16">
@@ -336,6 +368,19 @@ export default function CatalogSection({ properties, filters, onFiltersChange }:
               <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
                 {nonFeatured.map(p => <PropertyCard key={p.id} p={p} />)}
               </div>
+            )}
+            {/* Infinite scroll sentinel */}
+            {hasMore ? (
+              <div ref={sentinelRef} className="flex justify-center py-6">
+                <svg className="h-6 w-6 animate-spin text-[#A3A3C2]" fill="none" viewBox="0 0 24 24">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                </svg>
+              </div>
+            ) : (
+              <p className="text-center text-sm text-[#A3A3C2] py-4">
+                {results.length} imóve{results.length !== 1 ? 'is' : 'l'} exibido{results.length !== 1 ? 's' : ''}
+              </p>
             )}
           </div>
         )}

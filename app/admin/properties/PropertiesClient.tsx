@@ -26,7 +26,13 @@ export default function PropertiesClient({ initialProperties }: { initialPropert
   const [isDeleting, setIsDeleting] = useState(false)
   const [isDuplicating, setIsDuplicating] = useState<string | null>(null)
   const [swipeOpenId, setSwipeOpenId] = useState<string | null>(null)
+  const [statFilter, setStatFilter] = useState<'sale' | 'rent' | 'featured' | null>(null)
   const PER_PAGE = 10
+
+  function toggleStat(val: 'sale' | 'rent' | 'featured') {
+    setStatFilter(prev => prev === val ? null : val)
+    setPage(1)
+  }
 
   const filtered = useMemo(() => properties.filter(p => {
     const s = search.toLowerCase()
@@ -36,8 +42,12 @@ export default function PropertiesClient({ initialProperties }: { initialPropert
       || (statusFilter === 'active' && p.status.isActive)
       || (statusFilter === 'inactive' && !p.status.isActive)
       || (statusFilter === 'featured' && p.status.isFeatured)
-    return matchSearch && matchType && matchStatus
-  }), [properties, search, typeFilter, statusFilter])
+    const matchStat = !statFilter
+      || (statFilter === 'sale' && p.price.type === 'sale')
+      || (statFilter === 'rent' && p.price.type === 'rent')
+      || (statFilter === 'featured' && p.status.isFeatured)
+    return matchSearch && matchType && matchStatus && matchStat
+  }), [properties, search, typeFilter, statusFilter, statFilter])
 
   const totalPages = Math.ceil(filtered.length / PER_PAGE)
   const paginated = filtered.slice((page - 1) * PER_PAGE, page * PER_PAGE)
@@ -96,17 +106,38 @@ export default function PropertiesClient({ initialProperties }: { initialPropert
 
       {/* Stats */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-6">
-        {[
-          { label: 'Total', value: stats.total },
-          { label: 'À Venda', value: stats.sale },
-          { label: 'Para Alugar', value: stats.rent },
-          { label: 'Destaque', value: stats.featured },
-        ].map(s => (
-          <div key={s.label} className="bg-white rounded-2xl p-4 shadow-sm border border-[#E6E6EF]">
-            <p className="text-2xl font-bold text-[#4F4F6B]">{s.value}</p>
-            <p className="text-xs text-neutral-500 mt-0.5">{s.label}</p>
-          </div>
-        ))}
+        <button
+          onClick={() => { setStatFilter(null); setPage(1) }}
+          className={`rounded-2xl p-4 shadow-sm border text-left transition-colors ${
+            statFilter === null
+              ? 'bg-[#4F4F6B] border-[#4F4F6B]'
+              : 'bg-white border-[#E6E6EF] hover:border-[#6D6D85]'
+          }`}
+        >
+          <p className={`text-2xl font-bold ${statFilter === null ? 'text-white' : 'text-[#4F4F6B]'}`}>{stats.total}</p>
+          <p className={`text-xs mt-0.5 ${statFilter === null ? 'text-white/80' : 'text-neutral-500'}`}>Total</p>
+        </button>
+        {([
+          { label: 'À Venda',     value: stats.sale,     key: 'sale'     },
+          { label: 'Para Alugar', value: stats.rent,     key: 'rent'     },
+          { label: 'Destaque',    value: stats.featured, key: 'featured' },
+        ] as const).map(s => {
+          const active = statFilter === s.key
+          return (
+            <button
+              key={s.key}
+              onClick={() => toggleStat(s.key)}
+              className={`rounded-2xl p-4 shadow-sm border text-left transition-colors ${
+                active
+                  ? 'bg-[#4F4F6B] border-[#4F4F6B] text-white'
+                  : 'bg-white border-[#E6E6EF] hover:border-[#6D6D85]'
+              }`}
+            >
+              <p className={`text-2xl font-bold ${active ? 'text-white' : 'text-[#4F4F6B]'}`}>{s.value}</p>
+              <p className={`text-xs mt-0.5 ${active ? 'text-white/80' : 'text-neutral-500'}`}>{s.label}</p>
+            </button>
+          )
+        })}
       </div>
 
       {/* Filters */}
@@ -238,7 +269,7 @@ export default function PropertiesClient({ initialProperties }: { initialPropert
             {paginated.length === 0 ? (
               <tr><td colSpan={6} className="text-center py-12 text-sm text-neutral-400">Nenhum imóvel encontrado</td></tr>
             ) : paginated.map(p => (
-              <tr key={p.id} className="border-b border-neutral-100 hover:bg-[#F7F7FA] transition-colors">
+              <tr key={p.id} className="border-b border-neutral-100 hover:bg-[#F7F7FA] transition-colors cursor-pointer" onClick={() => router.push(`/admin/properties/${p.id}`)}>
                 <td className="px-4 py-3"><span className="text-xs font-mono text-neutral-400">{p.id}</span></td>
                 <td className="px-4 py-3">
                   <div className="flex items-center gap-3">
@@ -270,7 +301,7 @@ export default function PropertiesClient({ initialProperties }: { initialPropert
                     {p.status.isFeatured && <span className="text-amber-400 text-xs ml-1">★</span>}
                   </div>
                 </td>
-                <td className="px-4 py-3">
+                <td className="px-4 py-3" onClick={e => e.stopPropagation()}>
                   <div className="flex items-center justify-end gap-3">
                     <Link href={`/admin/properties/${p.id}`} className="text-xs text-[#4F4F6B] hover:underline font-medium">Editar</Link>
                     <button onClick={() => handleDuplicate(p.id)} disabled={isDuplicating === p.id}

@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import type { Property } from '@/data/properties'
 
@@ -53,6 +53,14 @@ export default function PropertyForm({ property: initial }: { property?: Propert
   const [saveState, setSaveState] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle')
   const [errors, setErrors] = useState<Record<string, string>>({})
   const [customFeature, setCustomFeature] = useState('')
+  const [savedCustomFeatures, setSavedCustomFeatures] = useState<{ value: string; label: string }[]>([])
+
+  useEffect(() => {
+    fetch('/api/admin/features')
+      .then(r => r.json())
+      .then(setSavedCustomFeatures)
+      .catch(() => {})
+  }, [])
   const [deleteConfirm, setDeleteConfirm] = useState('')
   const [isDeleting, setIsDeleting] = useState(false)
   const [toast, setToast] = useState<{ msg: string; type: 'success' | 'error' } | null>(null)
@@ -152,10 +160,27 @@ export default function PropertyForm({ property: initial }: { property?: Propert
     }))
   }
 
-  function addCustomFeature() {
-    const f = customFeature.trim().toLowerCase()
-    if (f && !form.features.includes(f)) setForm(prev => ({ ...prev, features: [...prev.features, f] }))
+  async function addCustomFeature() {
+    const label = customFeature.trim()
+    const value = label.toLowerCase()
+    if (!value) return
     setCustomFeature('')
+    if (!form.features.includes(value))
+      setForm(prev => ({ ...prev, features: [...prev.features, value] }))
+    if (!ALL_FEATURES.find(f => f.value === value) && !savedCustomFeatures.find(f => f.value === value)) {
+      await fetch('/api/admin/features', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ value, label }),
+      })
+      setSavedCustomFeatures(prev => [...prev, { value, label }])
+    }
+  }
+
+  async function deleteCustomFeature(value: string) {
+    await fetch(`/api/admin/features/${encodeURIComponent(value)}`, { method: 'DELETE' })
+    setSavedCustomFeatures(prev => prev.filter(f => f.value !== value))
+    setForm(prev => ({ ...prev, features: prev.features.filter(f => f !== value) }))
   }
 
   const Input = ({ label, value, onChange, error, placeholder, type = 'text', required = false }: {
@@ -350,12 +375,21 @@ export default function PropertyForm({ property: initial }: { property?: Propert
                   {label}
                 </button>
               ))}
-              {form.features.filter(f => !ALL_FEATURES.find(x => x.value === f)).map(f => (
-                <button key={f} type="button" onClick={() => toggleFeature(f)}
-                  className="px-3 py-1.5 rounded-full text-xs font-medium border bg-[#1E3A5F] text-white border-[#1E3A5F]">
-                  {f}
-                </button>
-              ))}
+              {savedCustomFeatures.map(({ value, label }) => {
+                const active = form.features.includes(value)
+                return (
+                  <span key={value} className={`inline-flex items-center gap-1 rounded-full text-xs font-medium border transition-colors ${active ? 'bg-[#1E3A5F] text-white border-[#1E3A5F]' : 'bg-white text-neutral-600 border-neutral-200'}`}>
+                    <button type="button" onClick={() => toggleFeature(value)} className="pl-3 py-1.5">
+                      {label}
+                    </button>
+                    <button type="button" onClick={() => deleteCustomFeature(value)}
+                      className={`pr-2.5 py-1.5 transition-colors ${active ? 'hover:text-red-300' : 'hover:text-red-500'}`}
+                      title="Remover característica">
+                      ×
+                    </button>
+                  </span>
+                )
+              })}
             </div>
             <div className="flex gap-2">
               <input type="text" value={customFeature} onChange={e => setCustomFeature(e.target.value)}

@@ -1,19 +1,8 @@
-import { db } from './db'
+import { db, ensureInit } from './db'
 import type { Post } from '@/data/posts'
 
-async function ensureTable() {
-  await db.execute(`
-    CREATE TABLE IF NOT EXISTS blog_posts (
-      slug TEXT PRIMARY KEY,
-      data TEXT NOT NULL,
-      created_at TEXT NOT NULL DEFAULT (datetime('now')),
-      updated_at TEXT NOT NULL DEFAULT (datetime('now'))
-    )
-  `)
-}
-
 export async function getPosts(): Promise<Post[]> {
-  await ensureTable()
+  await ensureInit()
   const result = await db.execute(
     "SELECT data FROM blog_posts ORDER BY json_extract(data, '$.date') DESC"
   )
@@ -36,7 +25,7 @@ export async function getPosts(): Promise<Post[]> {
 }
 
 export async function getPost(slug: string): Promise<Post | null> {
-  await ensureTable()
+  await ensureInit()
   const result = await db.execute({
     sql: 'SELECT data FROM blog_posts WHERE slug = ?',
     args: [slug],
@@ -46,7 +35,7 @@ export async function getPost(slug: string): Promise<Post | null> {
 }
 
 export async function createPost(post: Post): Promise<Post> {
-  await ensureTable()
+  await ensureInit()
   await db.execute({
     sql: 'INSERT INTO blog_posts (slug, data) VALUES (?, ?)',
     args: [post.slug, JSON.stringify(post)],
@@ -66,6 +55,6 @@ export async function updatePost(slug: string, updates: Partial<Post>): Promise<
 }
 
 export async function deletePost(slug: string): Promise<void> {
-  await ensureTable()
+  await ensureInit()
   await db.execute({ sql: 'DELETE FROM blog_posts WHERE slug = ?', args: [slug] })
 }

@@ -19,6 +19,13 @@ export const db = new Proxy({} as Client, {
   },
 })
 
+// Runs once per server process — all subsequent calls are no-ops
+let _initPromise: Promise<void> | null = null
+export function ensureInit(): Promise<void> {
+  if (!_initPromise) _initPromise = initDb()
+  return _initPromise
+}
+
 export async function initDb() {
   await db.execute(`
     CREATE TABLE IF NOT EXISTS properties (
@@ -45,6 +52,13 @@ export async function initDb() {
       data TEXT NOT NULL,
       created_at TEXT NOT NULL DEFAULT (datetime('now')),
       updated_at TEXT NOT NULL DEFAULT (datetime('now'))
+    )
+  `)
+  await db.execute(`
+    CREATE TABLE IF NOT EXISTS custom_features (
+      value TEXT PRIMARY KEY,
+      label TEXT NOT NULL,
+      created_at TEXT NOT NULL DEFAULT (datetime('now'))
     )
   `)
   await db.execute(`

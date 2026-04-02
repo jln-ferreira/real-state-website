@@ -25,8 +25,13 @@ export default function PostsClient({ initialPosts }: { initialPosts: Post[] }) 
   const [deleteConfirm,  setDeleteConfirm]  = useState('')
   const [isDeleting,     setIsDeleting]     = useState(false)
   const [swipeOpenId,    setSwipeOpenId]    = useState<string | null>(null)
+  const [statFilter,     setStatFilter]     = useState<'published' | 'draft' | null>(null)
 
   const categories = [...new Set(posts.map(p => p.category))]
+
+  function toggleStat(val: 'published' | 'draft') {
+    setStatFilter(prev => prev === val ? null : val)
+  }
 
   const filtered = useMemo(() => posts.filter(p => {
     const s = search.toLowerCase()
@@ -35,8 +40,11 @@ export default function PostsClient({ initialPosts }: { initialPosts: Post[] }) 
     const matchStatus   = statusFilter === 'all'
       || (statusFilter === 'published' && p.published !== false)
       || (statusFilter === 'draft'     && p.published === false)
-    return matchSearch && matchCategory && matchStatus
-  }), [posts, search, categoryFilter, statusFilter])
+    const matchStat = !statFilter
+      || (statFilter === 'published' && p.published !== false)
+      || (statFilter === 'draft'     && p.published === false)
+    return matchSearch && matchCategory && matchStatus && matchStat
+  }), [posts, search, categoryFilter, statusFilter, statFilter])
 
   const stats = {
     total:      posts.length,
@@ -82,17 +90,41 @@ export default function PostsClient({ initialPosts }: { initialPosts: Post[] }) 
 
       {/* ── Stats ──────────────────────────────────────────────────────────────── */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-6">
-        {[
-          { label: 'Total',      value: stats.total },
-          { label: 'Publicados', value: stats.published },
-          { label: 'Rascunhos',  value: stats.drafts },
-          { label: 'Categorias', value: stats.categories },
-        ].map(s => (
-          <div key={s.label} className="bg-white rounded-2xl p-4 shadow-sm border border-[#E6E6EF]">
-            <p className="text-2xl font-bold text-[#4F4F6B]">{s.value}</p>
-            <p className="text-xs text-neutral-500 mt-0.5">{s.label}</p>
-          </div>
-        ))}
+        <button
+          onClick={() => setStatFilter(null)}
+          className={`rounded-2xl p-4 shadow-sm border text-left transition-colors ${
+            statFilter === null
+              ? 'bg-[#4F4F6B] border-[#4F4F6B]'
+              : 'bg-white border-[#E6E6EF] hover:border-[#6D6D85]'
+          }`}
+        >
+          <p className={`text-2xl font-bold ${statFilter === null ? 'text-white' : 'text-[#4F4F6B]'}`}>{stats.total}</p>
+          <p className={`text-xs mt-0.5 ${statFilter === null ? 'text-white/80' : 'text-neutral-500'}`}>Total</p>
+        </button>
+        {([
+          { label: 'Publicados', value: stats.published, key: 'published' },
+          { label: 'Rascunhos',  value: stats.drafts,    key: 'draft'     },
+        ] as const).map(s => {
+          const active = statFilter === s.key
+          return (
+            <button
+              key={s.key}
+              onClick={() => toggleStat(s.key)}
+              className={`rounded-2xl p-4 shadow-sm border text-left transition-colors ${
+                active
+                  ? 'bg-[#4F4F6B] border-[#4F4F6B] text-white'
+                  : 'bg-white border-[#E6E6EF] hover:border-[#6D6D85]'
+              }`}
+            >
+              <p className={`text-2xl font-bold ${active ? 'text-white' : 'text-[#4F4F6B]'}`}>{s.value}</p>
+              <p className={`text-xs mt-0.5 ${active ? 'text-white/80' : 'text-neutral-500'}`}>{s.label}</p>
+            </button>
+          )
+        })}
+        <div className="bg-white rounded-2xl p-4 shadow-sm border border-[#E6E6EF]">
+          <p className="text-2xl font-bold text-[#4F4F6B]">{stats.categories}</p>
+          <p className="text-xs text-neutral-500 mt-0.5">Categorias</p>
+        </div>
       </div>
 
       {/* ── Filters ────────────────────────────────────────────────────────────── */}
@@ -215,7 +247,7 @@ export default function PostsClient({ initialPosts }: { initialPosts: Post[] }) 
                 </td>
               </tr>
             ) : filtered.map(p => (
-              <tr key={p.slug} className="border-b border-[#E6E6EF] hover:bg-[#F7F7FA] transition-colors">
+              <tr key={p.slug} className="border-b border-[#E6E6EF] hover:bg-[#F7F7FA] transition-colors cursor-pointer" onClick={() => router.push(`/admin/blog/${p.slug}`)}>
                 <td className="px-4 py-3">
                   <div className="flex items-center gap-3">
                     {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -242,7 +274,7 @@ export default function PostsClient({ initialPosts }: { initialPosts: Post[] }) 
                     </span>
                   </div>
                 </td>
-                <td className="px-4 py-3">
+                <td className="px-4 py-3" onClick={e => e.stopPropagation()}>
                   <div className="flex items-center justify-end gap-3">
                     <Link href={`/admin/blog/${p.slug}`} className="text-xs text-[#4F4F6B] hover:underline font-medium">
                       Editar
