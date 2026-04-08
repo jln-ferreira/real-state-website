@@ -19,11 +19,15 @@ export default function Header() {
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 12)
-    // Set initial state in case the page loads mid-scroll
     onScroll()
     window.addEventListener('scroll', onScroll, { passive: true })
     return () => window.removeEventListener('scroll', onScroll)
   }, [])
+
+  useEffect(() => {
+    // py-3 + h-20 = 24px + 80px = 104px unscrolled; py-1 + h-12 = 8px + 48px = 56px scrolled
+    document.documentElement.style.setProperty('--header-h', scrolled ? '56px' : '104px')
+  }, [scrolled])
 
   function handleHashNav(e: React.MouseEvent<HTMLAnchorElement>, hash: string) {
     if (!isHome) return
@@ -46,27 +50,30 @@ export default function Header() {
     <>
       <header
         className={[
-          'fixed top-0 inset-x-0 z-30 bg-white',
+          'fixed top-0 inset-x-0 z-50 bg-[#6B6B99]',
           'transition-[padding,box-shadow] duration-300 ease-in-out',
           scrolled
-            ? 'py-0 shadow-[0_1px_0_0_#E6E6EF]'
-            : 'py-3 shadow-[0_4px_24px_rgba(0,0,0,0.06)]',
+            ? 'py-1 shadow-[0_4px_24px_rgba(0,0,0,0.22)]'
+            : 'py-3 shadow-[0_2px_12px_rgba(0,0,0,0.12)]',
         ].join(' ')}
       >
-        <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
+        <div className="mx-auto flex max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
 
           {/* Logo */}
           <a
             href="/"
             onClick={handleLogoClick}
-            className="flex items-center gap-2 shrink-0"
+            className="flex items-center shrink-0"
           >
-            <svg className="h-7 w-7 text-[#6D6D85]" fill="currentColor" viewBox="0 0 24 24">
-              <path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z" />
-            </svg>
-            <span className="text-xl font-bold tracking-tight text-[#2E2E3A]">
-              Casa <span className="text-[#6D6D85]">Baccarat</span>
-            </span>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src="/logo.png"
+              alt="Casa Baccarat Imóveis"
+              className={[
+                'w-auto transition-[height] duration-300 ease-in-out',
+                scrolled ? 'h-12' : 'h-20',
+              ].join(' ')}
+            />
           </a>
 
           {/* Desktop nav */}
@@ -76,24 +83,24 @@ export default function Header() {
                 key={hash}
                 href={isHome ? `#${hash}` : `/#${hash}`}
                 onClick={e => handleHashNav(e, hash)}
-                className="rounded-lg px-3 py-2 text-sm font-medium text-[#6D6D85]
-                           hover:text-[#4F4F6B] hover:bg-[#F7F7FA] transition-colors"
+                className="rounded-lg px-4 py-2 text-sm font-light tracking-wide text-white/80
+                           hover:text-white hover:bg-white/10 transition-colors"
               >
                 {label}
               </a>
             ))}
             <Link
               href="/blog"
-              className="rounded-lg px-3 py-2 text-sm font-medium text-[#6D6D85]
-                         hover:text-[#4F4F6B] hover:bg-[#F7F7FA] transition-colors"
+              className="rounded-lg px-4 py-2 text-sm font-light tracking-wide text-white/80
+                         hover:text-white hover:bg-white/10 transition-colors"
             >
               Blog
             </Link>
             <a
               href={isHome ? '#listings' : '/#listings'}
               onClick={e => handleHashNav(e, 'listings')}
-              className="ml-3 rounded-xl bg-[#6D6D85] px-4 py-2 text-sm font-semibold
-                         text-white hover:bg-[#585874] transition-colors duration-200 shadow-sm"
+              className="ml-3 rounded-xl bg-white px-5 py-2 text-sm font-medium
+                         text-[#6B6B99] hover:bg-[#F5F0E8] transition-colors duration-200 shadow-sm"
             >
               Ver Imóveis
             </a>
@@ -103,7 +110,7 @@ export default function Header() {
           <button
             onClick={() => setMenuOpen(true)}
             aria-label="Abrir menu"
-            className="md:hidden rounded-lg p-2 text-[#6D6D85] hover:bg-[#F7F7FA] transition-colors"
+            className="md:hidden rounded-lg p-2 text-white hover:bg-white/10 transition-colors"
           >
             <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" strokeWidth={1.8} stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />

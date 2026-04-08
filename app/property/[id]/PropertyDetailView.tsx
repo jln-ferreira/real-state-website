@@ -185,15 +185,80 @@ export default function PropertyDetailView({ property, similarProperties }: { pr
     }
   }
 
+  const shareUrl = encodeURIComponent(getPageUrl())
   const shareText = encodeURIComponent(`${property.title} — Casa Baccarat`)
-  const shareUrl  = encodeURIComponent(getPageUrl())
+
+  function buildWhatsAppMessage(): string {
+    const { amount, currency, type } = property.price
+    const currencyPrefix = currency === 'BRL' ? 'R$' : currency === 'CAD' ? 'CA$' : 'US$'
+    const priceFormatted = amount.toLocaleString('pt-BR')
+    const priceSuffix    = type === 'rent' ? '/mes' : ''
+    const price = `${currencyPrefix} ${priceFormatted}${priceSuffix}`
+
+    const { bedrooms, bathrooms, areaSqFt, lavabo, escritorio } = property.propertyDetails
+    const featureLabelMap: Record<string, string> = {
+      balcony: 'Varanda', parking: 'Estacionamento', gym: 'Academia', pool: 'Piscina',
+      garden: 'Jardim', furnished: 'Mobiliado', 'pet-friendly': 'Aceita Pets',
+      concierge: 'Portaria', baccarat: 'Exclusivo Baccarat', fireplace: 'Lareira',
+      rooftop: 'Cobertura', 'ev charging': 'Carregador Eletrico', storage: 'Deposito',
+      elevator: 'Elevador', security: 'Seguranca', '24h security': 'Seguranca 24h',
+    }
+
+    const bullets: string[] = []
+    if (bedrooms > 0)              bullets.push(`- ${bedrooms} suite${bedrooms > 1 ? 's' : ''}`)
+    if (bathrooms > 0)             bullets.push(`- ${bathrooms} banheiro${bathrooms > 1 ? 's' : ''}`)
+    if (lavabo && lavabo > 0)      bullets.push(`- ${lavabo} lavabo${lavabo > 1 ? 's' : ''}`)
+    if (escritorio && escritorio > 0) bullets.push(`- ${escritorio} escritorio${escritorio > 1 ? 's' : ''}`)
+    if (areaSqFt > 0)              bullets.push(`- ${areaSqFt} m2`)
+    property.features.slice(0, 4).forEach(f => bullets.push(`- ${featureLabelMap[f] ?? f}`))
+
+    const typeMap: Record<string, string> = { house: 'Casa', apartment: 'Apartamento', commercial: 'Imovel Comercial', land: 'Terreno' }
+    const typeLabel = typeMap[property.propertyDetails.type] || 'Imovel'
+    const buyerProfile = type === 'rent'
+      ? 'quem busca conforto e praticidade no dia a dia'
+      : bedrooms >= 3
+        ? 'familias que valorizam espaco e qualidade de vida'
+        : 'casais e investidores que buscam sofisticacao'
+
+    const photo = property.media?.thumbnail || property.media?.images?.[0] || ''
+
+    const lines: string[] = [
+      '*CASA BACCARAT IMOVEIS*',
+      'Excelencia em cada detalhe',
+      '',
+      `*${property.title}*`,
+      `${property.location.residential ? property.location.residential + ' - ' : ''}${property.location.city}, ${property.location.province}`,
+      '',
+      `Preco: *${price}*`,
+      '',
+      `${typeLabel} de alto padrao com acabamentos sofisticados e localizacao privilegiada.`,
+      'Um imovel pensado para quem valoriza o melhor da vida.',
+      '',
+      '*Destaques:*',
+      ...bullets,
+      '',
+      `Ideal para: ${buyerProfile}`,
+      '',
+      'Venha conhecer pessoalmente e se apaixone por cada detalhe.',
+      '',
+      ...(photo ? ['Foto principal:', photo, ''] : []),
+      'Ver imovel completo:',
+      getPageUrl(),
+      '',
+      'Entre em contato e solicite uma visita exclusiva.',
+    ]
+
+    return lines.join('\n')
+  }
+
+  const whatsappHref = `https://wa.me/?text=${encodeURIComponent(buildWhatsAppMessage())}`
 
   return (
     <Layout>
-    <div className="min-h-screen bg-[#F8F9FC]">
+    <div className="min-h-screen bg-[#F5F0E8]">
 
       {/* ── Sub-header bar ─────────────────────────────────────────────────── */}
-      <div className="sticky top-16 z-40 border-b border-neutral-100 bg-white px-4 sm:px-6 lg:px-8">
+      <div className="sticky z-30 border-b border-[#E0DACE] bg-[#F5F0E8] px-4 sm:px-6 lg:px-8" style={{ top: 'var(--header-h, 104px)' }}>
         <div className="max-w-7xl mx-auto flex items-center justify-between h-12">
           <Link
             href="/"
@@ -213,7 +278,7 @@ export default function PropertyDetailView({ property, similarProperties }: { pr
             {shareOpen && (
               <div className="absolute right-0 top-full mt-2 w-52 bg-white rounded-xl shadow-lg border border-neutral-100 py-1 z-50">
                 <a
-                  href={`https://wa.me/?text=${shareText}%20${shareUrl}`}
+                  href={whatsappHref}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="flex items-center gap-3 px-4 py-2.5 text-sm text-neutral-700 hover:bg-neutral-50"
@@ -281,7 +346,7 @@ export default function PropertyDetailView({ property, similarProperties }: { pr
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src={images[0]} alt={property.title} className="w-full h-full object-contain" />
             <div className="absolute top-4 left-4 flex gap-2 z-10">
-              <span className="px-3 py-1 text-xs font-bold text-white bg-[#1E3A5F] rounded-md">
+              <span className="px-3 py-1 text-xs font-bold text-white bg-[#6B6B99] rounded-md">
                 Ref: {property.id}
               </span>
               <span className="px-3 py-1 text-xs font-medium text-white bg-neutral-900/70 backdrop-blur-sm rounded-md">
@@ -335,10 +400,10 @@ export default function PropertyDetailView({ property, similarProperties }: { pr
           <div className="lg:col-span-3 space-y-4">
 
             {/* Title card */}
-            <div className="p-4 rounded-2xl border border-neutral-200 bg-white shadow-sm">
+            <div className="p-4 rounded-2xl border border-[#E0DACE] bg-white shadow-sm">
               <div className="flex items-start justify-between gap-2 mb-0.5">
                 <h1 className="text-lg md:text-xl font-bold text-neutral-900">{property.title}</h1>
-                <span className="flex-shrink-0 px-4 py-1.5 text-base font-extrabold text-[#1E3A5F] bg-[#1E3A5F]/10 rounded-lg">
+                <span className="flex-shrink-0 px-4 py-1.5 text-base font-extrabold text-[#6B6B99] bg-[#6B6B99]/10 rounded-lg">
                   {property.id}
                 </span>
               </div>
@@ -373,7 +438,7 @@ export default function PropertyDetailView({ property, similarProperties }: { pr
                   <ul className="mt-3 space-y-1 not-prose">
                     {property.features.map(f => (
                       <li key={f} className="flex items-start gap-2">
-                        <span className="mt-1.5 w-1.5 h-1.5 rounded-full bg-[#6D6D85] flex-shrink-0" />
+                        <span className="mt-1.5 w-1.5 h-1.5 rounded-full bg-[#6B6B99] flex-shrink-0" />
                         <span>{FEATURE_LABELS[f] ?? f}</span>
                       </li>
                     ))}
@@ -397,12 +462,12 @@ export default function PropertyDetailView({ property, similarProperties }: { pr
 
           {/* ── Right sidebar ────────────────────────────────────────────────── */}
           <div className="lg:col-span-2">
-            <div className="sticky top-[7rem] space-y-4">
+            <div className="sticky space-y-4" style={{ top: 'calc(var(--header-h, 104px) + 4rem)' }}>
 
               {/* Price card */}
-              <div className="p-4 rounded-2xl border border-neutral-200 bg-white shadow-sm">
+              <div className="p-4 rounded-2xl border border-[#E0DACE] bg-white shadow-sm">
                 <div className="flex flex-wrap items-center gap-1.5 mb-2">
-                  <span className="px-2.5 py-0.5 text-xs font-bold rounded-md uppercase bg-[#1E3A5F] text-white">
+                  <span className="px-2.5 py-0.5 text-xs font-bold rounded-md uppercase bg-[#6B6B99] text-white">
                     {property.price.type === 'rent' ? 'ALUGUEL' : 'VENDA'}
                   </span>
                   <span className="px-2.5 py-0.5 text-xs font-medium bg-neutral-100 text-neutral-600 rounded-md capitalize">
@@ -414,7 +479,7 @@ export default function PropertyDetailView({ property, similarProperties }: { pr
                   <p className="text-[10px] text-neutral-500 uppercase tracking-wide">
                     {property.price.type === 'rent' ? 'Aluguel Mensal' : 'Preço de Venda'}
                   </p>
-                  <p className="text-2xl font-bold text-[#1E3A5F]">
+                  <p className="text-2xl font-bold text-[#6B6B99]">
                     {property.price.currency} {property.price.amount.toLocaleString()}
                     {property.price.type === 'rent' && (
                       <span className="text-sm font-normal text-neutral-400">/mês</span>
@@ -431,7 +496,7 @@ export default function PropertyDetailView({ property, similarProperties }: { pr
                     <p className="text-xs text-neutral-500">Entraremos em contato em breve.</p>
                     <button
                       onClick={() => { setFormStatus('idle'); setFormData(d => ({ ...d, name: '', phone: '', email: '' })) }}
-                      className="text-xs text-[#1E3A5F] underline underline-offset-2 mt-1"
+                      className="text-xs text-[#6B6B99] underline underline-offset-2 mt-1"
                     >
                       Enviar outra mensagem
                     </button>
@@ -444,7 +509,7 @@ export default function PropertyDetailView({ property, similarProperties }: { pr
                       required
                       value={formData.name}
                       onChange={e => setFormData(d => ({ ...d, name: e.target.value }))}
-                      className="w-full px-3 py-2.5 rounded-lg bg-neutral-100 border-0 text-sm focus:ring-2 focus:ring-[#1E3A5F]/30 outline-none"
+                      className="w-full px-3 py-2.5 rounded-lg bg-neutral-100 border-0 text-sm focus:ring-2 focus:ring-[#6B6B99]/30 outline-none"
                     />
                     <div className="flex gap-2">
                       <span className="px-3 py-2.5 rounded-lg bg-neutral-100 text-sm text-neutral-500">Tel</span>
@@ -453,7 +518,7 @@ export default function PropertyDetailView({ property, similarProperties }: { pr
                         placeholder=""
                         value={formData.phone}
                         onChange={e => setFormData(d => ({ ...d, phone: e.target.value }))}
-                        className="flex-1 px-3 py-2.5 rounded-lg bg-neutral-100 border-0 text-sm focus:ring-2 focus:ring-[#1E3A5F]/30 outline-none"
+                        className="flex-1 px-3 py-2.5 rounded-lg bg-neutral-100 border-0 text-sm focus:ring-2 focus:ring-[#6B6B99]/30 outline-none"
                       />
                     </div>
                     <input
@@ -462,14 +527,14 @@ export default function PropertyDetailView({ property, similarProperties }: { pr
                       required
                       value={formData.email}
                       onChange={e => setFormData(d => ({ ...d, email: e.target.value }))}
-                      className="w-full px-3 py-2.5 rounded-lg bg-neutral-100 border-0 text-sm focus:ring-2 focus:ring-[#1E3A5F]/30 outline-none"
+                      className="w-full px-3 py-2.5 rounded-lg bg-neutral-100 border-0 text-sm focus:ring-2 focus:ring-[#6B6B99]/30 outline-none"
                     />
                     <textarea
                       rows={3}
                       placeholder="Olá, tenho interesse neste imóvel..."
                       value={formData.message}
                       onChange={e => setFormData(d => ({ ...d, message: e.target.value }))}
-                      className="w-full px-3 py-2.5 rounded-lg bg-neutral-100 border-0 text-sm resize-none focus:ring-2 focus:ring-[#1E3A5F]/30 outline-none"
+                      className="w-full px-3 py-2.5 rounded-lg bg-neutral-100 border-0 text-sm resize-none focus:ring-2 focus:ring-[#6B6B99]/30 outline-none"
                     />
                     {formStatus === 'error' && (
                       <p className="text-xs text-red-500">Algo deu errado. Tente novamente.</p>
@@ -477,7 +542,7 @@ export default function PropertyDetailView({ property, similarProperties }: { pr
                     <button
                       type="submit"
                       disabled={formStatus === 'sending'}
-                      className="w-full py-2.5 bg-[#1E3A5F] text-white font-semibold rounded-lg hover:bg-[#141d3a] transition-colors disabled:opacity-60"
+                      className="w-full py-2.5 bg-[#6B6B99] text-white font-semibold rounded-lg hover:bg-[#5a5a88] transition-colors disabled:opacity-60"
                     >
                       {formStatus === 'sending' ? 'Enviando...' : 'Enviar mensagem'}
                     </button>
@@ -498,7 +563,7 @@ export default function PropertyDetailView({ property, similarProperties }: { pr
             <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
               {similarProperties.map(p => (
                 <Link key={p.id} href={`/property/${p.id}`} className="block h-full">
-                  <div className="bg-white rounded-2xl overflow-hidden shadow-md border border-neutral-100 h-full flex flex-col">
+                  <div className="bg-white rounded-2xl overflow-hidden shadow-md border border-[#E0DACE] h-full flex flex-col">
                     <div className="relative aspect-[4/3] overflow-hidden">
                       {/* eslint-disable-next-line @next/next/no-img-element */}
                       <img
@@ -511,7 +576,7 @@ export default function PropertyDetailView({ property, similarProperties }: { pr
                         <span className="px-1.5 py-px bg-neutral-900/80 backdrop-blur-sm text-white text-[9px] font-medium rounded">
                           {p.id}
                         </span>
-                        <span className="px-1.5 py-px bg-[#1E3A5F] text-white text-[9px] font-bold uppercase rounded">
+                        <span className="px-1.5 py-px bg-[#6B6B99] text-white text-[9px] font-bold uppercase rounded">
                           {p.price.type === 'rent' ? 'ALUGUEL' : 'VENDA'}
                         </span>
                       </div>
@@ -540,7 +605,7 @@ export default function PropertyDetailView({ property, similarProperties }: { pr
                         </span>
                       </div>
                       <div className="pt-2 border-t border-neutral-100 mt-auto">
-                        <span className="text-base font-bold text-[#1E3A5F]">
+                        <span className="text-base font-bold text-[#6B6B99]">
                           {p.price.currency} {p.price.amount.toLocaleString()}
                           {p.price.type === 'rent' && (
                             <span className="text-xs font-normal text-neutral-400">/mês</span>

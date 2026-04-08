@@ -1,11 +1,11 @@
-import React from 'react'
+﻿import React from 'react'
 import { Document, Page, View, Text, Image, StyleSheet } from '@react-pdf/renderer'
 import type { Property } from '@/data/properties'
 
-const BRAND = '#6D6D85'
-const DARK  = '#2E2E3A'
-const MUTED = '#A3A3C2'
-const LIGHT = '#F7F7FA'
+const BRAND = '#6B6B99'
+const DARK  = '#4A5240'
+const MUTED = '#9898BB'
+const LIGHT = '#F5F0E8'
 const NAVY  = '#1E3A5F'
 
 const FEATURE_LABELS: Record<string, string> = {
@@ -77,7 +77,7 @@ const styles = StyleSheet.create({
   stat: { flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center' },
   statVal: { fontSize: 12, fontFamily: 'Helvetica-Bold', color: DARK },
   statLbl: { fontSize: 7, color: MUTED, marginTop: 2 },
-  divider: { height: 1, backgroundColor: '#E6E6EF', marginBottom: 10 },
+  divider: { height: 1, backgroundColor: '#E0DACE', marginBottom: 10 },
   // Section label
   sectionLabel: { fontSize: 8, fontFamily: 'Helvetica-Bold', color: BRAND, textTransform: 'uppercase', letterSpacing: 1, marginBottom: 5 },
   // Description
@@ -103,7 +103,7 @@ const styles = StyleSheet.create({
   agentContact: { fontSize: 8, color: BRAND },
   // Footer
   footer: {
-    borderTopWidth: 1, borderTopColor: '#E6E6EF', borderTopStyle: 'solid',
+    borderTopWidth: 1, borderTopColor: '#E0DACE', borderTopStyle: 'solid',
     padding: '7 20',
     display: 'flex', flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center',
     backgroundColor: LIGHT,
@@ -139,7 +139,7 @@ function PropertyPage({ p }: { p: Property }) {
         {p.img ? (
           <Image src={p.img} style={styles.heroImg} />
         ) : (
-          <View style={[styles.heroImg, { backgroundColor: '#E6E6EF' }]} />
+          <View style={[styles.heroImg, { backgroundColor: '#E0DACE' }]} />
         )}
         <View style={styles.heroOverlay}>
           <View>

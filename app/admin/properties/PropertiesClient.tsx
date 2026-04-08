@@ -27,6 +27,8 @@ export default function PropertiesClient({ initialProperties }: { initialPropert
   const [isDuplicating, setIsDuplicating] = useState<string | null>(null)
   const [swipeOpenId, setSwipeOpenId] = useState<string | null>(null)
   const [statFilter, setStatFilter] = useState<'sale' | 'rent' | 'featured' | null>(null)
+  const [priceMin, setPriceMin] = useState('')
+  const [priceMax, setPriceMax] = useState('')
   const PER_PAGE = 10
 
   function toggleStat(val: 'sale' | 'rent' | 'featured') {
@@ -34,20 +36,25 @@ export default function PropertiesClient({ initialProperties }: { initialPropert
     setPage(1)
   }
 
-  const filtered = useMemo(() => properties.filter(p => {
-    const s = search.toLowerCase()
-    const matchSearch = !s || p.title.toLowerCase().includes(s) || p.id.toLowerCase().includes(s) || p.location.city.toLowerCase().includes(s)
-    const matchType = typeFilter === 'all' || p.propertyDetails.type === typeFilter
-    const matchStatus = statusFilter === 'all'
-      || (statusFilter === 'active' && p.status.isActive)
-      || (statusFilter === 'inactive' && !p.status.isActive)
-      || (statusFilter === 'featured' && p.status.isFeatured)
-    const matchStat = !statFilter
-      || (statFilter === 'sale' && p.price.type === 'sale')
-      || (statFilter === 'rent' && p.price.type === 'rent')
-      || (statFilter === 'featured' && p.status.isFeatured)
-    return matchSearch && matchType && matchStatus && matchStat
-  }), [properties, search, typeFilter, statusFilter, statFilter])
+  const filtered = useMemo(() => {
+    const minVal = priceMin ? parseFloat(priceMin.replace(/\./g, '').replace(',', '.')) : null
+    const maxVal = priceMax ? parseFloat(priceMax.replace(/\./g, '').replace(',', '.')) : null
+    return properties.filter(p => {
+      const s = search.toLowerCase()
+      const matchSearch = !s || p.title.toLowerCase().includes(s) || p.id.toLowerCase().includes(s) || p.location.city.toLowerCase().includes(s)
+      const matchType = typeFilter === 'all' || p.propertyDetails.type === typeFilter
+      const matchStatus = statusFilter === 'all'
+        || (statusFilter === 'active' && p.status.isActive)
+        || (statusFilter === 'inactive' && !p.status.isActive)
+        || (statusFilter === 'featured' && p.status.isFeatured)
+      const matchStat = !statFilter
+        || (statFilter === 'sale' && p.price.type === 'sale')
+        || (statFilter === 'rent' && p.price.type === 'rent')
+        || (statFilter === 'featured' && p.status.isFeatured)
+      const matchPrice = (minVal === null || p.price.amount >= minVal) && (maxVal === null || p.price.amount <= maxVal)
+      return matchSearch && matchType && matchStatus && matchStat && matchPrice
+    })
+  }, [properties, search, typeFilter, statusFilter, statFilter, priceMin, priceMax])
 
   const totalPages = Math.ceil(filtered.length / PER_PAGE)
   const paginated = filtered.slice((page - 1) * PER_PAGE, page * PER_PAGE)
@@ -162,6 +169,32 @@ export default function PropertiesClient({ initialProperties }: { initialPropert
           <option value="inactive">Inativo</option>
           <option value="featured">Destaque</option>
         </select>
+        <div className="flex items-center gap-1 w-full sm:w-auto">
+          <input
+            type="text"
+            inputMode="numeric"
+            placeholder="Preço mín."
+            value={priceMin}
+            onChange={e => { setPriceMin(e.target.value.replace(/[^\d.,]/g, '')); setPage(1) }}
+            className="w-full sm:w-32 px-3 py-2 bg-white border border-[#E6E6EF] rounded-xl text-sm outline-none focus:ring-2 focus:ring-[#6D6D85]/20"
+          />
+          <span className="text-neutral-400 text-sm flex-shrink-0">–</span>
+          <input
+            type="text"
+            inputMode="numeric"
+            placeholder="Preço máx."
+            value={priceMax}
+            onChange={e => { setPriceMax(e.target.value.replace(/[^\d.,]/g, '')); setPage(1) }}
+            className="w-full sm:w-32 px-3 py-2 bg-white border border-[#E6E6EF] rounded-xl text-sm outline-none focus:ring-2 focus:ring-[#6D6D85]/20"
+          />
+          {(priceMin || priceMax) && (
+            <button
+              onClick={() => { setPriceMin(''); setPriceMax(''); setPage(1) }}
+              className="flex-shrink-0 text-neutral-400 hover:text-neutral-700 text-xs px-2 py-1.5 border border-[#E6E6EF] rounded-xl bg-white"
+              title="Limpar filtro de preço"
+            >✕</button>
+          )}
+        </div>
       </div>
 
       {/* Mobile / tablet card list */}

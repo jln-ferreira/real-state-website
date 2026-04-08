@@ -83,13 +83,13 @@ function ActiveChips({ filters, onChange }: { filters: Filters; onChange: (f: Fi
         <span
           key={chip.label}
           className="flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-medium"
-          style={{ background: 'rgba(109,109,133,0.1)', color: '#4F4F6B' }}
+          style={{ background: 'rgba(109,109,133,0.1)', color: '#4E6B5E' }}
         >
           {chip.label}
           <button
             onClick={chip.clear}
             aria-label={`Remover filtro ${chip.label}`}
-            className="rounded-full p-0.5 transition-colors hover:bg-[#6D6D85]/20"
+            className="rounded-full p-0.5 transition-colors hover:bg-[#6B6B99]/20"
           >
             <svg className="h-3 w-3" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
@@ -99,7 +99,7 @@ function ActiveChips({ filters, onChange }: { filters: Filters; onChange: (f: Fi
       ))}
       <button
         onClick={() => onChange(DEFAULT_FILTERS)}
-        className="text-xs text-[#A3A3C2] hover:text-[#6D6D85] underline underline-offset-2 transition-colors"
+        className="text-xs text-[#9898BB] hover:text-[#6B6B99] underline underline-offset-2 transition-colors"
       >
         Limpar tudo
       </button>
@@ -115,14 +115,14 @@ function EmptyState({ onReset }: { onReset: () => void }) {
       <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-[#EDEDF4] text-3xl">
         🏠
       </div>
-      <h3 className="text-lg font-semibold text-[#2E2E3A]">Nenhum imóvel encontrado</h3>
-      <p className="mt-1 max-w-xs text-sm text-[#A3A3C2]">
+      <h3 className="text-lg font-semibold text-[#4A5240]">Nenhum imóvel encontrado</h3>
+      <p className="mt-1 max-w-xs text-sm text-[#9898BB]">
         Nenhum anúncio corresponde aos seus filtros atuais. Tente ajustar os critérios de busca.
       </p>
       <button
         onClick={onReset}
-        className="mt-5 rounded-xl bg-[#6D6D85] px-5 py-2.5 text-sm font-semibold
-                   text-white hover:bg-[#585874] transition-colors duration-200"
+        className="mt-5 rounded-xl bg-[#6B6B99] px-5 py-2.5 text-sm font-semibold
+                   text-white hover:bg-[#5757A0] transition-colors duration-200"
       >
         Redefinir Filtros
       </button>
@@ -141,7 +141,7 @@ function FeaturedCard({ p }: { p: Property }) {
         className="group flex cursor-pointer flex-col overflow-hidden rounded-[14px] bg-white
                    transition-all duration-300 hover:-translate-y-0.5"
         style={{
-          border: '1px solid #E6E6EF',
+          border: '1px solid #E0DACE',
           boxShadow: '0 4px 20px rgba(0,0,0,0.06)',
         }}
         onMouseEnter={e => (e.currentTarget.style.boxShadow = '0 16px 48px rgba(0,0,0,0.12)')}
@@ -162,7 +162,7 @@ function FeaturedCard({ p }: { p: Property }) {
               ★ Destaque
             </span>
             <span className={`rounded-full px-3 py-1 text-[11px] font-semibold text-white
-              ${isSale ? 'bg-emerald-500' : 'bg-[#6D6D85]'}`}>
+              ${isSale ? 'bg-emerald-500' : 'bg-[#6B6B99]'}`}>
               {isSale ? 'À Venda' : 'Para Alugar'}
             </span>
           </div>
@@ -175,17 +175,17 @@ function FeaturedCard({ p }: { p: Property }) {
         {/* Body */}
         <div className="flex flex-1 flex-col justify-between p-7">
           <div>
-            <span className="text-xs font-semibold uppercase tracking-wider text-[#A3A3C2]">
+            <span className="text-xs font-semibold uppercase tracking-wider text-[#9898BB]">
               {p.propertyDetails.type.charAt(0).toUpperCase() + p.propertyDetails.type.slice(1)}
             </span>
-            <p className="mt-2 text-3xl font-extrabold leading-tight text-[#4F4F6B]">
+            <p className="mt-2 font-monument text-2xl leading-tight text-[#4E6B5E]">
               {formatPrice(p)}
             </p>
-            <h3 className="mt-1.5 text-xl font-semibold text-[#2E2E3A] transition-colors duration-200
-                           group-hover:text-[#6D6D85]">
+            <h3 className="mt-1.5 text-lg font-normal text-[#4A5240] transition-colors duration-200
+                           group-hover:text-[#6B6B99]">
               {p.title}
             </h3>
-            <p className="mt-2 flex items-center gap-1.5 text-sm text-[#A3A3C2]">
+            <p className="mt-2 flex items-center gap-1.5 text-sm text-[#9898BB]">
               <svg className="h-4 w-4 shrink-0" fill="none" viewBox="0 0 24 24"
                    strokeWidth={1.8} stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round"
@@ -195,7 +195,7 @@ function FeaturedCard({ p }: { p: Property }) {
             </p>
           </div>
 
-          <div className="mt-6 flex items-center gap-3 border-t border-[#E6E6EF] pt-5 text-xs text-[#A3A3C2]">
+          <div className="mt-6 flex items-center gap-3 border-t border-[#E0DACE] pt-5 text-xs text-[#9898BB]">
             {p.propertyDetails.bedrooms > 0 && (
               <span className="flex items-center gap-1">
                 <svg className="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" strokeWidth={1.8} stroke="currentColor">
@@ -214,7 +214,7 @@ function FeaturedCard({ p }: { p: Property }) {
                 {p.propertyDetails.bathrooms} banheiro{p.propertyDetails.bathrooms !== 1 ? 's' : ''}
               </span>
             )}
-            <span className="ml-auto font-medium text-[#6D6D85]">
+            <span className="ml-auto font-medium text-[#6B6B99]">
               {sqftToM2(p.propertyDetails.areaSqFt).toLocaleString()} m²
             </span>
           </div>
@@ -296,27 +296,27 @@ export default function CatalogSection({ properties, filters, onFiltersChange }:
   const nonFeatured = visibleResults.filter(p => !p.status.isFeatured)
 
   return (
-    <section id="listings" className="min-h-screen bg-[#F7F7FA] scroll-mt-16">
+    <section id="listings" className="min-h-screen bg-[#F5F0E8] scroll-mt-16">
       <div className="mx-auto max-w-7xl px-4 py-14 sm:px-6 lg:px-8">
 
         {/* Section heading */}
         <div className="mb-8 flex flex-wrap items-end justify-between gap-4">
           <div>
-            <h2 className="text-2xl font-bold text-[#2E2E3A]">Anúncios de Imóveis</h2>
-            <p className="mt-1 text-sm text-[#A3A3C2]">
+            <h2 className="font-monument text-xl text-[#4A5240]">Anúncios de Imóveis</h2>
+            <p className="mt-1 text-sm text-[#9898BB]">
               {results.length} de {properties.length} imóveis
             </p>
           </div>
 
           {/* Sort + Download */}
           <div className="flex items-center gap-2">
-            <span className="hidden text-sm text-[#A3A3C2] sm:inline">Ordenar:</span>
+            <span className="hidden text-sm text-[#9898BB] sm:inline">Ordenar:</span>
             <select
               value={sortKey}
               onChange={e => setSortKey(e.target.value as SortKey)}
-              className="cursor-pointer rounded-xl border border-[#E6E6EF] bg-white px-3 py-2 text-sm
-                         font-medium text-[#2E2E3A] shadow-sm transition
-                         focus:border-[#6D6D85] focus:outline-none focus:ring-1 focus:ring-[#6D6D85]/30"
+              className="cursor-pointer rounded-xl border border-[#E0DACE] bg-white px-3 py-2 text-sm
+                         font-medium text-[#4A5240] shadow-sm transition
+                         focus:border-[#6B6B99] focus:outline-none focus:ring-1 focus:ring-[#6B6B99]/30"
             >
               <option value="newest">Mais recente</option>
               <option value="price-asc">Preço: Menor → Maior</option>
@@ -325,8 +325,8 @@ export default function CatalogSection({ properties, filters, onFiltersChange }:
             <button
               onClick={handleDownload}
               disabled={downloading || results.length === 0}
-              className="flex items-center gap-2 rounded-xl border border-[#E6E6EF] bg-white px-3 py-2 text-sm
-                         font-medium text-[#6D6D85] shadow-sm transition hover:border-[#6D6D85] hover:text-[#4F4F6B]
+              className="flex items-center gap-2 rounded-xl border border-[#E0DACE] bg-white px-3 py-2 text-sm
+                         font-medium text-[#6B6B99] shadow-sm transition hover:border-[#6B6B99] hover:text-[#4E6B5E]
                          disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {downloading ? (
@@ -372,13 +372,13 @@ export default function CatalogSection({ properties, filters, onFiltersChange }:
             {/* Infinite scroll sentinel */}
             {hasMore ? (
               <div ref={sentinelRef} className="flex justify-center py-6">
-                <svg className="h-6 w-6 animate-spin text-[#A3A3C2]" fill="none" viewBox="0 0 24 24">
+                <svg className="h-6 w-6 animate-spin text-[#9898BB]" fill="none" viewBox="0 0 24 24">
                   <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
                   <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
                 </svg>
               </div>
             ) : (
-              <p className="text-center text-sm text-[#A3A3C2] py-4">
+              <p className="text-center text-sm text-[#9898BB] py-4">
                 {results.length} imóve{results.length !== 1 ? 'is' : 'l'} exibido{results.length !== 1 ? 's' : ''}
               </p>
             )}

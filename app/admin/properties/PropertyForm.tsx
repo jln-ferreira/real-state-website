@@ -26,15 +26,146 @@ const ALL_FEATURES: { value: string; label: string }[] = [
   { value: '24h security',label: 'Segurança 24h'      },
 ]
 
+// ── BRL helpers ───────────────────────────────────────────────────────────────
+
+function formatBRLDisplay(amount: number): string {
+  const str = amount.toFixed(2)
+  const [intStr, decStr] = str.split('.')
+  const withDots = intStr.replace(/\B(?=(\d{3})+(?!\d))/g, '.')
+  return withDots + ',' + decStr
+}
+
+function handleBRLChange(
+  raw: string,
+  setDisplay: (s: string) => void,
+  setAmount: (n: number) => void,
+) {
+  // Remove existing thousand-separator dots so user can backspace freely
+  const stripped = raw.replace(/\./g, '')
+  // Allow only digits and one comma
+  const onlyValid = stripped.replace(/[^\d,]/g, '')
+  const firstComma = onlyValid.indexOf(',')
+  const sanitized = firstComma === -1
+    ? onlyValid
+    : onlyValid.slice(0, firstComma + 1) + onlyValid.slice(firstComma + 1).replace(/,/g, '')
+
+  const parts = sanitized.split(',')
+  const intStr = parts[0].replace(/^0+(?=\d)/, '') // strip leading zeros
+  const intNum = parseInt(intStr) || 0
+  const intFormatted = intStr === '' ? '' : intNum.toLocaleString('pt-BR')
+  const display = parts.length > 1
+    ? intFormatted + ',' + parts[1].slice(0, 2)
+    : intFormatted
+
+  setDisplay(display)
+
+  const dec = parts[1] !== undefined ? parseFloat('0.' + parts[1].padEnd(2, '0').slice(0, 2)) : 0
+  setAmount(intNum + dec)
+}
+
+// ── Form sub-components (MUST be outside the main component to avoid remount on render) ──
+
+function Input({ label, value, onChange, error, placeholder, type = 'text', required = false }: {
+  label: string; value: string | number; onChange: (v: string) => void
+  error?: string; placeholder?: string; type?: string; required?: boolean
+}) {
+  return (
+    <div>
+      <label className="block text-xs font-semibold text-neutral-600 mb-1">
+        {label}{required && <span className="text-red-500 ml-0.5">*</span>}
+      </label>
+      <input
+        type={type}
+        value={value}
+        onChange={e => onChange(e.target.value)}
+        placeholder={placeholder}
+        className={`w-full px-3 py-2.5 bg-neutral-100 rounded-lg text-sm border-0 outline-none focus:ring-2 ${error ? 'ring-2 ring-red-300' : 'focus:ring-[#1E3A5F]/20'}`}
+      />
+      {error && <p className="text-xs text-red-500 mt-1">{error}</p>}
+    </div>
+  )
+}
+
+function Toggle({ label, description, checked, onChange }: {
+  label: string; description: string; checked: boolean; onChange: (v: boolean) => void
+}) {
+  return (
+    <div className="flex items-center justify-between py-3 border-b border-neutral-100 last:border-0">
+      <div>
+        <p className="text-sm font-medium text-neutral-800">{label}</p>
+        <p className="text-xs text-neutral-400">{description}</p>
+      </div>
+      <button type="button" onClick={() => onChange(!checked)}
+        className={`relative w-11 h-6 rounded-full transition-colors flex-shrink-0 ${checked ? 'bg-[#1E3A5F]' : 'bg-neutral-300'}`}>
+        <span className={`absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full shadow transition-transform ${checked ? 'translate-x-5' : 'translate-x-0'}`} />
+      </button>
+    </div>
+  )
+}
+
+// ── Counter input used for bedrooms / suites / lavabo / escritório ─────────────
+
+function Counter({ label, value, onChange, required = false }: {
+  label: string; value: number; onChange: (n: number) => void; required?: boolean
+}) {
+  return (
+    <div>
+      <label className="block text-xs font-semibold text-neutral-600 mb-1">
+        {label}{required && <span className="text-red-500 ml-0.5">*</span>}
+      </label>
+      <div className="flex items-center gap-3">
+        <button type="button" onClick={() => onChange(Math.max(0, value - 1))}
+          className="w-9 h-9 rounded-lg bg-neutral-100 hover:bg-neutral-200 flex items-center justify-center text-neutral-600 font-bold transition-colors">−</button>
+        <span className="w-8 text-center text-sm font-semibold">{value}</span>
+        <button type="button" onClick={() => onChange(value + 1)}
+          className="w-9 h-9 rounded-lg bg-neutral-100 hover:bg-neutral-200 flex items-center justify-center text-neutral-600 font-bold transition-colors">+</button>
+      </div>
+    </div>
+  )
+}
+
+// ── BRL styled input (R$ prefix + live dot/comma formatting) ─────────────────
+
+function BRLInput({ label, display, onChangeDisplay, error, placeholder = '0,00', required = false }: {
+  label: string
+  display: string
+  onChangeDisplay: (raw: string) => void
+  error?: string
+  placeholder?: string
+  required?: boolean
+}) {
+  return (
+    <div>
+      <label className="block text-xs font-semibold text-neutral-600 mb-1">
+        {label}{required && <span className="text-red-500 ml-0.5">*</span>}
+      </label>
+      <div className={`flex items-center bg-neutral-100 rounded-lg overflow-hidden focus-within:ring-2 ${error ? 'ring-2 ring-red-300' : 'focus-within:ring-[#1E3A5F]/20'}`}>
+        <span className="pl-3 pr-1 text-sm font-medium text-neutral-500 flex-shrink-0 select-none">R$</span>
+        <input
+          type="text"
+          inputMode="numeric"
+          value={display}
+          onChange={e => onChangeDisplay(e.target.value)}
+          placeholder={placeholder}
+          className="flex-1 px-2 py-2.5 bg-transparent text-sm border-0 outline-none"
+        />
+      </div>
+      {error && <p className="text-xs text-red-500 mt-1">{error}</p>}
+    </div>
+  )
+}
+
+// ── Empty property factory ────────────────────────────────────────────────────
+
 function emptyProperty(): Property {
   return {
     id: '',
     title: '',
     img: '',
     description: '',
-    price: { amount: 0, currency: 'CAD', type: 'sale' },
-    location: { address: '', city: '', province: '', country: 'Canada', postalCode: '', residential: '' },
-    propertyDetails: { type: 'apartment', bedrooms: 0, bathrooms: 0, areaSqFt: 0 },
+    price: { amount: 0, currency: 'BRL', type: 'sale' },
+    location: { address: '', city: '', province: '', country: 'Brasil', postalCode: '', residential: '' },
+    propertyDetails: { type: 'apartment', bedrooms: 0, bathrooms: 0, areaSqFt: 0, lavabo: 0, escritorio: 0 },
     features: [],
     media: { images: [''], thumbnail: '' },
     status: { isActive: true, isFeatured: false, isSpecial: false },
@@ -43,6 +174,8 @@ function emptyProperty(): Property {
     agent: { name: '', phone: '', email: '' },
   }
 }
+
+// ── Main form component ───────────────────────────────────────────────────────
 
 export default function PropertyForm({ property: initial }: { property?: Property }) {
   const router = useRouter()
@@ -54,6 +187,19 @@ export default function PropertyForm({ property: initial }: { property?: Propert
   const [errors, setErrors] = useState<Record<string, string>>({})
   const [customFeature, setCustomFeature] = useState('')
   const [savedCustomFeatures, setSavedCustomFeatures] = useState<{ value: string; label: string }[]>([])
+  const [deleteConfirm, setDeleteConfirm] = useState('')
+  const [isDeleting, setIsDeleting] = useState(false)
+  const [toast, setToast] = useState<{ msg: string; type: 'success' | 'error' } | null>(null)
+
+  // BRL display states for price inputs
+  const [brlDisplay, setBrlDisplay] = useState<string>(() =>
+    initial?.price.currency === 'BRL' && initial.price.amount
+      ? formatBRLDisplay(initial.price.amount)
+      : '')
+  const [condominioDisplay, setCondominioDisplay] = useState<string>(() =>
+    initial?.price.condominio ? formatBRLDisplay(initial.price.condominio) : '')
+  const [iptuDisplay, setIptuDisplay] = useState<string>(() =>
+    initial?.price.iptu ? formatBRLDisplay(initial.price.iptu) : '')
 
   useEffect(() => {
     fetch('/api/admin/features')
@@ -61,9 +207,6 @@ export default function PropertyForm({ property: initial }: { property?: Propert
       .then(setSavedCustomFeatures)
       .catch(() => {})
   }, [])
-  const [deleteConfirm, setDeleteConfirm] = useState('')
-  const [isDeleting, setIsDeleting] = useState(false)
-  const [toast, setToast] = useState<{ msg: string; type: 'success' | 'error' } | null>(null)
 
   function set<K extends keyof Property>(key: K, value: Property[K]) {
     setForm(f => ({ ...f, [key]: value }))
@@ -183,35 +326,6 @@ export default function PropertyForm({ property: initial }: { property?: Propert
     setForm(prev => ({ ...prev, features: prev.features.filter(f => f !== value) }))
   }
 
-  const Input = ({ label, value, onChange, error, placeholder, type = 'text', required = false }: {
-    label: string; value: string | number; onChange: (v: string) => void
-    error?: string; placeholder?: string; type?: string; required?: boolean
-  }) => (
-    <div>
-      <label className="block text-xs font-semibold text-neutral-600 mb-1">
-        {label}{required && <span className="text-red-500 ml-0.5">*</span>}
-      </label>
-      <input type={type} value={value} onChange={e => onChange(e.target.value)} placeholder={placeholder}
-        className={`w-full px-3 py-2.5 bg-neutral-100 rounded-lg text-sm border-0 outline-none focus:ring-2 ${error ? 'ring-2 ring-red-300' : 'focus:ring-[#1E3A5F]/20'}`} />
-      {error && <p className="text-xs text-red-500 mt-1">{error}</p>}
-    </div>
-  )
-
-  const Toggle = ({ label, description, checked, onChange }: {
-    label: string; description: string; checked: boolean; onChange: (v: boolean) => void
-  }) => (
-    <div className="flex items-center justify-between py-3 border-b border-neutral-100 last:border-0">
-      <div>
-        <p className="text-sm font-medium text-neutral-800">{label}</p>
-        <p className="text-xs text-neutral-400">{description}</p>
-      </div>
-      <button type="button" onClick={() => onChange(!checked)}
-        className={`relative w-11 h-6 rounded-full transition-colors flex-shrink-0 ${checked ? 'bg-[#1E3A5F]' : 'bg-neutral-300'}`}>
-        <span className={`absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full shadow transition-transform ${checked ? 'translate-x-5' : 'translate-x-0'}`} />
-      </button>
-    </div>
-  )
-
   return (
     <div className="w-full max-w-3xl">
       {/* Toast */}
@@ -269,6 +383,7 @@ export default function PropertyForm({ property: initial }: { property?: Propert
 
       <div className="space-y-4">
 
+        {/* ── Info Básica ── */}
         {activeTab === 'Info Básica' && (
           <>
             <Input label="Título" required value={form.title} onChange={v => set('title', v)} error={errors.title} placeholder="ex. Loft Moderno no Centro" />
@@ -295,6 +410,7 @@ export default function PropertyForm({ property: initial }: { property?: Propert
           </>
         )}
 
+        {/* ── Preço ── */}
         {activeTab === 'Preço' && (
           <>
             <div>
@@ -308,35 +424,66 @@ export default function PropertyForm({ property: initial }: { property?: Propert
                 ))}
               </div>
             </div>
-            <div>
-              <label className="block text-xs font-semibold text-neutral-600 mb-1">Preço <span className="text-red-500">*</span></label>
-              <div className="flex gap-2">
-                <span className="px-3 py-2.5 bg-neutral-100 rounded-lg text-sm text-neutral-500 flex-shrink-0">{form.price.currency}</span>
-                <input type="number" value={form.price.amount || ''} placeholder="0"
-                  onChange={e => set('price', { ...form.price, amount: parseFloat(e.target.value) || 0 })}
-                  className={`flex-1 px-3 py-2.5 bg-neutral-100 rounded-lg text-sm border-0 outline-none focus:ring-2 ${errors['price.amount'] ? 'ring-2 ring-red-300' : 'focus:ring-[#1E3A5F]/20'}`} />
-              </div>
-              {errors['price.amount'] && <p className="text-xs text-red-500 mt-1">{errors['price.amount']}</p>}
-            </div>
+
             <div>
               <label className="block text-xs font-semibold text-neutral-600 mb-1">Moeda</label>
-              <select value={form.price.currency} onChange={e => set('price', { ...form.price, currency: e.target.value as any })}
+              <select
+                value={form.price.currency}
+                onChange={e => {
+                  const curr = e.target.value as 'BRL' | 'CAD' | 'USD'
+                  if (curr === 'BRL' && form.price.amount) setBrlDisplay(formatBRLDisplay(form.price.amount))
+                  set('price', { ...form.price, currency: curr })
+                }}
                 className="w-full px-3 py-2.5 bg-neutral-100 rounded-lg text-sm border-0 outline-none focus:ring-2 focus:ring-[#1E3A5F]/20">
-                <option value="BRL">BRL</option>
-                <option value="CAD">CAD</option>
-                <option value="USD">USD</option>
+                <option value="BRL">BRL – Real Brasileiro</option>
+                <option value="CAD">CAD – Dólar Canadense</option>
+                <option value="USD">USD – Dólar Americano</option>
               </select>
             </div>
+
+            {form.price.currency === 'BRL' ? (
+              <BRLInput
+                label="Preço"
+                required
+                display={brlDisplay}
+                onChangeDisplay={raw => handleBRLChange(raw, setBrlDisplay, amount => set('price', { ...form.price, amount }))}
+                error={errors['price.amount']}
+              />
+            ) : (
+              <div>
+                <label className="block text-xs font-semibold text-neutral-600 mb-1">Preço <span className="text-red-500">*</span></label>
+                <div className="flex gap-2">
+                  <span className="px-3 py-2.5 bg-neutral-100 rounded-lg text-sm text-neutral-500 flex-shrink-0">{form.price.currency}</span>
+                  <input type="number" value={form.price.amount || ''} placeholder="0"
+                    onChange={e => set('price', { ...form.price, amount: parseFloat(e.target.value) || 0 })}
+                    className={`flex-1 px-3 py-2.5 bg-neutral-100 rounded-lg text-sm border-0 outline-none focus:ring-2 ${errors['price.amount'] ? 'ring-2 ring-red-300' : 'focus:ring-[#1E3A5F]/20'}`} />
+                </div>
+                {errors['price.amount'] && <p className="text-xs text-red-500 mt-1">{errors['price.amount']}</p>}
+              </div>
+            )}
+
+            <BRLInput
+              label="Condomínio (mensal)"
+              display={condominioDisplay}
+              onChangeDisplay={raw => handleBRLChange(raw, setCondominioDisplay, amount => set('price', { ...form.price, condominio: amount || undefined }))}
+            />
+
+            <BRLInput
+              label="IPTU (anual)"
+              display={iptuDisplay}
+              onChangeDisplay={raw => handleBRLChange(raw, setIptuDisplay, amount => set('price', { ...form.price, iptu: amount || undefined }))}
+            />
           </>
         )}
 
+        {/* ── Localização ── */}
         {activeTab === 'Localização' && (
           <>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <Input label="Endereço" required value={form.location.address} onChange={v => set('location', { ...form.location, address: v })} error={errors['location.address']} />
               <Input label="Cidade" required value={form.location.city} onChange={v => set('location', { ...form.location, city: v })} error={errors['location.city']} />
-              <Input label="Província" required value={form.location.province} onChange={v => set('location', { ...form.location, province: v })} error={errors['location.province']} />
-              <Input label="Código Postal" value={form.location.postalCode ?? ''} onChange={v => set('location', { ...form.location, postalCode: v })} />
+              <Input label="Província / Estado" required value={form.location.province} onChange={v => set('location', { ...form.location, province: v })} error={errors['location.province']} />
+              <Input label="Código Postal / CEP" value={form.location.postalCode ?? ''} onChange={v => set('location', { ...form.location, postalCode: v })} />
             </div>
             <Input label="Residencial / Comunidade" required value={form.location.residential} onChange={v => set('location', { ...form.location, residential: v })} error={errors['location.residential']} />
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -346,25 +493,37 @@ export default function PropertyForm({ property: initial }: { property?: Propert
           </>
         )}
 
+        {/* ── Detalhes ── */}
         {activeTab === 'Detalhes' && (
           <>
-            {([['bedrooms', 'Quartos'], ['bathrooms', 'Banheiros']] as const).map(([key, label]) => (
-              <div key={key}>
-                <label className="block text-xs font-semibold text-neutral-600 mb-1">{label} <span className="text-red-500">*</span></label>
-                <div className="flex items-center gap-3">
-                  <button type="button" onClick={() => set('propertyDetails', { ...form.propertyDetails, [key]: Math.max(0, form.propertyDetails[key] - 1) })}
-                    className="w-9 h-9 rounded-lg bg-neutral-100 hover:bg-neutral-200 flex items-center justify-center text-neutral-600 font-bold transition-colors">−</button>
-                  <span className="w-8 text-center text-sm font-semibold">{form.propertyDetails[key]}</span>
-                  <button type="button" onClick={() => set('propertyDetails', { ...form.propertyDetails, [key]: form.propertyDetails[key] + 1 })}
-                    className="w-9 h-9 rounded-lg bg-neutral-100 hover:bg-neutral-200 flex items-center justify-center text-neutral-600 font-bold transition-colors">+</button>
-                </div>
-              </div>
-            ))}
+            <Counter
+              label="Número de Suítes"
+              value={form.propertyDetails.bedrooms}
+              onChange={n => set('propertyDetails', { ...form.propertyDetails, bedrooms: n })}
+              required
+            />
+            <Counter
+              label="Banheiros"
+              value={form.propertyDetails.bathrooms}
+              onChange={n => set('propertyDetails', { ...form.propertyDetails, bathrooms: n })}
+              required
+            />
+            <Counter
+              label="Lavabo"
+              value={form.propertyDetails.lavabo ?? 0}
+              onChange={n => set('propertyDetails', { ...form.propertyDetails, lavabo: n })}
+            />
+            <Counter
+              label="Escritório"
+              value={form.propertyDetails.escritorio ?? 0}
+              onChange={n => set('propertyDetails', { ...form.propertyDetails, escritorio: n })}
+            />
             <Input label="Área (m²)" required type="number" value={form.propertyDetails.areaSqFt || ''} onChange={v => set('propertyDetails', { ...form.propertyDetails, areaSqFt: parseFloat(v) || 0 })} />
             <Input label="Ano de Construção" type="number" value={form.propertyDetails.yearBuilt ?? ''} onChange={v => set('propertyDetails', { ...form.propertyDetails, yearBuilt: parseInt(v) || undefined })} placeholder="ex. 2018" />
           </>
         )}
 
+        {/* ── Características ── */}
         {activeTab === 'Características' && (
           <>
             <p className="text-xs text-neutral-500">Clique para selecionar características</p>
@@ -402,6 +561,7 @@ export default function PropertyForm({ property: initial }: { property?: Propert
           </>
         )}
 
+        {/* ── Mídia ── */}
         {activeTab === 'Mídia' && (
           <>
             <div>
@@ -449,6 +609,7 @@ export default function PropertyForm({ property: initial }: { property?: Propert
           </>
         )}
 
+        {/* ── Status & Agente ── */}
         {activeTab === 'Status & Agente' && (
           <>
             <div className="bg-white rounded-xl border border-neutral-100 px-4 divide-y divide-neutral-100">

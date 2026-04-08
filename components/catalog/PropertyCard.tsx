@@ -1,4 +1,4 @@
-import Link from 'next/link'
+﻿import Link from 'next/link'
 import { type Property, formatPrice, sqftToM2 } from '@/data/properties'
 
 const TYPE_LABELS: Record<Property['propertyDetails']['type'], string> = {
@@ -17,7 +17,7 @@ export default function PropertyCard({ p }: { p: Property }) {
         className="group flex flex-col overflow-hidden rounded-[14px] bg-white cursor-pointer
                    transition-all duration-300 hover:-translate-y-1"
         style={{
-          border: '1px solid #E6E6EF',
+          border: '1px solid #E0DACE',
           boxShadow: '0 4px 20px rgba(0,0,0,0.06)',
         }}
         onMouseEnter={e => (e.currentTarget.style.boxShadow = '0 12px 36px rgba(0,0,0,0.11)')}
@@ -37,7 +37,7 @@ export default function PropertyCard({ p }: { p: Property }) {
           {/* Transaction badge */}
           <span className={`absolute top-3 left-3 rounded-full px-2.5 py-1 text-[11px] font-semibold
                             text-white backdrop-blur-sm
-                            ${isSale ? 'bg-emerald-500' : 'bg-[#6D6D85]'}`}>
+                            ${isSale ? 'bg-emerald-500' : 'bg-[#6B6B99]'}`}>
             {isSale ? 'À Venda' : 'Para Alugar'}
           </span>
 
@@ -59,18 +59,18 @@ export default function PropertyCard({ p }: { p: Property }) {
         {/* ── Body ─────────────────────────────────────────────────────────────── */}
         <div className="flex flex-1 flex-col p-5">
           {/* Price */}
-          <p className="text-xl font-extrabold text-[#4F4F6B] leading-tight">
+          <p className="text-xl font-extrabold text-[#4E6B5E] leading-tight">
             {formatPrice(p)}
           </p>
 
           {/* Title */}
-          <h3 className="mt-1.5 text-sm font-semibold text-[#2E2E3A] leading-snug
-                         group-hover:text-[#6D6D85] transition-colors duration-200 line-clamp-1">
+          <h3 className="mt-1.5 text-sm font-semibold text-[#4A5240] leading-snug
+                         group-hover:text-[#6B6B99] transition-colors duration-200 line-clamp-1">
             {p.title}
           </h3>
 
           {/* Address */}
-          <p className="mt-1 flex items-center gap-1 text-xs text-[#A3A3C2] line-clamp-1">
+          <p className="mt-1 flex items-center gap-1 text-xs text-[#9898BB] line-clamp-1">
             <svg className="h-3.5 w-3.5 shrink-0" fill="none" viewBox="0 0 24 24"
                  strokeWidth={1.8} stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round"
@@ -80,7 +80,7 @@ export default function PropertyCard({ p }: { p: Property }) {
           </p>
 
           {/* Specs */}
-          <div className="mt-auto pt-4 flex items-center gap-3 text-xs text-[#A3A3C2] border-t border-[#E6E6EF]">
+          <div className="mt-auto pt-4 flex items-center gap-3 text-xs text-[#9898BB] border-t border-[#E0DACE]">
             {p.propertyDetails.bedrooms > 0 && (
               <span className="flex items-center gap-1">
                 <svg className="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none"
@@ -101,7 +101,7 @@ export default function PropertyCard({ p }: { p: Property }) {
                 {p.propertyDetails.bathrooms} banheiro{p.propertyDetails.bathrooms !== 1 ? 's' : ''}
               </span>
             )}
-            <span className="ml-auto font-medium text-[#6D6D85]">
+            <span className="ml-auto font-medium text-[#6B6B99]">
               {sqftToM2(p.propertyDetails.areaSqFt).toLocaleString()} m²
             </span>
           </div>

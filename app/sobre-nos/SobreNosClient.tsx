@@ -88,12 +88,12 @@ function ValueCard({
         transform: visible ? 'translateY(0)' : 'translateY(24px)',
       }}
     >
-      <div className="bg-white rounded-2xl p-8 border border-[#E6E6EF] shadow-[0_4px_20px_rgba(0,0,0,0.05)] hover:shadow-[0_12px_40px_rgba(0,0,0,0.1)] hover:-translate-y-1 transition-all duration-300 h-full">
-        <div className="w-12 h-12 rounded-xl bg-[#F7F7FA] border border-[#E6E6EF] flex items-center justify-center mb-5 text-[#6D6D85]">
+      <div className="bg-white rounded-2xl p-8 border border-[#E0DACE] shadow-[0_4px_20px_rgba(0,0,0,0.05)] hover:shadow-[0_12px_40px_rgba(0,0,0,0.1)] hover:-translate-y-1 transition-all duration-300 h-full">
+        <div className="w-12 h-12 rounded-xl bg-[#F5F0E8] border border-[#E0DACE] flex items-center justify-center mb-5 text-[#6B6B99]">
           {icon}
         </div>
-        <h3 className="text-lg font-bold text-[#2E2E3A] mb-3">{title}</h3>
-        <p className="text-[#A3A3C2] text-sm leading-relaxed">{description}</p>
+        <h3 className="text-lg font-bold text-[#4A5240] mb-3">{title}</h3>
+        <p className="text-[#9898BB] text-sm leading-relaxed">{description}</p>
       </div>
     </div>
   )
@@ -121,32 +121,32 @@ export default function SobreNosClient() {
   return (
     <>
       {/* ── Hero ─────────────────────────────────────────────────────────────── */}
-      <section className="relative bg-white border-b border-[#E6E6EF] overflow-hidden">
+      <section className="relative bg-white border-b border-[#E0DACE] overflow-hidden">
         {/* Decorative circles */}
-        <div className="absolute -top-20 -right-20 w-96 h-96 rounded-full bg-[#6D6D85]/5 pointer-events-none" />
-        <div className="absolute -bottom-10 -left-10 w-64 h-64 rounded-full bg-[#6D6D85]/5 pointer-events-none" />
+        <div className="absolute -top-20 -right-20 w-96 h-96 rounded-full bg-[#6B6B99]/5 pointer-events-none" />
+        <div className="absolute -bottom-10 -left-10 w-64 h-64 rounded-full bg-[#6B6B99]/5 pointer-events-none" />
 
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-20 animate-page-in relative">
-          <p className="text-xs font-bold uppercase tracking-[0.18em] text-[#6D6D85] mb-4">
+          <p className="font-monument text-[10px] text-[#6B6B99] mb-4">
             Casa Baccarat
           </p>
-          <h1 className="text-5xl sm:text-6xl font-extrabold text-[#2E2E3A] tracking-tight mb-6 leading-tight">
+          <h1 className="font-monument text-5xl sm:text-6xl text-[#4A5240] mb-6">
             Quem Somos
           </h1>
-          <p className="text-xl text-[#A3A3C2] max-w-2xl leading-relaxed mb-8">
+          <p className="text-xl text-[#9898BB] max-w-2xl leading-relaxed mb-8">
             Mais do que uma imobiliária — somos parceiros na realização do seu sonho.
             Com paixão pelo que fazemos e compromisso com cada cliente.
           </p>
           {/* Animated underline accent */}
           <div className="flex items-center gap-3">
-            <div className="h-1 w-16 rounded-full bg-[#6D6D85] animate-scale-in" style={{ animationDelay: '200ms' }} />
-            <div className="h-1 w-8 rounded-full bg-[#A3A3C2] animate-scale-in" style={{ animationDelay: '320ms' }} />
-            <div className="h-1 w-4 rounded-full bg-[#E6E6EF] animate-scale-in" style={{ animationDelay: '440ms' }} />
+            <div className="h-1 w-16 rounded-full bg-[#6B6B99] animate-scale-in" style={{ animationDelay: '200ms' }} />
+            <div className="h-1 w-8 rounded-full bg-[#9898BB] animate-scale-in" style={{ animationDelay: '320ms' }} />
+            <div className="h-1 w-4 rounded-full bg-[#E0DACE] animate-scale-in" style={{ animationDelay: '440ms' }} />
           </div>
         </div>
 
         {/* Scroll hint */}
-        <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex flex-col items-center gap-1 text-[#A3A3C2] animate-fade-up" style={{ animationDelay: '600ms' }}>
+        <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex flex-col items-center gap-1 text-[#9898BB] animate-fade-up" style={{ animationDelay: '600ms' }}>
           <span className="text-xs tracking-widest uppercase">Role para baixo</span>
           <svg className="w-4 h-4 animate-bounce" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
@@ -155,7 +155,7 @@ export default function SobreNosClient() {
       </section>
 
       {/* ── Nossa História ────────────────────────────────────────────────────── */}
-      <section ref={storyRef} className="bg-[#F7F7FA] py-20 overflow-hidden">
+      <section ref={storyRef} className="bg-[#F5F0E8] py-20 overflow-hidden">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
 
@@ -170,7 +170,7 @@ export default function SobreNosClient() {
             >
               <div className="relative inline-block">
                 {/* Decorative background blob */}
-                <div className="absolute -inset-4 rounded-3xl bg-[#6D6D85]/10 -rotate-3" />
+                <div className="absolute -inset-4 rounded-3xl bg-[#6B6B99]/10 -rotate-3" />
                 {/* Photo frame */}
                 <div className="relative rounded-2xl overflow-hidden shadow-2xl border-4 border-white rotate-[-2deg] hover:rotate-0 transition-transform duration-500">
                   {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -181,13 +181,13 @@ export default function SobreNosClient() {
                     style={{ maxWidth: 420 }}
                   />
                   {/* Fun overlay badge */}
-                  <div className="absolute bottom-4 left-4 bg-white rounded-xl px-4 py-2 shadow-lg border border-[#E6E6EF]">
-                    <p className="text-xs font-bold text-[#2E2E3A]">Julia Baccarat</p>
-                    <p className="text-[11px] text-[#A3A3C2]">Fundador & CEO</p>
+                  <div className="absolute bottom-4 left-4 bg-white rounded-xl px-4 py-2 shadow-lg border border-[#E0DACE]">
+                    <p className="text-xs font-bold text-[#4A5240]">Julia Baccarat</p>
+                    <p className="text-[11px] text-[#9898BB]">Fundador & CEO</p>
                   </div>
                 </div>
                 {/* Floating emoji sticker */}
-                <div className="absolute -top-4 -right-4 w-14 h-14 bg-white rounded-full shadow-lg border border-[#E6E6EF] flex items-center justify-center text-2xl animate-float">
+                <div className="absolute -top-4 -right-4 w-14 h-14 bg-white rounded-full shadow-lg border border-[#E0DACE] flex items-center justify-center text-2xl animate-float">
                   🏡
                 </div>
               </div>
@@ -202,14 +202,14 @@ export default function SobreNosClient() {
                 transitionDelay: '250ms',
               }}
             >
-              <p className="text-xs font-bold uppercase tracking-[0.18em] text-[#6D6D85] mb-3">
+              <p className="font-monument text-[10px] text-[#6B6B99] mb-3">
                 Nossa História
               </p>
-              <h2 className="text-3xl sm:text-4xl font-extrabold text-[#2E2E3A] tracking-tight mb-6 leading-tight">
+              <h2 className="font-monument text-3xl sm:text-4xl text-[#4A5240] mb-6">
                 Nascemos da vontade<br />de fazer diferente
               </h2>
 
-              <div className="space-y-4 text-[#5a5a72] leading-relaxed">
+              <div className="space-y-4 text-[##4E6B5E] leading-relaxed">
                 <p>
                   A Casa Baccarat nasceu de um sonho simples: ajudar pessoas a encontrarem
                   não apenas um imóvel, mas um lar. Após anos trabalhando no mercado
@@ -229,13 +229,13 @@ export default function SobreNosClient() {
               </div>
 
               <div className="mt-8 flex flex-wrap gap-3">
-                <span className="inline-flex items-center gap-2 bg-white rounded-full px-4 py-2 text-sm font-medium text-[#6D6D85] border border-[#E6E6EF] shadow-sm">
+                <span className="inline-flex items-center gap-2 bg-white rounded-full px-4 py-2 text-sm font-medium text-[#6B6B99] border border-[#E0DACE] shadow-sm">
                   <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                   </svg>
                   CRECI Regularizado
                 </span>
-                <span className="inline-flex items-center gap-2 bg-white rounded-full px-4 py-2 text-sm font-medium text-[#6D6D85] border border-[#E6E6EF] shadow-sm">
+                <span className="inline-flex items-center gap-2 bg-white rounded-full px-4 py-2 text-sm font-medium text-[#6B6B99] border border-[#E0DACE] shadow-sm">
                   <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" d="M11.48 3.499a.562.562 0 011.04 0l2.125 5.111a.563.563 0 00.475.345l5.518.442c.499.04.701.663.321.988l-4.204 3.602a.563.563 0 00-.182.557l1.285 5.385a.562.562 0 01-.84.61l-4.725-2.885a.563.563 0 00-.586 0L6.982 20.54a.562.562 0 01-.84-.61l1.285-5.386a.562.562 0 00-.182-.557l-4.204-3.602a.562.562 0 01.321-.988l5.518-.442a.563.563 0 00.475-.345L11.48 3.5z" />
                   </svg>
@@ -251,10 +251,10 @@ export default function SobreNosClient() {
       <section className="bg-white py-20">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-14 animate-fade-up">
-            <p className="text-xs font-bold uppercase tracking-[0.18em] text-[#6D6D85] mb-3">
+            <p className="font-monument text-[10px] text-[#6B6B99] mb-3">
               O que nos guia
             </p>
-            <h2 className="text-3xl sm:text-4xl font-extrabold text-[#2E2E3A] tracking-tight">
+            <h2 className="font-monument text-3xl sm:text-4xl text-[#4A5240]">
               Nossos Valores
             </h2>
           </div>
@@ -296,13 +296,13 @@ export default function SobreNosClient() {
       </section>
 
       {/* ── Em Números ───────────────────────────────────────────────────────── */}
-      <section className="bg-[#2E2E3A] py-20 overflow-hidden">
+      <section className="bg-[#4A5240] py-20 overflow-hidden">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-14">
-            <p className="text-xs font-bold uppercase tracking-[0.18em] text-[#A3A3C2] mb-3">
+            <p className="font-monument text-[10px] text-[#9898BB] mb-3">
               Nossa trajetória
             </p>
-            <h2 className="text-3xl sm:text-4xl font-extrabold text-white tracking-tight">
+            <h2 className="font-monument text-3xl sm:text-4xl text-white">
               Em Números
             </h2>
           </div>
@@ -318,7 +318,7 @@ export default function SobreNosClient() {
                 <div className="text-4xl sm:text-5xl font-extrabold text-white mb-2 tracking-tight">
                   <AnimatedCounter target={target} suffix={suffix} prefix={prefix} />
                 </div>
-                <p className="text-[#A3A3C2] text-sm">{label}</p>
+                <p className="text-[#9898BB] text-sm">{label}</p>
               </div>
             ))}
           </div>
@@ -339,7 +339,7 @@ export default function SobreNosClient() {
 function PromisaSection() {
   const { ref, visible } = useReveal()
   return (
-    <section className="bg-[#F7F7FA] py-20">
+    <section className="bg-[#F5F0E8] py-20">
       <div className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8 text-center">
         <div
           ref={ref}
@@ -349,20 +349,20 @@ function PromisaSection() {
             transform: visible ? 'scale(1)' : 'scale(0.95)',
           }}
         >
-          <div className="relative bg-white rounded-3xl p-10 sm:p-14 border border-[#E6E6EF] shadow-[0_8px_40px_rgba(0,0,0,0.06)]">
+          <div className="relative bg-white rounded-3xl p-10 sm:p-14 border border-[#E0DACE] shadow-[0_8px_40px_rgba(0,0,0,0.06)]">
             {/* Large quote mark */}
-            <span className="absolute top-6 left-8 text-8xl font-serif text-[#E6E6EF] leading-none select-none pointer-events-none">
+            <span className="absolute top-6 left-8 text-8xl font-serif text-[#E0DACE] leading-none select-none pointer-events-none">
               &ldquo;
             </span>
-            <p className="relative text-xl sm:text-2xl text-[#2E2E3A] font-medium leading-relaxed italic">
+            <p className="relative text-xl sm:text-2xl text-[#4A5240] font-medium leading-relaxed italic">
               Não vendemos imóveis. Nós ajudamos pessoas a encontrarem o lugar
               onde a vida vai acontecer. Cada chave entregue é uma história que
               começa — e isso é o que nos faz levantar todo dia com vontade de fazer mais.
             </p>
             <div className="mt-8 flex flex-col items-center gap-1">
-              <div className="w-10 h-0.5 bg-[#6D6D85] rounded-full mb-4" />
-              <p className="text-sm font-bold text-[#2E2E3A]">Julia Baccarat</p>
-              <p className="text-xs text-[#A3A3C2]">Fundador & CEO, Casa Baccarat</p>
+              <div className="w-10 h-0.5 bg-[#6B6B99] rounded-full mb-4" />
+              <p className="text-sm font-bold text-[#4A5240]">Julia Baccarat</p>
+              <p className="text-xs text-[#9898BB]">Fundador & CEO, Casa Baccarat</p>
             </div>
           </div>
         </div>
@@ -376,7 +376,7 @@ function PromisaSection() {
 function CTASection() {
   const { ref, visible } = useReveal()
   return (
-    <section className="bg-white border-t border-[#E6E6EF] py-20">
+    <section className="bg-white border-t border-[#E0DACE] py-20">
       <div
         ref={ref}
         className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 text-center transition-all duration-700"
@@ -385,21 +385,21 @@ function CTASection() {
           transform: visible ? 'translateY(0)' : 'translateY(24px)',
         }}
       >
-        <p className="text-xs font-bold uppercase tracking-[0.18em] text-[#6D6D85] mb-3">
+        <p className="font-monument text-[10px] text-[#6B6B99] mb-3">
           Vamos conversar?
         </p>
-        <h2 className="text-3xl sm:text-4xl font-extrabold text-[#2E2E3A] tracking-tight mb-4">
+        <h2 className="font-monument text-3xl sm:text-4xl text-[#4A5240] mb-4">
           Pronto para encontrar seu lar?
         </h2>
-        <p className="text-lg text-[#A3A3C2] max-w-xl mx-auto mb-10">
+        <p className="text-lg text-[#9898BB] max-w-xl mx-auto mb-10">
           Nossa equipe está pronta para te ajudar a encontrar o imóvel ideal.
           Entre em contato ou explore nosso catálogo agora mesmo.
         </p>
         <div className="flex flex-wrap justify-center gap-4">
           <Link
             href="/#listings"
-            className="inline-flex items-center gap-2 px-7 py-3.5 rounded-xl bg-[#6D6D85] text-white font-semibold text-sm
-                       hover:bg-[#4F4F6B] transition-all duration-200 shadow-[0_4px_14px_rgba(109,109,133,0.35)]
+            className="inline-flex items-center gap-2 px-7 py-3.5 rounded-xl bg-[#6B6B99] text-white font-semibold text-sm
+                       hover:bg-[#4E6B5E] transition-all duration-200 shadow-[0_4px_14px_rgba(109,109,133,0.35)]
                        hover:shadow-[0_6px_20px_rgba(109,109,133,0.45)] hover:-translate-y-0.5"
           >
             Ver Imóveis
@@ -409,8 +409,8 @@ function CTASection() {
           </Link>
           <Link
             href="/#contact"
-            className="inline-flex items-center gap-2 px-7 py-3.5 rounded-xl bg-white text-[#6D6D85] font-semibold text-sm
-                       border border-[#E6E6EF] hover:border-[#6D6D85] transition-all duration-200
+            className="inline-flex items-center gap-2 px-7 py-3.5 rounded-xl bg-white text-[#6B6B99] font-semibold text-sm
+                       border border-[#E0DACE] hover:border-[#6B6B99] transition-all duration-200
                        hover:-translate-y-0.5 shadow-[0_2px_8px_rgba(0,0,0,0.06)]"
           >
             Falar Conosco

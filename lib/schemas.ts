@@ -7,8 +7,10 @@ export const PropertySchema = z.object({
   description: z.string().min(1, 'Description is required'),
   price: z.object({
     amount: z.number().positive('Price must be positive'),
-    currency: z.enum(['CAD', 'USD']),
+    currency: z.enum(['BRL', 'CAD', 'USD']),
     type: z.enum(['rent', 'sale']),
+    condominio: z.number().min(0).optional(),
+    iptu: z.number().min(0).optional(),
   }),
   location: z.object({
     address: z.string().min(1),
@@ -25,6 +27,8 @@ export const PropertySchema = z.object({
     bathrooms: z.number().int().min(0),
     areaSqFt: z.number().min(0),
     yearBuilt: z.number().int().optional(),
+    lavabo: z.number().int().min(0).optional(),
+    escritorio: z.number().int().min(0).optional(),
   }),
   features: z.array(z.string()),
   media: z.object({

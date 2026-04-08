@@ -1,4 +1,4 @@
-'use client'
+﻿'use client'
 
 import { useEffect } from 'react'
 import Link from 'next/link'
@@ -41,7 +41,7 @@ export default function MobileMenu({ isOpen, onClose, isHome }: MobileMenuProps)
         aria-hidden="true"
         onClick={onClose}
         className={[
-          'fixed inset-0 z-40 bg-black/40 backdrop-blur-sm transition-opacity duration-300',
+          'fixed inset-0 z-60 bg-black/40 backdrop-blur-sm transition-opacity duration-300',
           isOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none',
         ].join(' ')}
       />
@@ -52,20 +52,19 @@ export default function MobileMenu({ isOpen, onClose, isHome }: MobileMenuProps)
         aria-modal="true"
         aria-label="Menu de navegação"
         className={[
-          'fixed top-0 right-0 z-50 h-full w-72 bg-white',
+          'fixed top-0 right-0 z-70 h-full w-72 bg-white',
           'flex flex-col transition-transform duration-300 ease-in-out',
           isOpen ? 'translate-x-0' : 'translate-x-full',
         ].join(' ')}
       >
         {/* Panel header */}
-        <div className="flex items-center justify-between px-6 py-5 border-b border-[#E6E6EF]">
-          <span className="text-lg font-bold tracking-tight text-[#2E2E3A]">
-            Casa <span className="text-[#6D6D85]">Baccarat</span>
-          </span>
+        <div className="flex items-center justify-between bg-[#6B6B99] px-6 py-4">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src="/logo.png" alt="Casa Baccarat Imóveis" className="h-20 w-auto" />
           <button
             onClick={onClose}
             aria-label="Fechar menu"
-            className="rounded-lg p-2 text-[#A3A3C2] hover:bg-[#F7F7FA] hover:text-[#6D6D85] transition-colors"
+            className="rounded-lg p-2 text-white/70 hover:bg-white/10 hover:text-white transition-colors"
           >
             <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
@@ -81,8 +80,8 @@ export default function MobileMenu({ isOpen, onClose, isHome }: MobileMenuProps)
                 <a
                   href={isHome ? `#${hash}` : `/#${hash}`}
                   onClick={e => handleHashNav(e, hash)}
-                  className="flex items-center gap-3 rounded-xl px-4 py-3 text-base font-medium text-[#6D6D85]
-                             hover:bg-[#F7F7FA] hover:text-[#4F4F6B] transition-colors"
+                  className="flex items-center gap-3 rounded-xl px-4 py-3 text-base font-medium text-[#6B6B99]
+                             hover:bg-[#F5F0E8] hover:text-[#4E6B5E] transition-colors"
                 >
                   {label}
                 </a>
@@ -92,8 +91,8 @@ export default function MobileMenu({ isOpen, onClose, isHome }: MobileMenuProps)
               <Link
                 href="/blog"
                 onClick={onClose}
-                className="flex items-center gap-3 rounded-xl px-4 py-3 text-base font-medium text-[#6D6D85]
-                           hover:bg-[#F7F7FA] hover:text-[#4F4F6B] transition-colors"
+                className="flex items-center gap-3 rounded-xl px-4 py-3 text-base font-medium text-[#6B6B99]
+                           hover:bg-[#F5F0E8] hover:text-[#4E6B5E] transition-colors"
               >
                 Blog
               </Link>
@@ -106,8 +105,8 @@ export default function MobileMenu({ isOpen, onClose, isHome }: MobileMenuProps)
           <a
             href={isHome ? '#listings' : '/#listings'}
             onClick={e => handleHashNav(e, 'listings')}
-            className="block w-full rounded-xl bg-[#6D6D85] px-4 py-3 text-center
-                       text-sm font-semibold text-white hover:bg-[#585874] transition-colors duration-200"
+            className="block w-full rounded-xl bg-[#6B6B99] px-4 py-3 text-center
+                       text-sm font-semibold text-white hover:bg-[#5757A0] transition-colors duration-200"
           >
             Ver Imóveis
           </a>

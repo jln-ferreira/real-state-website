@@ -51,7 +51,7 @@ function displayCAD(rawDigits: string): string {
 function Chevron({ open, className = '' }: { open: boolean; className?: string }) {
   return (
     <svg
-      className={`shrink-0 text-[#A3A3C2] transition-transform duration-200 ${open ? 'rotate-180' : ''} ${className}`}
+      className={`shrink-0 text-[#9898BB] transition-transform duration-200 ${open ? 'rotate-180' : ''} ${className}`}
       fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor"
     >
       <path strokeLinecap="round" strokeLinejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5" />
@@ -93,23 +93,23 @@ function CustomDropdown({
       onClick={() => setOpen(v => !v)}
       className={
         'relative flex cursor-pointer items-center justify-between px-4 py-3 ' +
-        'border-b border-[#E6E6EF] ' +
+        'border-b border-[#E0DACE] ' +
         'md:flex-col md:items-stretch md:justify-center md:px-5 md:py-4 ' +
         'md:border-b-0 ' +
-        (hasRightBorder ? 'md:border-r md:border-[#E6E6EF]' : '')
+        (hasRightBorder ? 'md:border-r md:border-[#E0DACE]' : '')
       }
     >
       <div className="flex min-w-0 flex-col">
-        <span className="text-[10px] font-bold uppercase tracking-widest text-[#A3A3C2]">
+        <span className="font-monument text-[10px] text-[#9898BB]">
           {label}
         </span>
         <div className="mt-0.5 hidden items-center gap-1.5 md:flex">
-          <span className="whitespace-nowrap text-sm font-semibold text-[#2E2E3A]">
+          <span className="whitespace-nowrap text-sm font-semibold text-[#4A5240]">
             {displayLabel}
           </span>
           <Chevron open={open} className="h-3 w-3" />
         </div>
-        <span className="mt-0.5 text-sm font-semibold text-[#2E2E3A] md:hidden">
+        <span className="mt-0.5 text-sm font-semibold text-[#4A5240] md:hidden">
           {displayLabel}
         </span>
       </div>
@@ -117,7 +117,7 @@ function CustomDropdown({
 
       {open && (
         <div className="absolute left-0 top-full z-[100] mt-1 min-w-[180px] overflow-hidden
-                        rounded-xl border border-[#E6E6EF] bg-white shadow-[0_8px_24px_rgba(0,0,0,0.10)]">
+                        rounded-xl border border-[#E0DACE] bg-white shadow-[0_8px_24px_rgba(0,0,0,0.10)]">
           {options.map(opt => (
             <button
               key={opt.value}
@@ -126,8 +126,8 @@ function CustomDropdown({
               className={
                 'w-full px-4 py-2.5 text-left text-sm transition-colors ' +
                 (value === opt.value
-                  ? 'bg-[#EDEDF4] font-semibold text-[#4F4F6B]'
-                  : 'text-[#2E2E3A] hover:bg-[#F7F7FA]')
+                  ? 'bg-[#EDEDF4] font-semibold text-[#4E6B5E]'
+                  : 'text-[#4A5240] hover:bg-[#F5F0E8]')
               }
             >
               {opt.label}
@@ -149,23 +149,23 @@ function Stepper({ value, onChange }: { value: number; onChange: (v: number) => 
         onClick={() => onChange(Math.max(0, value - 1))}
         disabled={value === 0}
         className="flex h-8 w-8 items-center justify-center rounded-full border-2
-                   border-[#E6E6EF] text-[#2E2E3A] transition-colors
-                   hover:border-[#6D6D85] hover:text-[#6D6D85]
+                   border-[#E0DACE] text-[#4A5240] transition-colors
+                   hover:border-[#6B6B99] hover:text-[#6B6B99]
                    disabled:cursor-not-allowed disabled:opacity-30"
       >
         <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor">
           <path strokeLinecap="round" strokeLinejoin="round" d="M5 12h14" />
         </svg>
       </button>
-      <span className="w-7 text-center text-sm font-bold text-[#2E2E3A]">
+      <span className="w-7 text-center text-sm font-bold text-[#4A5240]">
         {value}+
       </span>
       <button
         type="button"
         onClick={() => onChange(value + 1)}
         className="flex h-8 w-8 items-center justify-center rounded-full border-2
-                   border-[#E6E6EF] text-[#2E2E3A] transition-colors
-                   hover:border-[#6D6D85] hover:text-[#6D6D85]"
+                   border-[#E0DACE] text-[#4A5240] transition-colors
+                   hover:border-[#6B6B99] hover:text-[#6B6B99]"
       >
         <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor">
           <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
@@ -184,7 +184,7 @@ function AdvancedInput({
 }) {
   return (
     <div>
-      <label className="mb-1.5 block text-[10px] font-bold uppercase tracking-widest text-[#A3A3C2]">
+      <label className="mb-1.5 block font-monument text-[10px] text-[#9898BB]">
         {label}
       </label>
       <input
@@ -192,9 +192,9 @@ function AdvancedInput({
         placeholder={placeholder}
         value={value}
         onChange={e => onChange(e.target.value)}
-        className="w-full rounded-xl border border-[#E6E6EF] bg-white px-4 py-3
-                   text-sm text-[#2E2E3A] placeholder-[#C8C8D8]
-                   outline-none transition focus:border-[#6D6D85] focus:ring-1 focus:ring-[#6D6D85]/30"
+        className="w-full rounded-xl border border-[#E0DACE] bg-white px-4 py-3
+                   text-sm text-[#4A5240] placeholder-[#C8C8D8]
+                   outline-none transition focus:border-[#6B6B99] focus:ring-1 focus:ring-[#6B6B99]/30"
       />
     </div>
   )
@@ -227,7 +227,7 @@ function HeroSection({ filters, onChange, totalCount }: { filters: Filters; onCh
   ]
 
   return (
-    <section id="home" className="relative bg-[#F7F7FA]">
+    <section id="home" className="relative bg-[#F5F0E8]">
 
       {/* Decorative radial gradients — clipped to section, never affecting dropdowns */}
       <div aria-hidden="true" className="pointer-events-none absolute inset-0 overflow-hidden">
@@ -248,29 +248,29 @@ function HeroSection({ filters, onChange, totalCount }: { filters: Filters; onCh
 
           {/* Left — headline + CTA */}
           <div className="animate-page-in">
-            <p className="mb-4 text-xs font-bold uppercase tracking-[0.18em] text-[#6D6D85]">
+            <p className="font-monument mb-4 text-[10px] text-[#C8DDB8]">
               Bem-vindo à Casa Baccarat
             </p>
-            <h1 className="text-4xl font-extrabold leading-[1.15] text-[#2E2E3A] sm:text-5xl lg:text-[3.25rem]">
+            <h1 className="font-monument text-4xl leading-[1.25] text-[#4A5240] sm:text-5xl lg:text-[3.25rem]">
               Encontre o imóvel<br />
-              <span className="text-[#6D6D85]">ideal para você</span>
+              <span className="text-[#6B6B99]">ideal para você</span>
             </h1>
-            <p className="mt-5 max-w-[420px] text-lg leading-relaxed text-[#A3A3C2]">
+            <p className="mt-5 max-w-[420px] text-base font-light leading-relaxed text-[#4E6B5E]">
               Explore centenas de anúncios verificados. Compra, venda ou aluguel — encontramos a opção certa para o seu momento.
             </p>
             <div className="mt-8 flex flex-wrap items-center gap-4">
               <button
                 onClick={scrollToListings}
-                className="inline-flex items-center gap-2 rounded-xl bg-[#6D6D85] px-6 py-3.5
+                className="inline-flex items-center gap-2 rounded-xl bg-[#6B6B99] px-6 py-3.5
                            text-sm font-semibold text-white shadow-sm
-                           hover:bg-[#585874] transition-colors duration-200"
+                           hover:bg-[#5757A0] transition-colors duration-200"
               >
                 Explorar Imóveis
                 <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
                 </svg>
               </button>
-              <span className="text-sm text-[#A3A3C2]">
+              <span className="text-sm text-[#9898BB]">
                 {totalCount > 0 ? `${totalCount} imóveis disponíveis` : 'Imóveis disponíveis'}
               </span>
             </div>
@@ -296,13 +296,13 @@ function HeroSection({ filters, onChange, totalCount }: { filters: Filters; onCh
             {/* Floating stats card */}
             <div className="absolute bottom-5 left-5 rounded-xl bg-white px-4 py-3"
                  style={{ boxShadow: '0 4px 20px rgba(0,0,0,0.12)' }}>
-              <p className="text-[10px] font-bold uppercase tracking-widest text-[#A3A3C2]">
+              <p className="font-monument text-[10px] text-[#9898BB]">
                 Imóveis verificados
               </p>
-              <p className="mt-0.5 text-2xl font-extrabold text-[#2E2E3A]">{totalCount > 0 ? `${totalCount}+` : '—'}</p>
+              <p className="mt-0.5 font-monument text-2xl text-[#4A5240]">{totalCount > 0 ? `${totalCount}+` : '—'}</p>
             </div>
             {/* Floating badge */}
-            <div className="absolute top-5 right-5 rounded-xl bg-[#6D6D85] px-3 py-1.5">
+            <div className="absolute top-5 right-5 rounded-xl bg-[#6B6B99] px-3 py-1.5">
               <p className="text-[11px] font-semibold text-white">★ Plataforma verificada</p>
             </div>
           </div>
@@ -312,7 +312,7 @@ function HeroSection({ filters, onChange, totalCount }: { filters: Filters; onCh
         <div className="mt-10">
           <div
             className="rounded-2xl bg-white"
-            style={{ boxShadow: '0 4px 20px rgba(0,0,0,0.07)', border: '1px solid #E6E6EF' }}
+            style={{ boxShadow: '0 4px 20px rgba(0,0,0,0.07)', border: '1px solid #E0DACE' }}
           >
             <div className="flex flex-col md:flex-row md:items-stretch">
 
@@ -333,11 +333,11 @@ function HeroSection({ filters, onChange, totalCount }: { filters: Filters; onCh
               />
 
               {/* VALOR MÁX */}
-              <div className="flex flex-1 flex-col border-b border-[#E6E6EF]
+              <div className="flex flex-1 flex-col border-b border-[#E0DACE]
                               px-4 py-3 text-left
-                              md:justify-center md:border-b-0 md:border-r md:border-[#E6E6EF]
+                              md:justify-center md:border-b-0 md:border-r md:border-[#E0DACE]
                               md:px-5 md:py-4">
-                <span className="text-[10px] font-bold uppercase tracking-widest text-[#A3A3C2]">
+                <span className="font-monument text-[10px] text-[#9898BB]">
                   VALOR MÁX.
                 </span>
                 <input
@@ -345,7 +345,7 @@ function HeroSection({ filters, onChange, totalCount }: { filters: Filters; onCh
                   value={displayCAD(filters.valorMax)}
                   placeholder="CA$ Ilimitado"
                   onChange={e => set({ valorMax: e.target.value.replace(/\D/g, '') })}
-                  className="mt-0.5 w-full bg-transparent text-sm font-semibold text-[#2E2E3A]
+                  className="mt-0.5 w-full bg-transparent text-sm font-semibold text-[#4A5240]
                              placeholder-[#C8C8D8] outline-none"
                 />
               </div>
@@ -361,7 +361,7 @@ function HeroSection({ filters, onChange, totalCount }: { filters: Filters; onCh
               {/* REF */}
               <div className="flex flex-col px-4 py-3 text-left
                               md:justify-center md:px-5 md:py-4">
-                <span className="text-[10px] font-bold uppercase tracking-widest text-[#A3A3C2]">
+                <span className="font-monument text-[10px] text-[#9898BB]">
                   REF.
                 </span>
                 <input
@@ -369,7 +369,7 @@ function HeroSection({ filters, onChange, totalCount }: { filters: Filters; onCh
                   value={filters.ref}
                   placeholder="PROP-000"
                   onChange={e => set({ ref: e.target.value })}
-                  className="mt-0.5 w-full bg-transparent text-sm font-semibold text-[#2E2E3A]
+                  className="mt-0.5 w-full bg-transparent text-sm font-semibold text-[#4A5240]
                              placeholder-[#C8C8D8] outline-none"
                 />
               </div>
@@ -378,8 +378,8 @@ function HeroSection({ filters, onChange, totalCount }: { filters: Filters; onCh
               <button
                 onClick={handleSearch}
                 className="flex shrink-0 items-center justify-center gap-2
-                           bg-[#6D6D85] px-7 py-4 text-sm font-bold text-white whitespace-nowrap
-                           transition-colors duration-200 hover:bg-[#585874]
+                           bg-[#6B6B99] px-7 py-4 text-sm font-bold text-white whitespace-nowrap
+                           transition-colors duration-200 hover:bg-[#5757A0]
                            rounded-b-2xl md:rounded-b-none md:rounded-r-2xl"
               >
                 <svg className="h-4 w-4 shrink-0" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
@@ -396,7 +396,7 @@ function HeroSection({ filters, onChange, totalCount }: { filters: Filters; onCh
             <button
               onClick={() => setExpanded(v => !v)}
               className="flex items-center gap-1.5 text-sm font-medium
-                         text-[#A3A3C2] transition-colors hover:text-[#6D6D85]"
+                         text-[#9898BB] transition-colors hover:text-[#6B6B99]"
             >
               Filtros Avançados
               <svg
@@ -416,28 +416,28 @@ function HeroSection({ filters, onChange, totalCount }: { filters: Filters; onCh
             }
           >
             <div
-              className="rounded-2xl bg-white p-6"
-              style={{ border: '1px solid #E6E6EF', boxShadow: '0 4px 20px rgba(0,0,0,0.05)' }}
+              className="rounded-2xl bg-[#F5F0E8] p-6"
+              style={{ border: '3px solid #C8DDB8', boxShadow: '0 4px 20px rgba(0,0,0,0.05)' }}
             >
-              <p className="mb-4 text-[10px] font-bold uppercase tracking-widest text-[#A3A3C2]">
+              <p className="mb-4 font-monument text-[10px] text-[#9898BB]">
                 Filtros Avançados
               </p>
 
               {/* Steppers + Area */}
               <div className="mb-5 grid grid-cols-2 gap-3">
-                <div className="flex flex-col items-center gap-3 rounded-xl border border-[#E6E6EF] bg-[#F7F7FA] p-4">
-                  <span className="text-[10px] font-bold uppercase tracking-widest text-[#A3A3C2]">
-                    QUARTOS
+                <div className="flex flex-col items-center gap-3 rounded-xl border border-[#E0DACE] bg-white p-4">
+                  <span className="font-monument text-[10px] text-[#9898BB]">
+                    NUMERO DE SUITES
                   </span>
                   <Stepper value={filters.bedrooms} onChange={v => set({ bedrooms: v })} />
                 </div>
-                <div className="flex flex-col items-center gap-3 rounded-xl border border-[#E6E6EF] bg-[#F7F7FA] p-4">
-                  <span className="text-[10px] font-bold uppercase tracking-widest text-[#A3A3C2]">
-                    BANHEIROS
+                <div className="flex flex-col items-center gap-3 rounded-xl border border-[#E0DACE] bg-white p-4">
+                  <span className="font-monument text-[10px] text-[#9898BB]">
+                    NUMERO DE LAVABOS
                   </span>
                   <Stepper value={filters.bathrooms} onChange={v => set({ bathrooms: v })} />
                 </div>
-                <div className="rounded-xl border border-[#E6E6EF] bg-[#F7F7FA] p-4">
+                <div className="rounded-xl border border-[#E0DACE] bg-white p-4">
                   <AdvancedInput
                     label="ÁREA MÍN (m²)"
                     placeholder="0"
@@ -445,7 +445,7 @@ function HeroSection({ filters, onChange, totalCount }: { filters: Filters; onCh
                     onChange={v => set({ areaMin: v })}
                   />
                 </div>
-                <div className="rounded-xl border border-[#E6E6EF] bg-[#F7F7FA] p-4">
+                <div className="rounded-xl border border-[#E0DACE] bg-white p-4">
                   <AdvancedInput
                     label="ÁREA MÁX (m²)"
                     placeholder="Ilimitado"
@@ -457,7 +457,7 @@ function HeroSection({ filters, onChange, totalCount }: { filters: Filters; onCh
 
               {/* Features */}
               <div>
-                <span className="mb-3 block text-[10px] font-bold uppercase tracking-widest text-[#A3A3C2]">
+                <span className="mb-3 block font-monument text-[10px] text-[#9898BB]">
                   CARACTERÍSTICAS
                 </span>
                 <div className="flex flex-wrap gap-2">
@@ -471,8 +471,8 @@ function HeroSection({ filters, onChange, totalCount }: { filters: Filters; onCh
                         className={
                           'cursor-pointer rounded-full border px-4 py-1.5 text-sm font-medium transition-colors duration-200 ' +
                           (active
-                            ? 'border-[#6D6D85] bg-[#6D6D85] text-white'
-                            : 'border-[#E6E6EF] bg-white text-[#6D6D85] hover:border-[#6D6D85]')
+                            ? 'border-[#6B6B99] bg-[#6B6B99] text-white'
+                            : 'border-[#E0DACE] bg-white text-[#6B6B99] hover:border-[#6B6B99]')
                         }
                       >
                         {label}
@@ -485,13 +485,13 @@ function HeroSection({ filters, onChange, totalCount }: { filters: Filters; onCh
               {/* Clear */}
               {(filters.bedrooms > 0 || filters.bathrooms > 0 ||
                 filters.areaMin || filters.areaMax || filters.features.length > 0) && (
-                <div className="mt-5 flex justify-end border-t border-[#E6E6EF] pt-4">
+                <div className="mt-5 flex justify-end border-t border-[#E0DACE] pt-4">
                   <button
                     type="button"
                     onClick={() => set({ bedrooms: 0, bathrooms: 0, areaMin: '', areaMax: '', features: [] })}
-                    className="flex items-center gap-1.5 rounded-full border border-[#E6E6EF] px-4 py-1.5
-                               text-sm font-medium text-[#A3A3C2] transition-colors
-                               hover:border-[#6D6D85] hover:text-[#6D6D85]"
+                    className="flex items-center gap-1.5 rounded-full border border-[#E0DACE] px-4 py-1.5
+                               text-sm font-medium text-[#9898BB] transition-colors
+                               hover:border-[#6B6B99] hover:text-[#6B6B99]"
                   >
                     <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />

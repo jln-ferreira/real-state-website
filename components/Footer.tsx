@@ -1,4 +1,4 @@
-import Link from 'next/link'
+﻿import Link from 'next/link'
 
 // ── Social icons ───────────────────────────────────────────────────────────────
 
@@ -75,7 +75,7 @@ const LEGAL_LINKS = [
 // ── Shared link style ─────────────────────────────────────────────────────────
 
 const linkCls =
-  'text-sm text-slate-400 transition-colors duration-200 hover:text-white'
+  'text-sm text-[#B8C8A8] font-light transition-colors duration-200 hover:text-white'
 
 // ── Footer ────────────────────────────────────────────────────────────────────
 
@@ -83,7 +83,7 @@ export default function Footer() {
   const year = new Date().getFullYear()
 
   return (
-    <footer id="contact" className="border-t border-slate-800 bg-slate-900">
+    <footer id="contact" className="border-t border-[#2A3124] bg-[#1E231A]">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
 
         {/* ── Main grid ──────────────────────────────────────────────────────── */}
@@ -92,23 +92,19 @@ export default function Footer() {
           {/* Section 1 — Brand ─────────────────────────────────────────────── */}
           <div className="flex flex-col items-center gap-4 sm:items-start">
             {/* Logo */}
-            <a href="#home" aria-label="Casa Baccarat início" className="flex items-center gap-2 w-fit">
-              <svg className="h-7 w-7 text-[#6D6D85]" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                <path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z" />
-              </svg>
-              <span className="text-xl font-bold tracking-tight text-white">
-                Casa <span className="text-[#6D6D85]">Baccarat</span>
-              </span>
+            <a href="#home" aria-label="Casa Baccarat início" className="w-fit">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src="/logo.png" alt="Casa Baccarat Imóveis" className="h-28 w-auto rounded-2xl" />
             </a>
 
-            <p className="max-w-xs text-center text-sm leading-relaxed text-slate-400 sm:text-left">
+            <p className="max-w-xs text-center text-sm leading-relaxed text-[#B8C8A8] font-light sm:text-left">
               Seu parceiro confiável na busca pelo imóvel perfeito. Explore anúncios verificados em todo o Texas, adaptados ao seu estilo de vida.
             </p>
           </div>
 
           {/* Section 2 — Explore (Next.js Link) ──────────────────────────────── */}
           <div className="hidden sm:block">
-            <h3 className="mb-5 text-sm font-semibold uppercase tracking-widest text-white">
+            <h3 className="mb-5 font-monument text-xs text-[#C8DDB8]">
               Explorar
             </h3>
             <ul className="flex flex-col gap-3" role="list">
@@ -124,7 +120,7 @@ export default function Footer() {
 
           {/* Section 3 — Company ─────────────────────────────────────────────── */}
           <div className="hidden sm:block">
-            <h3 className="mb-5 text-sm font-semibold uppercase tracking-widest text-white">
+            <h3 className="mb-5 font-monument text-xs text-[#C8DDB8]">
               Empresa
             </h3>
             <ul className="flex flex-col gap-3" role="list">
@@ -140,7 +136,7 @@ export default function Footer() {
 
           {/* Section 4 — Contact & Social ────────────────────────────────────── */}
           <div className="flex flex-col items-center sm:items-start">
-            <h3 className="mb-5 text-sm font-semibold uppercase tracking-widest text-white">
+            <h3 className="mb-5 font-monument text-xs text-[#C8DDB8]">
               Contato
             </h3>
 
@@ -188,8 +184,8 @@ export default function Footer() {
                   key={label}
                   href={href}
                   aria-label={label}
-                  className="flex h-9 w-9 items-center justify-center rounded-lg bg-slate-800
-                             text-slate-400 transition-all duration-200 hover:bg-[#6D6D85]
+                  className="flex h-9 w-9 items-center justify-center rounded-lg bg-[#2A3124]
+                             text-[#B8C8A8] transition-all duration-200 hover:bg-[#6B6B99]
                              hover:text-white hover:scale-110"
                 >
                   {icon}
@@ -200,9 +196,9 @@ export default function Footer() {
         </div>
 
         {/* ── Bottom bar ─────────────────────────────────────────────────────── */}
-        <div className="flex flex-col items-center gap-3 border-t border-slate-800 py-6
+        <div className="flex flex-col items-center gap-3 border-t border-[#2A3124] py-6
                         sm:flex-row sm:items-center sm:justify-between">
-          <p className="text-xs text-slate-500">
+          <p className="text-xs text-[#6B7A60] font-light">
             © {year} Casa Baccarat. Todos os direitos reservados.
           </p>
 
@@ -212,7 +208,7 @@ export default function Footer() {
                 <li key={label}>
                   <a
                     href={href}
-                    className="text-xs text-slate-500 transition-colors duration-200 hover:text-slate-300"
+                    className="text-xs text-[#6B7A60] font-light transition-colors duration-200 hover:text-[#B8C8A8]"
                   >
                     {label}
                   </a>

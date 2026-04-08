@@ -4,6 +4,7 @@ import { useState } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { signOut } from 'next-auth/react'
+import NextTopLoader from 'nextjs-toploader'
 
 const NAV_ITEMS = [
   {
@@ -44,6 +45,16 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   }
 
   return (
+    <>
+    <NextTopLoader
+      color="#6D6D85"
+      secondaryColor="#A3A3C2"
+      height={3}
+      showSpinner={false}
+      easing="ease"
+      speed={250}
+      shadow="0 0 10px #6D6D85, 0 0 5px #6D6D85"
+    />
     <div className="flex h-screen overflow-hidden bg-[#F7F7FA]">
 
       {/* ── Mobile overlay ─────────────────────────────────────────────────── */}
@@ -68,15 +79,9 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         <div className="px-5 py-5 flex items-center justify-between"
              style={{ borderBottom: '1px solid #E6E6EF' }}>
           <div className="flex items-center gap-2.5">
-            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-[#6D6D85]">
-              <svg className="h-4 w-4 text-white" fill="currentColor" viewBox="0 0 24 24">
-                <path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z" />
-              </svg>
-            </div>
-            <div>
-              <p className="font-bold text-sm text-[#2E2E3A] leading-tight">Casa Baccarat</p>
-              <p className="text-[10px] text-[#A3A3C2] leading-tight">Painel Admin</p>
-            </div>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src="/logo.png" alt="Casa Baccarat" className="h-9 w-auto rounded-lg flex-shrink-0" />
+            <p className="text-[10px] font-semibold text-[#A3A3C2] leading-tight">Painel Admin</p>
           </div>
           <button
             onClick={() => setOpen(false)}
@@ -150,12 +155,9 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             </svg>
           </button>
           <div className="flex items-center gap-2">
-            <div className="flex h-6 w-6 items-center justify-center rounded-md bg-[#6D6D85]">
-              <svg className="h-3.5 w-3.5 text-white" fill="currentColor" viewBox="0 0 24 24">
-                <path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z" />
-              </svg>
-            </div>
-            <span className="font-bold text-sm text-[#2E2E3A]">Casa Baccarat Admin</span>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src="/logo.png" alt="Casa Baccarat" className="h-7 w-auto rounded-md" />
+            <span className="font-semibold text-sm text-[#A3A3C2]">Admin</span>
           </div>
         </header>
 
@@ -164,5 +166,6 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         </div>
       </div>
     </div>
+    </>
   )
 }

@@ -10,9 +10,11 @@ export interface Property {
   img:         string
   description: string
   price: {
-    amount:   number
-    currency: 'BRL' | 'CAD' | 'USD'
-    type:     PriceType
+    amount:      number
+    currency:    'BRL' | 'CAD' | 'USD'
+    type:        PriceType
+    condominio?: number
+    iptu?:       number
   }
   location: {
     address:     string
@@ -24,11 +26,13 @@ export interface Property {
     coordinates?: { lat: number; lng: number }
   }
   propertyDetails: {
-    type:       PropertyType
-    bedrooms:   number
-    bathrooms:  number
-    areaSqFt:   number
-    yearBuilt?: number
+    type:        PropertyType
+    bedrooms:    number
+    bathrooms:   number
+    areaSqFt:    number
+    yearBuilt?:  number
+    lavabo?:     number
+    escritorio?: number
   }
   features: string[]
   media: { images: string[]; thumbnail: string }

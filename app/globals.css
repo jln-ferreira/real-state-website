@@ -1,29 +1,80 @@
+/* ── Allrounder Monument — drop .woff2 files in /public/fonts/ ───────────────── */
+@font-face {
+  font-family: 'Allrounder Monument';
+  src: url('/fonts/AllrounderMonument-Regular.woff2') format('woff2'),
+       url('/fonts/AllrounderMonument-Regular.woff')  format('woff');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Allrounder Monument';
+  src: url('/fonts/AllrounderMonument-Light.woff2') format('woff2'),
+       url('/fonts/AllrounderMonument-Light.woff')  format('woff');
+  font-weight: 300;
+  font-style: normal;
+  font-display: swap;
+}
+
 @import "tailwindcss";
 
+/* ── Design tokens ───────────────────────────────────────────────────────────── */
 @theme {
-  --font-sans: 'Inter', system-ui, sans-serif;
+  /* Fonts */
+  --font-sans:      'Montserrat', system-ui, sans-serif;
+  --font-monument:  'Allrounder Monument', 'Georgia', serif;
 
-  --color-brand:      #6D6D85;
-  --color-brand-dark: #4F4F6B;
-  --color-surface:    #F7F7FA;
-  --color-muted:      #A3A3C2;
-  --color-text:       #2E2E3A;
-  --color-border:     #E6E6EF;
+  /* Brand palette */
+  --color-brand:        #6B6B99;
+  --color-brand-hover:  #5757A0;
+  --color-brand-dark:   #4E6B5E;
+  --color-accent:       #C8DDB8;
+  --color-surface:      #F5F0E8;
+  --color-muted:        #9898BB;
+  --color-text:         #4A5240;
+  --color-text-dark:    #4A5240;
+  --color-border:       #E0DACE;
+
+  /* Dark bg (footer) */
+  --color-dark-bg:      #1E231A;
+  --color-dark-mid:     #2A3124;
+  --color-dark-muted:   #6B7A60;
+  --color-dark-subtle:  #B8C8A8;
 }
 
 :root {
-  --color-brand:      #6D6D85;
-  --color-brand-dark: #4F4F6B;
-  --color-surface:    #F7F7FA;
-  --color-muted:      #A3A3C2;
-  --color-text:       #2E2E3A;
-  --color-border:     #E6E6EF;
+  --color-brand:        #6B6B99;
+  --color-brand-hover:  #5757A0;
+  --color-brand-dark:   #4E6B5E;
+  --color-accent:       #C8DDB8;
+  --color-surface:      #F5F0E8;
+  --color-muted:        #9898BB;
+  --color-text:         #4A5240;
+  --color-border:       #E0DACE;
 }
 
+/* ── Base ────────────────────────────────────────────────────────────────────── */
 html {
   scroll-behavior: smooth;
 }
 
+body {
+  font-family: var(--font-montserrat, 'Montserrat', system-ui, sans-serif);
+  font-weight: 300;
+  color: #4A5240;
+  background-color: #F5F0E8;
+  letter-spacing: 0.01em;
+}
+
+/* ── Monument heading utility ─────────────────────────────────────────────────── */
+.font-monument {
+  font-family: 'Allrounder Monument', 'Georgia', serif;
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  font-weight: 300;
+}
+
+/* ── Animations ──────────────────────────────────────────────────────────────── */
 @keyframes page-in {
   from { opacity: 0; transform: translateY(10px); }
   to   { opacity: 1; transform: translateY(0);    }
@@ -60,27 +111,31 @@ html {
 .reveal              { opacity: 0; transition: opacity 0.6s ease, transform 0.6s cubic-bezier(0.22,1,0.36,1); transform: translateY(24px); }
 .reveal.is-visible   { opacity: 1; transform: translateY(0); }
 
-/* ── Blog prose content ──────────────────────────────────────────────────────── */
+/* ── Blog prose ──────────────────────────────────────────────────────────────── */
 .blog-prose h2 {
-  font-size: 1.375rem;
-  font-weight: 700;
-  color: #2E2E3A;
+  font-family: 'Allrounder Monument', 'Georgia', serif;
+  font-size: 1.25rem;
+  font-weight: 300;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: #4A5240;
   margin-top: 2.25rem;
   margin-bottom: 0.75rem;
   line-height: 1.3;
 }
 .blog-prose h3 {
-  font-size: 1.125rem;
-  font-weight: 600;
-  color: #2E2E3A;
+  font-size: 1.05rem;
+  font-weight: 400;
+  color: #4E6B5E;
   margin-top: 1.75rem;
   margin-bottom: 0.5rem;
 }
 .blog-prose p {
-  color: #5a5a72;
+  color: #4E6B5E;
   line-height: 1.85;
   margin-bottom: 1.25rem;
   font-size: 1rem;
+  font-weight: 300;
 }
 .blog-prose ul,
 .blog-prose ol {
@@ -90,22 +145,17 @@ html {
 .blog-prose ul { list-style-type: disc; }
 .blog-prose ol { list-style-type: decimal; }
 .blog-prose li {
-  color: #5a5a72;
+  color: #4E6B5E;
   line-height: 1.75;
   margin-bottom: 0.4rem;
   font-size: 1rem;
+  font-weight: 300;
 }
-.blog-prose strong { color: #2E2E3A; font-weight: 600; }
+.blog-prose strong { color: #4A5240; font-weight: 600; }
 .blog-prose blockquote {
-  border-left: 3px solid #6D6D85;
+  border-left: 3px solid #C8DDB8;
   padding-left: 1rem;
   margin: 1.75rem 0;
   font-style: italic;
-  color: #A3A3C2;
-}
-
-body {
-  font-family: var(--font-sans);
-  color: #2E2E3A;
-  background-color: #F7F7FA;
+  color: #9898BB;
 }
