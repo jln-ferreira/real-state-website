@@ -67,9 +67,9 @@ const COMPANY_LINKS = [
 // ── Legal links for bottom bar ────────────────────────────────────────────────
 
 const LEGAL_LINKS = [
-  { label: 'Política de Privacidade', href: '#' },
-  { label: 'Termos de Uso', href: '#' },
-  { label: 'Política de Cookies', href: '#' },
+  { label: 'Política de Privacidade', href: '/privacidade' },
+  { label: 'Termos de Uso', href: '/termos' },
+  { label: 'Política de Cookies', href: '/cookies' },
 ]
 
 // ── Shared link style ─────────────────────────────────────────────────────────
@@ -206,12 +206,12 @@ export default function Footer() {
             <ul className="flex flex-wrap items-center gap-x-5 gap-y-1" role="list">
               {LEGAL_LINKS.map(({ label, href }) => (
                 <li key={label}>
-                  <a
+                  <Link
                     href={href}
                     className="text-xs text-[#6B7A60] font-light transition-colors duration-200 hover:text-[#B8C8A8]"
                   >
                     {label}
-                  </a>
+                  </Link>
                 </li>
               ))}
             </ul>
