@@ -96,14 +96,13 @@ export default function Header() {
             >
               Blog
             </Link>
-            <a
-              href={isHome ? '#listings' : '/#listings'}
-              onClick={e => handleHashNav(e, 'listings')}
+            <Link
+              href="/register"
               className="ml-3 rounded-xl bg-white px-5 py-2 text-sm font-medium
                          text-[#6B6B99] hover:bg-[#F5F0E8] transition-colors duration-200 shadow-sm"
             >
-              Ver Imóveis
-            </a>
+              Anuncie seu Imóvel
+            </Link>
           </nav>
 
           {/* Mobile hamburger */}

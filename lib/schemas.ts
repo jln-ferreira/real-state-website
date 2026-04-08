@@ -54,6 +54,8 @@ export const PropertySchema = z.object({
     phone: z.string().min(1),
     email: z.string().email(),
   }),
+  ownerId: z.string().optional(),
+  adminStatus: z.enum(['pending', 'approved', 'rejected']).optional(),
 })
 
 export const PartialPropertySchema = PropertySchema.partial().required({ id: true })
@@ -67,8 +69,10 @@ export const PostSchema = z.object({
   date:       z.string().min(1, 'Data é obrigatória'),
   category:   z.string().optional().default(''),
   categories: z.array(z.string()).optional().default([]),
-  readTime:   z.string().min(1, 'Tempo de leitura é obrigatório'),
-  published:  z.boolean().default(true),
+  readTime:     z.string().min(1, 'Tempo de leitura é obrigatório'),
+  published:    z.boolean().default(true),
+  registeredAt: z.string().optional(),
+  views:        z.number().int().min(0).default(0),
 })
 
 export const ContactSchema = z.object({

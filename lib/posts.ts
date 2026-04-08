@@ -36,11 +36,15 @@ export async function getPost(slug: string): Promise<Post | null> {
 
 export async function createPost(post: Post): Promise<Post> {
   await ensureInit()
+  const withDate: Post = {
+    ...post,
+    registeredAt: post.registeredAt ?? new Date().toISOString(),
+  }
   await db.execute({
     sql: 'INSERT INTO blog_posts (slug, data) VALUES (?, ?)',
-    args: [post.slug, JSON.stringify(post)],
+    args: [withDate.slug, JSON.stringify(withDate)],
   })
-  return post
+  return withDate
 }
 
 export async function updatePost(slug: string, updates: Partial<Post>): Promise<Post> {
@@ -52,6 +56,15 @@ export async function updatePost(slug: string, updates: Partial<Post>): Promise<
     args: [JSON.stringify(updated), slug],
   })
   return updated
+}
+
+export async function incrementPostViews(slug: string): Promise<void> {
+  await ensureInit()
+  const result = await db.execute({ sql: 'SELECT data FROM blog_posts WHERE slug = ?', args: [slug] })
+  if (!result.rows[0]) return
+  const post = JSON.parse(result.rows[0].data as string)
+  const updated = { ...post, views: (post.views ?? 0) + 1 }
+  await db.execute({ sql: 'UPDATE blog_posts SET data = ? WHERE slug = ?', args: [JSON.stringify(updated), slug] })
 }
 
 export async function deletePost(slug: string): Promise<void> {

@@ -114,7 +114,6 @@ const styles = StyleSheet.create({
   footerCta:   { fontSize: 8, color: MUTED },
 })
 
-function sqftToM2(sqft: number) { return Math.round(sqft * 0.0929) }
 
 function formatPrice(p: Property): string {
   const amount = p.price.amount.toLocaleString('pt-BR')
@@ -172,17 +171,17 @@ function PropertyPage({ p }: { p: Property }) {
           {p.propertyDetails.bedrooms > 0 && (
             <View style={styles.stat}>
               <Text style={styles.statVal}>{p.propertyDetails.bedrooms}</Text>
-              <Text style={styles.statLbl}>Quartos</Text>
+              <Text style={styles.statLbl}>Suítes</Text>
             </View>
           )}
-          {p.propertyDetails.bathrooms > 0 && (
+          {p.propertyDetails.lavabo != null && p.propertyDetails.lavabo > 0 && (
             <View style={styles.stat}>
-              <Text style={styles.statVal}>{p.propertyDetails.bathrooms}</Text>
-              <Text style={styles.statLbl}>Banheiros</Text>
+              <Text style={styles.statVal}>{p.propertyDetails.lavabo}</Text>
+              <Text style={styles.statLbl}>Lavabo</Text>
             </View>
           )}
           <View style={styles.stat}>
-            <Text style={styles.statVal}>{sqftToM2(p.propertyDetails.areaSqFt).toLocaleString()}</Text>
+            <Text style={styles.statVal}>{p.propertyDetails.areaSqFt.toLocaleString()}</Text>
             <Text style={styles.statLbl}>m²</Text>
           </View>
           {p.features?.includes('parking') && (

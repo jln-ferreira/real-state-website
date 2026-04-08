@@ -1,0 +1,284 @@
+'use client'
+
+import { useState } from 'react'
+import type { Property } from '@/data/properties'
+import type { UserAccount } from '@/lib/users'
+
+type SafeUser = Omit<UserAccount, 'password_hash'>
+
+interface Props {
+  initialUsers: SafeUser[]
+  initialProperties: Property[]
+  userMap: Record<string, string>
+}
+
+type Tab = 'users' | 'properties'
+
+function StatusBadge({ status }: { status: string }) {
+  if (status === 'approved') return (
+    <span className="px-2 py-0.5 rounded-full text-xs font-semibold bg-green-100 text-green-700">Aprovado</span>
+  )
+  if (status === 'rejected') return (
+    <span className="px-2 py-0.5 rounded-full text-xs font-semibold bg-red-100 text-red-700">Recusado</span>
+  )
+  return (
+    <span className="px-2 py-0.5 rounded-full text-xs font-semibold bg-amber-100 text-amber-700">Pendente</span>
+  )
+}
+
+function formatDate(dateStr: string) {
+  try {
+    return new Date(dateStr).toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric' })
+  } catch {
+    return dateStr
+  }
+}
+
+export default function ApprovalsClient({ initialUsers, initialProperties, userMap }: Props) {
+  const [tab, setTab] = useState<Tab>('users')
+  const [users, setUsers] = useState<SafeUser[]>(initialUsers)
+  const [properties, setProperties] = useState<Property[]>(initialProperties)
+  const [loadingId, setLoadingId] = useState<string | null>(null)
+  const [toast, setToast] = useState<{ msg: string; type: 'success' | 'error' } | null>(null)
+
+  function showToast(msg: string, type: 'success' | 'error') {
+    setToast({ msg, type })
+    setTimeout(() => setToast(null), 3000)
+  }
+
+  async function handleUserAction(id: string, status: 'approved' | 'rejected') {
+    setLoadingId(id)
+    try {
+      const res = await fetch(`/api/admin/approvals/users/${id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status }),
+      })
+      if (res.ok) {
+        setUsers(prev => prev.map(u => u.id === id ? { ...u, status } : u))
+        showToast(status === 'approved' ? 'Usuário aprovado.' : 'Usuário recusado.', 'success')
+      } else {
+        showToast('Erro ao atualizar status.', 'error')
+      }
+    } catch {
+      showToast('Erro de conexão.', 'error')
+    } finally {
+      setLoadingId(null)
+    }
+  }
+
+  async function handlePropertyAction(id: string, adminStatus: 'approved' | 'rejected') {
+    setLoadingId(id)
+    try {
+      const res = await fetch(`/api/admin/approvals/properties/${id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ adminStatus }),
+      })
+      if (res.ok) {
+        setProperties(prev => prev.map(p => p.id === id ? { ...p, adminStatus } : p))
+        showToast(adminStatus === 'approved' ? 'Imóvel aprovado.' : 'Imóvel recusado.', 'success')
+      } else {
+        showToast('Erro ao atualizar status.', 'error')
+      }
+    } catch {
+      showToast('Erro de conexão.', 'error')
+    } finally {
+      setLoadingId(null)
+    }
+  }
+
+  const pendingUsers = users.filter(u => u.status === 'pending')
+  const pendingProperties = properties.filter(p => p.adminStatus === 'pending')
+
+  return (
+    <div className="max-w-5xl mx-auto">
+      {/* Page header */}
+      <div className="mb-6">
+        <h1 className="text-2xl font-bold text-[#1E3A5F]">Aprovações</h1>
+        <p className="text-sm text-[#6B6B99] mt-1">Gerencie usuários e imóveis pendentes de aprovação.</p>
+      </div>
+
+      {/* Tabs */}
+      <div className="flex items-center gap-1 mb-6 bg-white rounded-xl border border-[#E6E6EF] p-1 w-fit">
+        <button
+          onClick={() => setTab('users')}
+          className={[
+            'flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors',
+            tab === 'users'
+              ? 'bg-[#6B6B99] text-white'
+              : 'text-[#6B6B99] hover:bg-[#F7F7FA]',
+          ].join(' ')}
+        >
+          Usuários Pendentes
+          {pendingUsers.length > 0 && (
+            <span className={`text-xs rounded-full px-1.5 py-0.5 font-bold ${tab === 'users' ? 'bg-white/20 text-white' : 'bg-amber-100 text-amber-700'}`}>
+              {pendingUsers.length}
+            </span>
+          )}
+        </button>
+        <button
+          onClick={() => setTab('properties')}
+          className={[
+            'flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors',
+            tab === 'properties'
+              ? 'bg-[#6B6B99] text-white'
+              : 'text-[#6B6B99] hover:bg-[#F7F7FA]',
+          ].join(' ')}
+        >
+          Imóveis Pendentes
+          {pendingProperties.length > 0 && (
+            <span className={`text-xs rounded-full px-1.5 py-0.5 font-bold ${tab === 'properties' ? 'bg-white/20 text-white' : 'bg-amber-100 text-amber-700'}`}>
+              {pendingProperties.length}
+            </span>
+          )}
+        </button>
+      </div>
+
+      {/* Users tab */}
+      {tab === 'users' && (
+        <div className="bg-white rounded-2xl border border-[#E6E6EF] overflow-hidden">
+          {users.length === 0 ? (
+            <div className="py-16 text-center text-[#A3A3C2] text-sm">
+              Nenhum usuário cadastrado ainda.
+            </div>
+          ) : (
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="border-b border-[#E6E6EF] bg-[#F7F7FA]">
+                  <th className="text-left px-4 py-3 text-xs font-semibold text-[#6B6B99]">Nome</th>
+                  <th className="text-left px-4 py-3 text-xs font-semibold text-[#6B6B99]">E-mail</th>
+                  <th className="text-left px-4 py-3 text-xs font-semibold text-[#6B6B99] hidden md:table-cell">Telefone</th>
+                  <th className="text-left px-4 py-3 text-xs font-semibold text-[#6B6B99] hidden lg:table-cell">Data</th>
+                  <th className="text-left px-4 py-3 text-xs font-semibold text-[#6B6B99]">Status</th>
+                  <th className="text-right px-4 py-3 text-xs font-semibold text-[#6B6B99]">Ações</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-[#E6E6EF]">
+                {users.map(user => (
+                  <tr key={user.id} className="hover:bg-[#F7F7FA]/50 transition-colors">
+                    <td className="px-4 py-3 font-medium text-[#1E3A5F]">
+                      {user.first_name} {user.last_name}
+                    </td>
+                    <td className="px-4 py-3 text-[#6B6B99]">{user.email}</td>
+                    <td className="px-4 py-3 text-[#6B6B99] hidden md:table-cell">{user.phone}</td>
+                    <td className="px-4 py-3 text-[#A3A3C2] hidden lg:table-cell">{formatDate(user.created_at)}</td>
+                    <td className="px-4 py-3"><StatusBadge status={user.status} /></td>
+                    <td className="px-4 py-3">
+                      {user.status === 'pending' ? (
+                        <div className="flex items-center justify-end gap-2">
+                          <button
+                            onClick={() => handleUserAction(user.id, 'approved')}
+                            disabled={loadingId === user.id}
+                            className="px-3 py-1.5 text-xs font-semibold bg-green-50 text-green-700 border border-green-200 rounded-lg hover:bg-green-100 transition-colors disabled:opacity-50"
+                          >
+                            {loadingId === user.id ? '...' : 'Aprovar'}
+                          </button>
+                          <button
+                            onClick={() => handleUserAction(user.id, 'rejected')}
+                            disabled={loadingId === user.id}
+                            className="px-3 py-1.5 text-xs font-semibold bg-red-50 text-red-700 border border-red-200 rounded-lg hover:bg-red-100 transition-colors disabled:opacity-50"
+                          >
+                            {loadingId === user.id ? '...' : 'Recusar'}
+                          </button>
+                        </div>
+                      ) : (
+                        <span className="text-xs text-[#A3A3C2] text-right block">—</span>
+                      )}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          )}
+        </div>
+      )}
+
+      {/* Properties tab */}
+      {tab === 'properties' && (
+        <div className="bg-white rounded-2xl border border-[#E6E6EF] overflow-hidden">
+          {properties.length === 0 ? (
+            <div className="py-16 text-center text-[#A3A3C2] text-sm">
+              Nenhum imóvel pendente de aprovação.
+            </div>
+          ) : (
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="border-b border-[#E6E6EF] bg-[#F7F7FA]">
+                  <th className="text-left px-4 py-3 text-xs font-semibold text-[#6B6B99]">Imóvel</th>
+                  <th className="text-left px-4 py-3 text-xs font-semibold text-[#6B6B99] hidden md:table-cell">Enviado por</th>
+                  <th className="text-left px-4 py-3 text-xs font-semibold text-[#6B6B99] hidden lg:table-cell">Data</th>
+                  <th className="text-left px-4 py-3 text-xs font-semibold text-[#6B6B99]">Status</th>
+                  <th className="text-right px-4 py-3 text-xs font-semibold text-[#6B6B99]">Ações</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-[#E6E6EF]">
+                {properties.map(property => (
+                  <tr key={property.id} className="hover:bg-[#F7F7FA]/50 transition-colors">
+                    <td className="px-4 py-3">
+                      <div className="flex items-center gap-3">
+                        <div className="w-12 h-10 rounded-lg overflow-hidden flex-shrink-0 bg-[#F7F7FA]">
+                          {/* eslint-disable-next-line @next/next/no-img-element */}
+                          <img
+                            src={property.media.thumbnail || property.img}
+                            alt={property.title}
+                            className="w-full h-full object-cover"
+                          />
+                        </div>
+                        <div>
+                          <p className="font-medium text-[#1E3A5F] line-clamp-1">{property.title}</p>
+                          <p className="text-xs text-[#A3A3C2]">{property.id}</p>
+                        </div>
+                      </div>
+                    </td>
+                    <td className="px-4 py-3 text-[#6B6B99] hidden md:table-cell">
+                      {property.ownerId ? (userMap[property.ownerId] ?? property.ownerId) : '—'}
+                    </td>
+                    <td className="px-4 py-3 text-[#A3A3C2] hidden lg:table-cell">
+                      {property.timestamps?.createdAt ? formatDate(property.timestamps.createdAt) : '—'}
+                    </td>
+                    <td className="px-4 py-3">
+                      <StatusBadge status={property.adminStatus ?? 'pending'} />
+                    </td>
+                    <td className="px-4 py-3">
+                      {(!property.adminStatus || property.adminStatus === 'pending') ? (
+                        <div className="flex items-center justify-end gap-2">
+                          <button
+                            onClick={() => handlePropertyAction(property.id, 'approved')}
+                            disabled={loadingId === property.id}
+                            className="px-3 py-1.5 text-xs font-semibold bg-green-50 text-green-700 border border-green-200 rounded-lg hover:bg-green-100 transition-colors disabled:opacity-50"
+                          >
+                            {loadingId === property.id ? '...' : 'Aprovar'}
+                          </button>
+                          <button
+                            onClick={() => handlePropertyAction(property.id, 'rejected')}
+                            disabled={loadingId === property.id}
+                            className="px-3 py-1.5 text-xs font-semibold bg-red-50 text-red-700 border border-red-200 rounded-lg hover:bg-red-100 transition-colors disabled:opacity-50"
+                          >
+                            {loadingId === property.id ? '...' : 'Recusar'}
+                          </button>
+                        </div>
+                      ) : (
+                        <span className="text-xs text-[#A3A3C2] text-right block">—</span>
+                      )}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          )}
+        </div>
+      )}
+
+      {/* Toast */}
+      {toast && (
+        <div className={[
+          'fixed bottom-6 right-6 z-50 px-4 py-3 rounded-xl shadow-lg text-sm font-medium transition-all',
+          toast.type === 'success' ? 'bg-green-600 text-white' : 'bg-red-600 text-white',
+        ].join(' ')}>
+          {toast.msg}
+        </div>
+      )}
+    </div>
+  )
+}

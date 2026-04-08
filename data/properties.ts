@@ -51,6 +51,8 @@ export interface Property {
     updatedAt: string
   }
   agent: { name: string; phone: string; email: string }
+  ownerId?: string
+  adminStatus?: 'pending' | 'approved' | 'rejected'
 }
 
 // ── Helpers ───────────────────────────────────────────────────────────────────

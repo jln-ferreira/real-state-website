@@ -11,7 +11,7 @@ export async function loginAction(_prevState: any, formData: FormData) {
   if (!allowed) return { error: `Too many attempts. Try again in ${retryAfter}s.` }
 
   try {
-    await signIn('credentials', {
+    await signIn('admin-credentials', {
       username: formData.get('username'),
       password: formData.get('password'),
       redirectTo: '/admin/properties',

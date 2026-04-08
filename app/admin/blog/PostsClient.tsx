@@ -238,13 +238,14 @@ export default function PostsClient({ initialPosts }: { initialPosts: Post[] }) 
               <th className="text-left px-4 py-3 text-xs font-semibold text-neutral-500 uppercase tracking-wider hidden sm:table-cell">Categoria</th>
               <th className="text-left px-4 py-3 text-xs font-semibold text-neutral-500 uppercase tracking-wider hidden md:table-cell">Data</th>
               <th className="text-left px-4 py-3 text-xs font-semibold text-neutral-500 uppercase tracking-wider hidden lg:table-cell">Status</th>
+              <th className="text-left px-4 py-3 text-xs font-semibold text-neutral-500 uppercase tracking-wider hidden xl:table-cell">Cadastro</th>
               <th className="text-right px-4 py-3 text-xs font-semibold text-neutral-500 uppercase tracking-wider">Ações</th>
             </tr>
           </thead>
           <tbody>
             {filtered.length === 0 ? (
               <tr>
-                <td colSpan={5} className="text-center py-12 text-sm text-neutral-400">
+                <td colSpan={6} className="text-center py-12 text-sm text-neutral-400">
                   Nenhum post encontrado
                 </td>
               </tr>
@@ -279,6 +280,13 @@ export default function PostsClient({ initialPosts }: { initialPosts: Post[] }) 
                       {p.published !== false ? 'Publicado' : 'Rascunho'}
                     </span>
                   </div>
+                </td>
+                <td className="px-4 py-3 hidden xl:table-cell">
+                  <span className="text-xs text-neutral-500">
+                    {p.registeredAt
+                      ? new Date(p.registeredAt).toLocaleDateString('pt-BR', { day: '2-digit', month: 'short', year: 'numeric' })
+                      : '—'}
+                  </span>
                 </td>
                 <td className="px-4 py-3" onClick={e => e.stopPropagation()}>
                   <div className="flex items-center justify-end gap-3">

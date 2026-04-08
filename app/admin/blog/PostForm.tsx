@@ -334,6 +334,16 @@ export default function PostForm({ post: initial }: { post?: Post }) {
             <div className="bg-white rounded-2xl shadow-sm border border-neutral-100 p-6 space-y-4">
               <h2 className="text-xs font-bold text-neutral-500 uppercase tracking-widest">Publicação</h2>
 
+              {/* Registration date (readonly) */}
+              {form.registeredAt && (
+                <div>
+                  <label className={labelCls}>Cadastrado em</label>
+                  <p className="text-sm text-neutral-600 py-2">
+                    {new Date(form.registeredAt).toLocaleDateString('pt-BR', { day: '2-digit', month: 'long', year: 'numeric' })}
+                  </p>
+                </div>
+              )}
+
               {/* Date */}
               <div>
                 <label className={labelCls}>Data *</label>

@@ -9,6 +9,8 @@ export interface Post {
   categories?: string[]
   readTime: string
   published?: boolean  // defaults to true
+  registeredAt?: string  // ISO string, auto-set on creation
+  views?: number
 }
 
 /** Returns the post's categories, handling both old (string) and new (array) format */

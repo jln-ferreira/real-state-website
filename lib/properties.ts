@@ -42,11 +42,19 @@ export async function getSimilarProperties(id: string, type: string, limit = 4):
 
 export async function createProperty(property: Property): Promise<Property> {
   await ensureInit()
+  const now = new Date().toISOString()
+  const withTimestamps: Property = {
+    ...property,
+    timestamps: {
+      createdAt: property.timestamps?.createdAt ?? now,
+      updatedAt: now,
+    },
+  }
   await db.execute({
     sql: 'INSERT INTO properties (id, data) VALUES (?, ?)',
-    args: [property.id, JSON.stringify(property)],
+    args: [withTimestamps.id, JSON.stringify(withTimestamps)],
   })
-  return property
+  return withTimestamps
 }
 
 export async function updateProperty(id: string, updates: Partial<Property>): Promise<Property> {
@@ -65,6 +73,18 @@ export async function updateProperty(id: string, updates: Partial<Property>): Pr
     args: [JSON.stringify(updated), id],
   })
   return updated
+}
+
+export async function incrementPropertyViews(id: string): Promise<void> {
+  await ensureInit()
+  const result = await db.execute({ sql: 'SELECT data FROM properties WHERE id = ?', args: [id] })
+  if (!result.rows[0]) return
+  const property = JSON.parse(result.rows[0].data as string) as Property
+  const updated = {
+    ...property,
+    metrics: { ...property.metrics, views: (property.metrics?.views ?? 0) + 1 },
+  }
+  await db.execute({ sql: 'UPDATE properties SET data = ? WHERE id = ?', args: [JSON.stringify(updated), id] })
 }
 
 export async function deleteProperty(id: string): Promise<void> {

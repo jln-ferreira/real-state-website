@@ -3,6 +3,7 @@ import { notFound } from 'next/navigation'
 import Link from 'next/link'
 import Layout from '@/components/Layout'
 import ScrollReveal from '@/components/blog/ScrollReveal'
+import ViewTracker from '@/components/ViewTracker'
 import { getPost, getPosts } from '@/lib/posts'
 import { getPostBySlug, formatDate, getPostCategories } from '@/data/posts'
 import type { Post } from '@/data/posts'
@@ -48,6 +49,7 @@ export default async function BlogPostPage(
 
   return (
     <Layout>
+      <ViewTracker endpoint={`/api/posts/${post.slug}/view`} />
       <article>
 
         {/* ── Hero ────────────────────────────────────────────────────────────── */}

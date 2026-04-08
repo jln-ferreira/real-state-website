@@ -3,7 +3,7 @@
 import { useState, useRef, useEffect } from 'react'
 import Link from 'next/link'
 import type { Property } from '@/data/properties'
-import { PROPERTIES, sqftToM2 } from '@/data/properties'
+import { PROPERTIES } from '@/data/properties'
 
 // ── Icons ──────────────────────────────────────────────────────────────────────
 
@@ -322,17 +322,27 @@ export default function PropertyDetailClient({ property }: { property: Property 
               <div className="flex flex-wrap items-center gap-1.5 text-sm">
                 {property.propertyDetails.bedrooms > 0 && (
                   <span className="flex items-center gap-1 bg-neutral-100 text-neutral-700 px-2 py-0.5 rounded-lg font-medium">
-                    <BedIcon className="w-3.5 h-3.5" /> {property.propertyDetails.bedrooms} quartos
+                    <BedIcon className="w-3.5 h-3.5" /> {property.propertyDetails.bedrooms} suíte{property.propertyDetails.bedrooms > 1 ? 's' : ''}
                   </span>
                 )}
-                {property.propertyDetails.bathrooms > 0 && (
+                {property.propertyDetails.lavabo != null && property.propertyDetails.lavabo > 0 && (
                   <span className="flex items-center gap-1 bg-neutral-100 text-neutral-700 px-2 py-0.5 rounded-lg font-medium">
-                    <BathIcon className="w-3.5 h-3.5" /> {property.propertyDetails.bathrooms} banheiros
+                    <BathIcon className="w-3.5 h-3.5" /> {property.propertyDetails.lavabo} lavabo{property.propertyDetails.lavabo > 1 ? 's' : ''}
                   </span>
                 )}
-                <span className="flex items-center gap-1 bg-neutral-100 text-neutral-700 px-2 py-0.5 rounded-lg font-medium">
-                  <RulerIcon className="w-3.5 h-3.5" /> {sqftToM2(property.propertyDetails.areaSqFt).toLocaleString()} m²
-                </span>
+                {property.propertyDetails.escritorio != null && property.propertyDetails.escritorio > 0 && (
+                  <span className="flex items-center gap-1 bg-neutral-100 text-neutral-700 px-2 py-0.5 rounded-lg font-medium">
+                    <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" strokeWidth={1.8} stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M9 17.25v1.007a3 3 0 01-.879 2.122L7.5 21h9l-.621-.621A3 3 0 0115 18.257V17.25m6-12V15a2.25 2.25 0 01-2.25 2.25H5.25A2.25 2.25 0 013 15V5.25m18 0A2.25 2.25 0 0018.75 3H5.25A2.25 2.25 0 003 5.25m18 0v.243a2.25 2.25 0 01-1.07 1.916l-7.5 4.615a2.25 2.25 0 01-2.36 0L3.32 7.409A2.25 2.25 0 012.25 5.493V5.25" />
+                    </svg>
+                    {property.propertyDetails.escritorio} escritório{property.propertyDetails.escritorio > 1 ? 's' : ''}
+                  </span>
+                )}
+                {property.propertyDetails.areaSqFt > 0 && (
+                  <span className="flex items-center gap-1 bg-neutral-100 text-neutral-700 px-2 py-0.5 rounded-lg font-medium">
+                    <RulerIcon className="w-3.5 h-3.5" /> {property.propertyDetails.areaSqFt.toLocaleString()} m²
+                  </span>
+                )}
               </div>
             </div>
 
@@ -512,7 +522,7 @@ export default function PropertyDetailClient({ property }: { property: Property 
                         )}
                         <span className="flex items-center gap-1.5">
                           <RulerIcon className="w-3 h-3" />
-                          <strong className="text-neutral-800">{sqftToM2(p.propertyDetails.areaSqFt).toLocaleString()}</strong> m²
+                          <strong className="text-neutral-800">{p.propertyDetails.areaSqFt.toLocaleString()}</strong> m²
                         </span>
                       </div>
                       <div className="pt-2 border-t border-neutral-100 mt-auto">

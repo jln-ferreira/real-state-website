@@ -295,12 +295,13 @@ export default function PropertiesClient({ initialProperties }: { initialPropert
               <th className="text-left px-4 py-3 text-xs font-semibold text-neutral-500 uppercase tracking-wider hidden sm:table-cell">Tipo</th>
               <th className="text-left px-4 py-3 text-xs font-semibold text-neutral-500 uppercase tracking-wider hidden md:table-cell">Preço</th>
               <th className="text-left px-4 py-3 text-xs font-semibold text-neutral-500 uppercase tracking-wider hidden lg:table-cell">Status</th>
+              <th className="text-left px-4 py-3 text-xs font-semibold text-neutral-500 uppercase tracking-wider hidden xl:table-cell">Cadastro</th>
               <th className="text-right px-4 py-3 text-xs font-semibold text-neutral-500 uppercase tracking-wider">Ações</th>
             </tr>
           </thead>
           <tbody>
             {paginated.length === 0 ? (
-              <tr><td colSpan={6} className="text-center py-12 text-sm text-neutral-400">Nenhum imóvel encontrado</td></tr>
+              <tr><td colSpan={7} className="text-center py-12 text-sm text-neutral-400">Nenhum imóvel encontrado</td></tr>
             ) : paginated.map(p => (
               <tr key={p.id} className="border-b border-neutral-100 hover:bg-[#F7F7FA] transition-colors cursor-pointer" onClick={() => router.push(`/admin/properties/${p.id}`)}>
                 <td className="px-4 py-3"><span className="text-xs font-mono text-neutral-400">{p.id}</span></td>
@@ -333,6 +334,13 @@ export default function PropertiesClient({ initialProperties }: { initialPropert
                     </span>
                     {p.status.isFeatured && <span className="text-amber-400 text-xs ml-1">★</span>}
                   </div>
+                </td>
+                <td className="px-4 py-3 hidden xl:table-cell">
+                  <span className="text-xs text-neutral-500">
+                    {p.timestamps?.createdAt
+                      ? new Date(p.timestamps.createdAt).toLocaleDateString('pt-BR', { day: '2-digit', month: 'short', year: 'numeric' })
+                      : '—'}
+                  </span>
                 </td>
                 <td className="px-4 py-3" onClick={e => e.stopPropagation()}>
                   <div className="flex items-center justify-end gap-3">

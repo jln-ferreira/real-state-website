@@ -2,7 +2,6 @@
 
 import { useState, useRef, useEffect } from 'react'
 import Link from 'next/link'
-import { sqftToM2 } from '@/data/properties'
 import type { Property } from '@/data/properties'
 import Layout from '@/components/Layout'
 
@@ -145,6 +144,10 @@ export default function PropertyDetailView({ property, similarProperties }: { pr
   const shareRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
+    fetch(`/api/properties/${property.id}/view`, { method: 'POST' }).catch(() => {})
+  }, [property.id])
+
+  useEffect(() => {
     function handleClickOutside(e: MouseEvent) {
       if (shareRef.current && !shareRef.current.contains(e.target as Node)) {
         setShareOpen(false)
@@ -168,6 +171,14 @@ export default function PropertyDetailView({ property, similarProperties }: { pr
   function openLightbox(i: number) {
     setLightboxIndex(i)
     setLightboxOpen(true)
+  }
+
+  function trackWhatsApp() {
+    fetch('/api/whatsapp-click', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ propertyId: property.id }),
+    }).catch(() => {})
   }
 
   async function handleSubmit(e: React.FormEvent) {
@@ -282,7 +293,7 @@ export default function PropertyDetailView({ property, similarProperties }: { pr
                   target="_blank"
                   rel="noopener noreferrer"
                   className="flex items-center gap-3 px-4 py-2.5 text-sm text-neutral-700 hover:bg-neutral-50"
-                  onClick={() => setShareOpen(false)}
+                  onClick={() => { setShareOpen(false); trackWhatsApp() }}
                 >
                   <span className="text-[#25D366] w-4 h-4 shrink-0">
                     <svg viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.025.507 3.94 1.404 5.617L0 24l6.532-1.384A11.945 11.945 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.818a9.818 9.818 0 01-5.017-1.373l-.36-.213-3.732.979.995-3.641-.234-.374A9.818 9.818 0 1112 21.818z"/></svg>
@@ -413,17 +424,27 @@ export default function PropertyDetailView({ property, similarProperties }: { pr
               <div className="flex flex-wrap items-center gap-1.5 text-sm">
                 {property.propertyDetails.bedrooms > 0 && (
                   <span className="flex items-center gap-1 bg-neutral-100 text-neutral-700 px-2 py-0.5 rounded-lg font-medium">
-                    <BedIcon className="w-3.5 h-3.5" /> {property.propertyDetails.bedrooms} quartos
+                    <BedIcon className="w-3.5 h-3.5" /> {property.propertyDetails.bedrooms} suíte{property.propertyDetails.bedrooms > 1 ? 's' : ''}
                   </span>
                 )}
-                {property.propertyDetails.bathrooms > 0 && (
+                {property.propertyDetails.lavabo != null && property.propertyDetails.lavabo > 0 && (
                   <span className="flex items-center gap-1 bg-neutral-100 text-neutral-700 px-2 py-0.5 rounded-lg font-medium">
-                    <BathIcon className="w-3.5 h-3.5" /> {property.propertyDetails.bathrooms} banheiros
+                    <BathIcon className="w-3.5 h-3.5" /> {property.propertyDetails.lavabo} lavabo{property.propertyDetails.lavabo > 1 ? 's' : ''}
                   </span>
                 )}
-                <span className="flex items-center gap-1 bg-neutral-100 text-neutral-700 px-2 py-0.5 rounded-lg font-medium">
-                  <RulerIcon className="w-3.5 h-3.5" /> {sqftToM2(property.propertyDetails.areaSqFt).toLocaleString()} m²
-                </span>
+                {property.propertyDetails.escritorio != null && property.propertyDetails.escritorio > 0 && (
+                  <span className="flex items-center gap-1 bg-neutral-100 text-neutral-700 px-2 py-0.5 rounded-lg font-medium">
+                    <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" strokeWidth={1.8} stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M9 17.25v1.007a3 3 0 01-.879 2.122L7.5 21h9l-.621-.621A3 3 0 0115 18.257V17.25m6-12V15a2.25 2.25 0 01-2.25 2.25H5.25A2.25 2.25 0 013 15V5.25m18 0A2.25 2.25 0 0018.75 3H5.25A2.25 2.25 0 003 5.25m18 0v.243a2.25 2.25 0 01-1.07 1.916l-7.5 4.615a2.25 2.25 0 01-2.36 0L3.32 7.409A2.25 2.25 0 012.25 5.493V5.25" />
+                    </svg>
+                    {property.propertyDetails.escritorio} escritório{property.propertyDetails.escritorio > 1 ? 's' : ''}
+                  </span>
+                )}
+                {property.propertyDetails.areaSqFt > 0 && (
+                  <span className="flex items-center gap-1 bg-neutral-100 text-neutral-700 px-2 py-0.5 rounded-lg font-medium">
+                    <RulerIcon className="w-3.5 h-3.5" /> {property.propertyDetails.areaSqFt.toLocaleString()} m²
+                  </span>
+                )}
               </div>
             </div>
 
@@ -452,6 +473,7 @@ export default function PropertyDetailView({ property, similarProperties }: { pr
               href={`https://wa.me/${property.agent.phone.replace(/\D/g, '')}`}
               target="_blank"
               rel="noreferrer"
+              onClick={trackWhatsApp}
               className="w-full flex items-center justify-center gap-3 px-6 py-3 rounded-xl bg-green-500 hover:bg-green-600 text-white font-semibold transition-colors"
             >
               <WhatsAppIcon className="w-5 h-5" />
@@ -485,6 +507,26 @@ export default function PropertyDetailView({ property, similarProperties }: { pr
                       <span className="text-sm font-normal text-neutral-400">/mês</span>
                     )}
                   </p>
+                  {(property.price.condominio || property.price.iptu) && (
+                    <div className="mt-2 pt-2 border-t border-neutral-100 space-y-1">
+                      {property.price.condominio != null && property.price.condominio > 0 && (
+                        <div className="flex justify-between text-xs text-neutral-500">
+                          <span>Condomínio</span>
+                          <span className="font-medium text-neutral-700">
+                            R$ {property.price.condominio.toLocaleString('pt-BR')}<span className="text-neutral-400">/mês</span>
+                          </span>
+                        </div>
+                      )}
+                      {property.price.iptu != null && property.price.iptu > 0 && (
+                        <div className="flex justify-between text-xs text-neutral-500">
+                          <span>IPTU</span>
+                          <span className="font-medium text-neutral-700">
+                            R$ {property.price.iptu.toLocaleString('pt-BR')}<span className="text-neutral-400">/ano</span>
+                          </span>
+                        </div>
+                      )}
+                    </div>
+                  )}
                 </div>
 
                 {formStatus === 'success' ? (
@@ -601,7 +643,7 @@ export default function PropertyDetailView({ property, similarProperties }: { pr
                         )}
                         <span className="flex items-center gap-1.5">
                           <RulerIcon className="w-3 h-3" />
-                          <strong className="text-neutral-800">{sqftToM2(p.propertyDetails.areaSqFt).toLocaleString()}</strong> m²
+                          <strong className="text-neutral-800">{p.propertyDetails.areaSqFt.toLocaleString()}</strong> m²
                         </span>
                       </div>
                       <div className="pt-2 border-t border-neutral-100 mt-auto">

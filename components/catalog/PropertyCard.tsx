@@ -1,5 +1,5 @@
 ﻿import Link from 'next/link'
-import { type Property, formatPrice, sqftToM2 } from '@/data/properties'
+import { type Property, formatPrice } from '@/data/properties'
 
 const TYPE_LABELS: Record<Property['propertyDetails']['type'], string> = {
   house:      'Casa',
@@ -88,21 +88,21 @@ export default function PropertyCard({ p }: { p: Property }) {
                   <path strokeLinecap="round" strokeLinejoin="round"
                         d="M2 9V6a1 1 0 011-1h18a1 1 0 011 1v3M2 9h20M2 9v9m20-9v9M2 18h20M7 13h10" />
                 </svg>
-                {p.propertyDetails.bedrooms} quarto{p.propertyDetails.bedrooms !== 1 ? 's' : ''}
+                {p.propertyDetails.bedrooms} suíte{p.propertyDetails.bedrooms !== 1 ? 's' : ''}
               </span>
             )}
-            {p.propertyDetails.bathrooms > 0 && (
+            {p.propertyDetails.lavabo != null && p.propertyDetails.lavabo > 0 && (
               <span className="flex items-center gap-1">
                 <svg className="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none"
                      strokeWidth={1.8} stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round"
                         d="M4 12h16M4 12V7a2 2 0 012-2h3m-5 7v5a2 2 0 002 2h12a2 2 0 002-2v-5M10 5V4a1 1 0 011-1h2a1 1 0 011 1v1" />
                 </svg>
-                {p.propertyDetails.bathrooms} banheiro{p.propertyDetails.bathrooms !== 1 ? 's' : ''}
+                {p.propertyDetails.lavabo} lavabo{p.propertyDetails.lavabo !== 1 ? 's' : ''}
               </span>
             )}
             <span className="ml-auto font-medium text-[#6B6B99]">
-              {sqftToM2(p.propertyDetails.areaSqFt).toLocaleString()} m²
+              {p.propertyDetails.areaSqFt.toLocaleString()} m²
             </span>
           </div>
         </div>

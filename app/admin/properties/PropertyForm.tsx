@@ -348,9 +348,14 @@ export default function PropertyForm({ property: initial }: { property?: Propert
             <h1 className="text-xl font-bold text-neutral-900">{isEdit ? form.title : 'Novo Imóvel'}</h1>
             {isEdit && <span className="px-2.5 py-0.5 text-xs font-bold text-[#1E3A5F] bg-[#1E3A5F]/10 rounded-lg">{form.id}</span>}
           </div>
-          {form.timestamps?.updatedAt && (
-            <p className="text-xs text-neutral-400 mt-0.5">Última atualização: {new Date(form.timestamps.updatedAt).toLocaleString('pt-BR')}</p>
-          )}
+          <div className="flex flex-wrap gap-x-4 gap-y-0.5 mt-0.5">
+            {form.timestamps?.createdAt && (
+              <p className="text-xs text-neutral-400">Cadastrado em: {new Date(form.timestamps.createdAt).toLocaleDateString('pt-BR', { day: '2-digit', month: 'long', year: 'numeric' })}</p>
+            )}
+            {form.timestamps?.updatedAt && (
+              <p className="text-xs text-neutral-400">Última atualização: {new Date(form.timestamps.updatedAt).toLocaleString('pt-BR')}</p>
+            )}
+          </div>
         </div>
         <div className="flex items-center gap-2 flex-shrink-0">
           <button onClick={() => router.push('/admin/properties')}
@@ -503,15 +508,10 @@ export default function PropertyForm({ property: initial }: { property?: Propert
               required
             />
             <Counter
-              label="Banheiros"
-              value={form.propertyDetails.bathrooms}
-              onChange={n => set('propertyDetails', { ...form.propertyDetails, bathrooms: n })}
-              required
-            />
-            <Counter
               label="Lavabo"
               value={form.propertyDetails.lavabo ?? 0}
               onChange={n => set('propertyDetails', { ...form.propertyDetails, lavabo: n })}
+              required
             />
             <Counter
               label="Escritório"

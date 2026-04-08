@@ -102,14 +102,14 @@ export default function MobileMenu({ isOpen, onClose, isHome }: MobileMenuProps)
 
         {/* CTA */}
         <div className="px-6 pb-8">
-          <a
-            href={isHome ? '#listings' : '/#listings'}
-            onClick={e => handleHashNav(e, 'listings')}
+          <Link
+            href="/register"
+            onClick={onClose}
             className="block w-full rounded-xl bg-[#6B6B99] px-4 py-3 text-center
                        text-sm font-semibold text-white hover:bg-[#5757A0] transition-colors duration-200"
           >
-            Ver Imóveis
-          </a>
+            Anuncie seu Imóvel
+          </Link>
         </div>
       </div>
     </>
