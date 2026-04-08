@@ -48,7 +48,6 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     <>
     <NextTopLoader
       color="#6D6D85"
-      secondaryColor="#A3A3C2"
       height={3}
       showSpinner={false}
       easing="ease"
