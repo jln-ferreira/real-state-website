@@ -226,7 +226,7 @@ export default function PropertyForm({ property: initial }: { property?: Propert
     if (!form.location.province.trim()) e['location.province'] = 'Província é obrigatória'
     if (!form.location.residential.trim()) e['location.residential'] = 'Residencial é obrigatório'
     if (!form.media.thumbnail.trim()) e['media.thumbnail'] = 'URL da miniatura é obrigatória'
-    if (form.price.amount <= 0) e['price.amount'] = 'O preço deve ser maior que 0'
+    if (!(Number(form.price.amount) > 0)) e['price.amount'] = 'O preço deve ser maior que 0'
     if (!form.agent.name.trim()) e['agent.name'] = 'Nome do agente é obrigatório'
     if (!form.agent.phone.trim()) e['agent.phone'] = 'Telefone do agente é obrigatório'
     if (!form.agent.email.trim()) e['agent.email'] = 'E-mail do agente é obrigatório'
@@ -270,6 +270,10 @@ export default function PropertyForm({ property: initial }: { property?: Propert
       if (res.ok) {
         setSaveState('saved')
         showToast('Imóvel salvo ✓', 'success')
+        if (isEdit) {
+          const now = new Date().toISOString()
+          setForm(f => ({ ...f, timestamps: { ...f.timestamps, updatedAt: now } }))
+        }
         setTimeout(() => setSaveState('idle'), 2000)
       } else {
         setSaveState('error')

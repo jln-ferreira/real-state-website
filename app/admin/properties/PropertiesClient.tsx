@@ -41,7 +41,7 @@ export default function PropertiesClient({ initialProperties }: { initialPropert
     const maxVal = priceMax ? parseFloat(priceMax.replace(/\./g, '').replace(',', '.')) : null
     return properties.filter(p => {
       const s = search.toLowerCase()
-      const matchSearch = !s || p.title.toLowerCase().includes(s) || p.id.toLowerCase().includes(s) || p.location.city.toLowerCase().includes(s)
+      const matchSearch = !s || p.title.toLowerCase().includes(s) || p.id.toLowerCase().includes(s) || p.location.city.toLowerCase().includes(s) || p.location.address.toLowerCase().includes(s)
       const matchType = typeFilter === 'all' || p.propertyDetails.type === typeFilter
       const matchStatus = statusFilter === 'all'
         || (statusFilter === 'active' && p.status.isActive)

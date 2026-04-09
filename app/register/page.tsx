@@ -15,6 +15,7 @@ export default function RegisterPage() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const [success, setSuccess] = useState(false)
+  const [passwordMismatch, setPasswordMismatch] = useState(false)
 
   function set(field: keyof typeof form) {
     return (e: React.ChangeEvent<HTMLInputElement>) =>
@@ -170,11 +171,15 @@ export default function RegisterPage() {
                 <input
                   type="password"
                   value={form.confirm_password}
-                  onChange={set('confirm_password')}
+                  onChange={e => { setForm(f => ({ ...f, confirm_password: e.target.value })); setPasswordMismatch(false) }}
+                  onBlur={() => setPasswordMismatch(!!form.confirm_password && form.confirm_password !== form.password)}
                   required
                   placeholder="Repita a senha"
-                  className="w-full px-3 py-2.5 bg-[#F7F7FA] border border-[#E6E6EF] rounded-xl text-sm outline-none focus:ring-2 focus:ring-[#6B6B99]/30 focus:border-[#6B6B99] transition"
+                  className={`w-full px-3 py-2.5 bg-[#F7F7FA] border rounded-xl text-sm outline-none focus:ring-2 transition ${passwordMismatch ? 'border-red-400 focus:ring-red-300' : 'border-[#E6E6EF] focus:ring-[#6B6B99]/30 focus:border-[#6B6B99]'}`}
                 />
+                {passwordMismatch && (
+                  <p className="text-xs text-red-500 mt-1">As senhas não coincidem.</p>
+                )}
               </div>
 
               {error && (
