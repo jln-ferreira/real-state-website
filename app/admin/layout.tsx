@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { signOut } from 'next-auth/react'
@@ -57,6 +57,18 @@ const NAV_ITEMS = [
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname()
   const [open, setOpen] = useState(false)
+  const [pendingCount, setPendingCount] = useState(0)
+
+  useEffect(() => {
+    Promise.all([
+      fetch('/api/admin/approvals/users').then(r => r.ok ? r.json() : []),
+      fetch('/api/admin/approvals/properties').then(r => r.ok ? r.json() : []),
+    ]).then(([users, properties]) => {
+      const pendingUsers = Array.isArray(users) ? users.filter((u: any) => u.status === 'pending').length : 0
+      const pendingProps = Array.isArray(properties) ? properties.length : 0
+      setPendingCount(pendingUsers + pendingProps)
+    }).catch(() => {})
+  }, [pathname])
 
   if (pathname === '/admin/login') {
     return <>{children}</>
@@ -118,6 +130,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           </p>
           {NAV_ITEMS.map(item => {
             const active = pathname.startsWith(item.href)
+            const showBadge = item.href === '/admin/approvals' && pendingCount > 0
             return (
               <Link
                 key={item.href}
@@ -133,7 +146,10 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                 <span className={active ? 'text-[#6D6D85]' : 'text-[#A3A3C2]'}>
                   {item.icon}
                 </span>
-                {item.label}
+                <span className="flex-1">{item.label}</span>
+                {showBadge && (
+                  <span className="w-2 h-2 rounded-full bg-red-500 flex-shrink-0" />
+                )}
               </Link>
             )
           })}
