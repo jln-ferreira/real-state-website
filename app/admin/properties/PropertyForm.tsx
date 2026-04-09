@@ -271,8 +271,9 @@ export default function PropertyForm({ property: initial }: { property?: Propert
         setSaveState('saved')
         showToast('Imóvel salvo ✓', 'success')
         if (isEdit) {
-          const now = new Date().toISOString()
-          setForm(f => ({ ...f, timestamps: { ...f.timestamps, updatedAt: now } }))
+          const updated = await res.json()
+          const updatedAt = updated?.timestamps?.updatedAt ?? new Date().toISOString()
+          setForm(f => ({ ...f, timestamps: { ...f.timestamps, updatedAt } }))
         }
         setTimeout(() => setSaveState('idle'), 2000)
       } else {
