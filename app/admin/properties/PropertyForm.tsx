@@ -273,7 +273,7 @@ export default function PropertyForm({ property: initial }: { property?: Propert
         if (isEdit) {
           const updated = await res.json()
           const updatedAt = updated?.timestamps?.updatedAt ?? new Date().toISOString()
-          setForm(f => ({ ...f, timestamps: { ...f.timestamps, updatedAt } }))
+          setForm(f => ({ ...f, timestamps: { createdAt: f.timestamps?.createdAt ?? '', updatedAt } }))
         }
         setTimeout(() => setSaveState('idle'), 2000)
       } else {
