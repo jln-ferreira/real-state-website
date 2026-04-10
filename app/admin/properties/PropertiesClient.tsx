@@ -14,12 +14,21 @@ const TYPE_COLORS: Record<string, string> = {
   land: 'bg-orange-100 text-orange-700',
 }
 
-export default function PropertiesClient({ initialProperties }: { initialProperties: Property[] }) {
+type UserOption = { id: string; first_name: string; last_name: string }
+
+export default function PropertiesClient({
+  initialProperties,
+  users = [],
+}: {
+  initialProperties: Property[]
+  users?: UserOption[]
+}) {
   const router = useRouter()
   const [properties, setProperties] = useState(initialProperties)
   const [search, setSearch] = useState('')
   const [typeFilter, setTypeFilter] = useState('all')
   const [statusFilter, setStatusFilter] = useState('all')
+  const [ownerFilter, setOwnerFilter] = useState('all')
   const [page, setPage] = useState(1)
   const [deleteTarget, setDeleteTarget] = useState<Property | null>(null)
   const [deleteConfirm, setDeleteConfirm] = useState('')
@@ -35,6 +44,28 @@ export default function PropertiesClient({ initialProperties }: { initialPropert
     setStatFilter(prev => prev === val ? null : val)
     setPage(1)
   }
+
+  const userMap = useMemo(() => {
+    const m = new Map<string, string>()
+    for (const u of users) m.set(u.id, `${u.first_name} ${u.last_name}`)
+    return m
+  }, [users])
+
+  // Only show owner options that actually appear in the property list
+  const ownerOptions = useMemo(() => {
+    const seen = new Set<string>()
+    const opts: { value: string; label: string }[] = []
+    for (const p of properties) {
+      if (p.ownerId && !seen.has(p.ownerId)) {
+        seen.add(p.ownerId)
+        opts.push({ value: p.ownerId, label: userMap.get(p.ownerId) ?? p.ownerId })
+      }
+    }
+    const hasAdmin = properties.some(p => !p.ownerId)
+    if (hasAdmin) opts.push({ value: '__admin__', label: 'Admin' })
+    opts.sort((a, b) => a.label.localeCompare(b.label))
+    return opts
+  }, [properties, userMap])
 
   const filtered = useMemo(() => {
     const minVal = priceMin ? parseFloat(priceMin.replace(/\./g, '').replace(',', '.')) : null
@@ -52,9 +83,12 @@ export default function PropertiesClient({ initialProperties }: { initialPropert
         || (statFilter === 'rent' && p.price.type === 'rent')
         || (statFilter === 'featured' && p.status.isFeatured)
       const matchPrice = (minVal === null || p.price.amount >= minVal) && (maxVal === null || p.price.amount <= maxVal)
-      return matchSearch && matchType && matchStatus && matchStat && matchPrice
+      const matchOwner = ownerFilter === 'all'
+        || (ownerFilter === '__admin__' && !p.ownerId)
+        || p.ownerId === ownerFilter
+      return matchSearch && matchType && matchStatus && matchStat && matchPrice && matchOwner
     })
-  }, [properties, search, typeFilter, statusFilter, statFilter, priceMin, priceMax])
+  }, [properties, search, typeFilter, statusFilter, statFilter, priceMin, priceMax, ownerFilter])
 
   const totalPages = Math.ceil(filtered.length / PER_PAGE)
   const paginated = filtered.slice((page - 1) * PER_PAGE, page * PER_PAGE)
@@ -169,6 +203,15 @@ export default function PropertiesClient({ initialProperties }: { initialPropert
           <option value="inactive">Inativo</option>
           <option value="featured">Destaque</option>
         </select>
+        {ownerOptions.length > 0 && (
+          <select value={ownerFilter} onChange={e => { setOwnerFilter(e.target.value); setPage(1) }}
+            className="flex-1 sm:flex-none px-3 py-2 bg-white border border-[#E6E6EF] rounded-xl text-sm outline-none focus:ring-2 focus:ring-[#6D6D85]/20">
+            <option value="all">Todos os Anunciantes</option>
+            {ownerOptions.map(o => (
+              <option key={o.value} value={o.value}>{o.label}</option>
+            ))}
+          </select>
+        )}
         <div className="flex items-center gap-1 w-full sm:w-auto">
           <input
             type="text"
@@ -277,6 +320,11 @@ export default function PropertiesClient({ initialProperties }: { initialPropert
                       {p.status.isActive ? 'Ativo' : 'Inativo'}
                       {p.status.isFeatured && <span className="text-amber-400 ml-0.5">★</span>}
                     </span>
+                    {p.ownerId && userMap.get(p.ownerId) && (
+                      <span className="text-[10px] text-[#6B6B99] bg-[#F0F0F8] px-1.5 py-0.5 rounded font-medium">
+                        {userMap.get(p.ownerId)}
+                      </span>
+                    )}
                   </div>
                 </div>
               </div>
@@ -295,13 +343,14 @@ export default function PropertiesClient({ initialProperties }: { initialPropert
               <th className="text-left px-4 py-3 text-xs font-semibold text-neutral-500 uppercase tracking-wider hidden sm:table-cell">Tipo</th>
               <th className="text-left px-4 py-3 text-xs font-semibold text-neutral-500 uppercase tracking-wider hidden md:table-cell">Preço</th>
               <th className="text-left px-4 py-3 text-xs font-semibold text-neutral-500 uppercase tracking-wider hidden lg:table-cell">Status</th>
+              <th className="text-left px-4 py-3 text-xs font-semibold text-neutral-500 uppercase tracking-wider hidden xl:table-cell">Anunciante</th>
               <th className="text-left px-4 py-3 text-xs font-semibold text-neutral-500 uppercase tracking-wider hidden xl:table-cell">Cadastro</th>
               <th className="text-right px-4 py-3 text-xs font-semibold text-neutral-500 uppercase tracking-wider">Ações</th>
             </tr>
           </thead>
           <tbody>
             {paginated.length === 0 ? (
-              <tr><td colSpan={7} className="text-center py-12 text-sm text-neutral-400">Nenhum imóvel encontrado</td></tr>
+              <tr><td colSpan={8} className="text-center py-12 text-sm text-neutral-400">Nenhum imóvel encontrado</td></tr>
             ) : paginated.map(p => (
               <tr key={p.id} className="border-b border-neutral-100 hover:bg-[#F7F7FA] transition-colors cursor-pointer" onClick={() => router.push(`/admin/properties/${p.id}`)}>
                 <td className="px-4 py-3"><span className="text-xs font-mono text-neutral-400">{p.id}</span></td>
@@ -334,6 +383,16 @@ export default function PropertiesClient({ initialProperties }: { initialPropert
                     </span>
                     {p.status.isFeatured && <span className="text-amber-400 text-xs ml-1">★</span>}
                   </div>
+                </td>
+                <td className="px-4 py-3 hidden xl:table-cell">
+                  {p.ownerId && userMap.get(p.ownerId) ? (
+                    <span className="inline-flex items-center gap-1.5 px-2 py-0.5 bg-[#F0F0F8] text-[#4F4F6B] rounded-lg text-xs font-medium">
+                      <span className="w-1.5 h-1.5 rounded-full bg-[#6B6B99] flex-shrink-0" />
+                      {userMap.get(p.ownerId)}
+                    </span>
+                  ) : (
+                    <span className="text-xs text-neutral-400">Admin</span>
+                  )}
                 </td>
                 <td className="px-4 py-3 hidden xl:table-cell">
                   <span className="text-xs text-neutral-500">
