@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 
@@ -80,6 +80,10 @@ function Field({ label, required, children, error }: {
 const inputCls = "w-full px-3 py-2.5 bg-[#F7F7FA] border border-[#E6E6EF] rounded-xl text-sm outline-none focus:ring-2 focus:ring-[#6B6B99]/30 focus:border-[#6B6B99] transition"
 const selectCls = inputCls + " cursor-pointer"
 
+function SectionTitle({ children }: { children: React.ReactNode }) {
+  return <h2 className="text-base font-semibold text-[#1E3A5F] mb-4 pt-2 border-t border-[#E6E6EF] first:border-0 first:pt-0">{children}</h2>
+}
+
 function Counter({ label, value, onChange }: { label: string; value: number; onChange: (n: number) => void }) {
   return (
     <div>
@@ -97,6 +101,7 @@ function Counter({ label, value, onChange }: { label: string; value: number; onC
 
 export default function UserPropertyFormClient() {
   const router = useRouter()
+  const formRef = useRef<HTMLFormElement>(null)
   const [form, setForm] = useState<FormState>(emptyForm())
   const [errors, setErrors] = useState<Record<string, string>>({})
   const [saving, setSaving] = useState(false)
@@ -154,7 +159,7 @@ export default function UserPropertyFormClient() {
     setSubmitError('')
     if (!validate()) {
       setSubmitError('Preencha todos os campos obrigatórios destacados abaixo.')
-      window.scrollTo({ top: 0, behavior: 'smooth' })
+      formRef.current?.scrollIntoView({ block: 'start' })
       return
     }
 
@@ -219,10 +224,6 @@ export default function UserPropertyFormClient() {
     }
   }
 
-  function SectionTitle({ children }: { children: React.ReactNode }) {
-    return <h2 className="text-base font-semibold text-[#1E3A5F] mb-4 pt-2 border-t border-[#E6E6EF] first:border-0 first:pt-0">{children}</h2>
-  }
-
   return (
     <div className="max-w-2xl mx-auto">
       {/* Header */}
@@ -238,7 +239,7 @@ export default function UserPropertyFormClient() {
         </div>
       </div>
 
-      <form onSubmit={handleSubmit} className="bg-white rounded-2xl border border-[#E6E6EF] p-6 space-y-6">
+      <form ref={formRef} onSubmit={handleSubmit} noValidate className="bg-white rounded-2xl border border-[#E6E6EF] p-6 space-y-6">
 
         {submitError && (
           <div className="bg-red-50 border border-red-200 rounded-xl px-4 py-3 text-sm text-red-700 font-medium">

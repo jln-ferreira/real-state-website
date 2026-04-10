@@ -3,6 +3,7 @@ import { redirect } from 'next/navigation'
 import UserPropertyFormClient from './UserPropertyFormClient'
 
 export const dynamic = 'force-dynamic'
+export const maxDuration = 30
 
 export default async function NewUserPropertyPage() {
   const session = await auth()
