@@ -102,7 +102,7 @@ export default function PostForm({ post: initial }: { post?: Post }) {
     setTimeout(() => setToast(null), 3000)
   }
 
-  function validate() {
+  function validate(): Record<string, string> {
     const e: Record<string, string> = {}
     if (!form.title.trim())    e.title    = 'Título é obrigatório'
     if (!form.slug.trim())     e.slug     = 'Slug é obrigatório'
@@ -115,11 +115,25 @@ export default function PostForm({ post: initial }: { post?: Post }) {
     if (!form.date.trim())     e.date     = 'Data é obrigatória'
     if (!form.readTime.trim()) e.readTime = 'Tempo de leitura é obrigatório'
     setErrors(e)
-    return Object.keys(e).length === 0
+    return e
   }
 
   async function handleSave() {
-    if (!validate()) { showToast('Corrija os erros antes de salvar.', 'error'); return }
+    const errs = validate()
+    if (Object.keys(errs).length > 0) {
+      const FIELD_LABELS: Record<string, string> = {
+        title: 'Título', slug: 'Slug', excerpt: 'Resumo', content: 'Conteúdo',
+        image: 'Imagem de Capa', category: 'Categoria', date: 'Data', readTime: 'Tempo de Leitura',
+      }
+      const missing = Object.keys(errs).map(k => FIELD_LABELS[k] ?? k).join(', ')
+      showToast(`Campos obrigatórios: ${missing}`, 'error')
+      if (errs.content && !errs.title && !errs.slug && !errs.excerpt && !errs.image && !errs.category && !errs.date && !errs.readTime) {
+        setActiveTab('Conteúdo')
+      } else {
+        setActiveTab('Informações')
+      }
+      return
+    }
     setSaveState('saving')
     try {
       const res = isEdit
@@ -204,23 +218,28 @@ export default function PostForm({ post: initial }: { post?: Post }) {
 
       {/* ── Tabs ───────────────────────────────────────────────────────────────── */}
       <div className="flex gap-1 mb-6 bg-neutral-100 p-1 rounded-xl w-fit">
-        {TABS.map(tab => (
-          <button
-            key={tab}
-            onClick={() => setActiveTab(tab)}
-            className={[
-              'px-4 py-2 rounded-lg text-sm font-medium transition-colors',
-              activeTab === tab
-                ? 'bg-white text-neutral-900 shadow-sm'
-                : 'text-neutral-500 hover:text-neutral-700',
-            ].join(' ')}
-          >
-            {tab}
-            {tab === 'Conteúdo' && errors.content && (
-              <span className="ml-1.5 w-1.5 h-1.5 inline-block rounded-full bg-red-500" />
-            )}
-          </button>
-        ))}
+        {TABS.map(tab => {
+          const hasError = tab === 'Conteúdo'
+            ? !!errors.content
+            : ['title', 'slug', 'excerpt', 'image', 'category', 'date', 'readTime'].some(k => errors[k])
+          return (
+            <button
+              key={tab}
+              onClick={() => setActiveTab(tab)}
+              className={[
+                'px-4 py-2 rounded-lg text-sm font-medium transition-colors',
+                activeTab === tab
+                  ? 'bg-white text-neutral-900 shadow-sm'
+                  : 'text-neutral-500 hover:text-neutral-700',
+              ].join(' ')}
+            >
+              {tab}
+              {hasError && (
+                <span className="ml-1.5 w-1.5 h-1.5 inline-block rounded-full bg-red-500" />
+              )}
+            </button>
+          )
+        })}
       </div>
 
       {/* ── Tab: Informações ───────────────────────────────────────────────────── */}

@@ -1,9 +1,11 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 
 export default function RegisterPage() {
+  const router = useRouter()
   const [form, setForm] = useState({
     first_name: '',
     last_name: '',
@@ -16,6 +18,14 @@ export default function RegisterPage() {
   const [error, setError] = useState('')
   const [success, setSuccess] = useState(false)
   const [passwordMismatch, setPasswordMismatch] = useState(false)
+  const [countdown, setCountdown] = useState(5)
+
+  useEffect(() => {
+    if (!success) return
+    if (countdown <= 0) { router.push('/login'); return }
+    const t = setTimeout(() => setCountdown(c => c - 1), 1000)
+    return () => clearTimeout(t)
+  }, [success, countdown, router])
 
   function set(field: keyof typeof form) {
     return (e: React.ChangeEvent<HTMLInputElement>) =>
@@ -62,7 +72,7 @@ export default function RegisterPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[#F7F7FA] flex items-start justify-center px-4 py-6">
+    <div className="min-h-screen bg-[#F7F7FA] flex items-start justify-center px-4 py-6 overflow-y-auto">
       <div className="w-full max-w-md">
         {/* Logo / brand */}
         <div className="text-center mb-5">
@@ -84,11 +94,15 @@ export default function RegisterPage() {
               <p className="text-sm text-[#6B6B99]">
                 Aguarde a aprovação do administrador. Você receberá um e-mail quando sua conta for aprovada.
               </p>
+              <p className="text-xs text-[#A3A3C2] mt-3">
+                Você será redirecionado para o login em{' '}
+                <span className="font-semibold text-[#6B6B99]">{countdown}</span> segundo{countdown !== 1 ? 's' : ''}…
+              </p>
               <Link
-                href="/"
-                className="mt-6 inline-block text-sm font-medium text-[#6B6B99] hover:text-[#4F4F6B] transition-colors"
+                href="/login"
+                className="mt-4 inline-block text-sm font-medium text-[#6B6B99] hover:text-[#4F4F6B] transition-colors"
               >
-                ← Voltar ao início
+                Ir para o login agora →
               </Link>
             </div>
           ) : (

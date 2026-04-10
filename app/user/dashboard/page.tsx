@@ -3,6 +3,9 @@ import { redirect } from 'next/navigation'
 import { getProperties } from '@/lib/properties'
 import UserDashboardClient from './UserDashboardClient'
 
+export const dynamic = 'force-dynamic'
+export const maxDuration = 30
+
 export default async function UserDashboardPage() {
   const session = await auth()
   if (!session?.user || (session.user as any).role !== 'user') {

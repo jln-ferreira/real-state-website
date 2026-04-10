@@ -218,6 +218,12 @@ export default function PropertyForm({ property: initial }: { property?: Propert
       .catch(() => {})
   }, [])
 
+  useEffect(() => {
+    if (!isEdit) {
+      setForm(f => ({ ...f, id: `PROP-${Date.now().toString(36).toUpperCase()}` }))
+    }
+  }, [isEdit])
+
   function set<K extends keyof Property>(key: K, value: Property[K]) {
     setForm(f => ({ ...f, [key]: value }))
   }
@@ -264,16 +270,12 @@ export default function PropertyForm({ property: initial }: { property?: Propert
           body: JSON.stringify(payload),
         })
       } else {
-        const allRes = await fetch('/api/admin/properties')
-        const all: Property[] = allRes.ok ? await allRes.json() : []
-        const nums = all.map(p => parseInt(p.id.replace('PROP-', ''))).filter(n => !isNaN(n)).sort((a, b) => b - a)
-        const newId = `PROP-${String((nums[0] ?? 0) + 1).padStart(3, '0')}`
         res = await fetch('/api/admin/properties', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             ...payload,
-            id: newId,
+            id: form.id,
             timestamps: { createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() },
           }),
         })
@@ -637,6 +639,12 @@ export default function PropertyForm({ property: initial }: { property?: Propert
         {/* ── Status & Agente ── */}
         {activeTab === 'Status & Agente' && (
           <>
+            {!isEdit && form.id && (
+              <div>
+                <label className="block text-xs font-semibold text-neutral-600 mb-1">ID do Imóvel (gerado automaticamente)</label>
+                <div className="px-3 py-2.5 bg-neutral-100 rounded-lg text-sm font-mono text-neutral-500 select-all">{form.id}</div>
+              </div>
+            )}
             <div className="bg-white rounded-xl border border-neutral-100 px-4 divide-y divide-neutral-100">
               <Toggle label="Anúncio ativo" description="Visível nos resultados de busca públicos" checked={form.status.isActive} onChange={v => set('status', { ...form.status, isActive: v })} />
               <Toggle label="Imóvel em destaque" description="Destacado na página inicial" checked={form.status.isFeatured} onChange={v => set('status', { ...form.status, isFeatured: v })} />

@@ -57,7 +57,7 @@ function emptyForm(): FormState {
     title: '', description: '', propertyType: 'apartment', priceType: 'sale',
     priceAmount: '', currency: 'BRL', condominio: '', iptu: '',
     address: '', city: '', province: '', residential: '',
-    bedrooms: 0, bathrooms: 0, areaSqFt: '', yearBuilt: '',
+    bedrooms: 1, bathrooms: 1, areaSqFt: '', yearBuilt: '',
     features: [], thumbnail: '', images: [''],
     agentName: '', agentPhone: '', agentEmail: '',
   }
@@ -78,19 +78,20 @@ function Field({ label, required, children, error }: {
 }
 
 const inputCls = "w-full px-3 py-2.5 bg-[#F7F7FA] border border-[#E6E6EF] rounded-xl text-sm outline-none focus:ring-2 focus:ring-[#6B6B99]/30 focus:border-[#6B6B99] transition"
+const inputErrCls = "w-full px-3 py-2.5 bg-[#FFF5F5] border border-red-300 rounded-xl text-sm outline-none focus:ring-2 focus:ring-red-300/30 focus:border-red-400 transition"
 const selectCls = inputCls + " cursor-pointer"
 
 function SectionTitle({ children }: { children: React.ReactNode }) {
   return <h2 className="text-base font-semibold text-[#1E3A5F] mb-4 pt-2 border-t border-[#E6E6EF] first:border-0 first:pt-0">{children}</h2>
 }
 
-function Counter({ label, value, onChange }: { label: string; value: number; onChange: (n: number) => void }) {
+function Counter({ label, value, min = 0, onChange }: { label: string; value: number; min?: number; onChange: (n: number) => void }) {
   return (
     <div>
       <label className="block text-xs font-semibold text-[#4F4F6B] mb-1.5">{label}</label>
       <div className="flex items-center gap-3">
-        <button type="button" onClick={() => onChange(Math.max(0, value - 1))}
-          className="w-9 h-9 rounded-xl bg-[#F7F7FA] border border-[#E6E6EF] hover:bg-[#E6E6EF] flex items-center justify-center text-[#4F4F6B] font-bold transition-colors">−</button>
+        <button type="button" onClick={() => onChange(Math.max(min, value - 1))} disabled={value <= min}
+          className="w-9 h-9 rounded-xl bg-[#F7F7FA] border border-[#E6E6EF] hover:bg-[#E6E6EF] flex items-center justify-center text-[#4F4F6B] font-bold transition-colors disabled:opacity-40 disabled:cursor-not-allowed">−</button>
         <span className="w-8 text-center text-sm font-semibold text-[#1E3A5F]">{value}</span>
         <button type="button" onClick={() => onChange(value + 1)}
           className="w-9 h-9 rounded-xl bg-[#F7F7FA] border border-[#E6E6EF] hover:bg-[#E6E6EF] flex items-center justify-center text-[#4F4F6B] font-bold transition-colors">+</button>
@@ -98,6 +99,10 @@ function Counter({ label, value, onChange }: { label: string; value: number; onC
     </div>
   )
 }
+
+const REQUIRED_FIELDS: (keyof FormState)[] = [
+  'title', 'description', 'priceAmount', 'address', 'city', 'province', 'residential', 'thumbnail', 'agentName', 'agentPhone', 'agentEmail',
+]
 
 export default function UserPropertyFormClient() {
   const router = useRouter()
@@ -107,6 +112,9 @@ export default function UserPropertyFormClient() {
   const [saving, setSaving] = useState(false)
   const [apiError, setApiError] = useState('')
   const [submitError, setSubmitError] = useState('')
+
+  const filledCount = REQUIRED_FIELDS.filter(f => String(form[f]).trim() !== '').length
+  const progress = Math.round((filledCount / REQUIRED_FIELDS.length) * 100)
 
   function set(field: keyof FormState) {
     return (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) =>
@@ -227,16 +235,25 @@ export default function UserPropertyFormClient() {
   return (
     <div className="max-w-2xl mx-auto">
       {/* Header */}
-      <div className="flex items-center gap-3 mb-8">
+      <div className="flex items-center gap-3 mb-6">
         <Link href="/user/dashboard" className="text-[#A3A3C2] hover:text-[#6B6B99] transition-colors">
           <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
           </svg>
         </Link>
-        <div>
+        <div className="flex-1 min-w-0">
           <h1 className="text-xl font-bold text-[#1E3A5F]">Novo Imóvel</h1>
           <p className="text-xs text-[#6B6B99] mt-0.5">O imóvel ficará pendente até aprovação do administrador.</p>
         </div>
+        <span className="text-xs font-semibold text-[#6B6B99] flex-shrink-0">{progress}%</span>
+      </div>
+
+      {/* Progress bar */}
+      <div className="mb-6 h-1.5 bg-[#E6E6EF] rounded-full overflow-hidden">
+        <div
+          className="h-full rounded-full bg-[#6B6B99] transition-all duration-500"
+          style={{ width: `${progress}%` }}
+        />
       </div>
 
       <form ref={formRef} onSubmit={handleSubmit} noValidate className="bg-white rounded-2xl border border-[#E6E6EF] p-6 space-y-6">
@@ -252,10 +269,10 @@ export default function UserPropertyFormClient() {
           <SectionTitle>Informações Básicas</SectionTitle>
           <div className="space-y-4">
             <Field label="Título" required error={errors.title}>
-              <input type="text" value={form.title} onChange={set('title')} placeholder="Ex: Apartamento de 3 quartos no centro" className={inputCls} />
+              <input type="text" value={form.title} onChange={set('title')} placeholder="Ex: Apartamento de 3 quartos no centro" className={errors.title ? inputErrCls : inputCls} />
             </Field>
             <Field label="Descrição" required error={errors.description}>
-              <textarea value={form.description} onChange={set('description')} rows={4} placeholder="Descreva o imóvel..." className="w-full px-3 py-2.5 bg-white border border-neutral-300 rounded-xl text-sm outline-none focus:ring-2 focus:ring-[#6B6B99]/30 focus:border-[#6B6B99] transition resize-none" />
+              <textarea value={form.description} onChange={set('description')} rows={4} placeholder="Descreva o imóvel..." className={`w-full px-3 py-2.5 border rounded-xl text-sm outline-none focus:ring-2 focus:ring-[#6B6B99]/30 focus:border-[#6B6B99] transition resize-none ${errors.description ? 'bg-[#FFF5F5] border-red-300' : 'bg-white border-neutral-300'}`} />
             </Field>
             <Field label="Tipo de Imóvel" required>
               <select value={form.propertyType} onChange={set('propertyType')} className={selectCls}>
@@ -285,7 +302,7 @@ export default function UserPropertyFormClient() {
               </Field>
             </div>
             <Field label="Valor" required error={errors.priceAmount}>
-              <input type="text" inputMode="numeric" value={form.priceAmount} onChange={set('priceAmount')} placeholder="0,00" className={inputCls} />
+              <input type="text" inputMode="numeric" value={form.priceAmount} onChange={set('priceAmount')} placeholder="0,00" className={errors.priceAmount ? inputErrCls : inputCls} />
             </Field>
             <div className="grid grid-cols-2 gap-4">
               <Field label="Condomínio (opcional)">
@@ -303,18 +320,18 @@ export default function UserPropertyFormClient() {
           <SectionTitle>Localização</SectionTitle>
           <div className="space-y-4">
             <Field label="Endereço" required error={errors.address}>
-              <input type="text" value={form.address} onChange={set('address')} placeholder="Rua, número, bairro" className={inputCls} />
+              <input type="text" value={form.address} onChange={set('address')} placeholder="Rua, número, bairro" className={errors.address ? inputErrCls : inputCls} />
             </Field>
             <div className="grid grid-cols-2 gap-4">
               <Field label="Cidade" required error={errors.city}>
-                <input type="text" value={form.city} onChange={set('city')} placeholder="São Paulo" className={inputCls} />
+                <input type="text" value={form.city} onChange={set('city')} placeholder="São Paulo" className={errors.city ? inputErrCls : inputCls} />
               </Field>
               <Field label="Estado" required error={errors.province}>
-                <input type="text" value={form.province} onChange={set('province')} placeholder="SP" className={inputCls} />
+                <input type="text" value={form.province} onChange={set('province')} placeholder="SP" className={errors.province ? inputErrCls : inputCls} />
               </Field>
             </div>
             <Field label="Residencial / Condomínio" required error={errors.residential}>
-              <input type="text" value={form.residential} onChange={set('residential')} placeholder="Nome do condomínio" className={inputCls} />
+              <input type="text" value={form.residential} onChange={set('residential')} placeholder="Nome do condomínio" className={errors.residential ? inputErrCls : inputCls} />
             </Field>
           </div>
         </div>
@@ -324,8 +341,8 @@ export default function UserPropertyFormClient() {
           <SectionTitle>Detalhes</SectionTitle>
           <div className="space-y-4">
             <div className="grid grid-cols-2 gap-6">
-              <Counter label="Quartos" value={form.bedrooms} onChange={v => setForm(f => ({ ...f, bedrooms: v }))} />
-              <Counter label="Banheiros" value={form.bathrooms} onChange={v => setForm(f => ({ ...f, bathrooms: v }))} />
+              <Counter label="Quartos" value={form.bedrooms} min={1} onChange={v => setForm(f => ({ ...f, bedrooms: v }))} />
+              <Counter label="Banheiros" value={form.bathrooms} min={1} onChange={v => setForm(f => ({ ...f, bathrooms: v }))} />
             </div>
             <div className="grid grid-cols-2 gap-4">
               <Field label="Área (m²)">
@@ -368,7 +385,7 @@ export default function UserPropertyFormClient() {
           <SectionTitle>Mídia</SectionTitle>
           <div className="space-y-4">
             <Field label="URL da Miniatura" required error={errors.thumbnail}>
-              <input type="url" value={form.thumbnail} onChange={set('thumbnail')} placeholder="https://..." className={inputCls} />
+              <input type="url" value={form.thumbnail} onChange={set('thumbnail')} placeholder="https://..." className={errors.thumbnail ? inputErrCls : inputCls} />
             </Field>
             <div>
               <label className="block text-xs font-semibold text-[#4F4F6B] mb-1.5">Fotos adicionais (URLs)</label>
@@ -409,14 +426,14 @@ export default function UserPropertyFormClient() {
           <SectionTitle>Informações de Contato</SectionTitle>
           <div className="space-y-4">
             <Field label="Seu nome" required error={errors.agentName}>
-              <input type="text" value={form.agentName} onChange={set('agentName')} placeholder="João Silva" className={inputCls} />
+              <input type="text" value={form.agentName} onChange={set('agentName')} placeholder="João Silva" className={errors.agentName ? inputErrCls : inputCls} />
             </Field>
             <div className="grid grid-cols-2 gap-4">
               <Field label="Telefone / WhatsApp" required error={errors.agentPhone}>
-                <input type="tel" value={form.agentPhone} onChange={set('agentPhone')} placeholder="(11) 99999-9999" className={inputCls} />
+                <input type="tel" value={form.agentPhone} onChange={set('agentPhone')} placeholder="(11) 99999-9999" className={errors.agentPhone ? inputErrCls : inputCls} />
               </Field>
               <Field label="E-mail de contato" required error={errors.agentEmail}>
-                <input type="email" value={form.agentEmail} onChange={set('agentEmail')} placeholder="joao@email.com" className={inputCls} />
+                <input type="email" value={form.agentEmail} onChange={set('agentEmail')} placeholder="joao@email.com" className={errors.agentEmail ? inputErrCls : inputCls} />
               </Field>
             </div>
           </div>
@@ -436,8 +453,14 @@ export default function UserPropertyFormClient() {
           <button
             type="submit"
             disabled={saving}
-            className="px-6 py-2.5 bg-[#6B6B99] hover:bg-[#4F4F6B] text-white text-sm font-semibold rounded-xl transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
+            className="px-6 py-2.5 bg-[#6B6B99] hover:bg-[#4F4F6B] text-white text-sm font-semibold rounded-xl transition-colors disabled:opacity-60 disabled:cursor-not-allowed flex items-center gap-2"
           >
+            {saving && (
+              <svg className="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
+                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+              </svg>
+            )}
             {saving ? 'Enviando...' : 'Enviar para análise'}
           </button>
         </div>

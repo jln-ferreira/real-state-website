@@ -342,7 +342,7 @@ export default function DashboardClient({ properties, posts, contactMessages, wh
                     <span className="text-xs font-bold text-neutral-300 w-4 flex-shrink-0 text-center">{i + 1}</span>
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     {row.thumbnail
-                      ? <img src={row.thumbnail} alt="" className="w-8 h-8 rounded-lg object-cover flex-shrink-0" />
+                      ? /* eslint-disable-next-line @next/next/no-img-element */ <img src={row.thumbnail} alt="" className="w-8 h-8 rounded-lg object-cover flex-shrink-0" onError={e => { (e.target as HTMLImageElement).src = '/placeholder-property.svg' }} />
                       : <div className="w-8 h-8 rounded-lg bg-neutral-100 flex-shrink-0" />
                     }
                     <div className="flex-1 min-w-0">
@@ -407,7 +407,7 @@ export default function DashboardClient({ properties, posts, contactMessages, wh
                   >
                     <span className="text-xs font-bold text-neutral-300 w-5 flex-shrink-0 text-center">{i + 1}</span>
                     {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img src={p.media?.thumbnail ?? p.img} alt="" className="w-9 h-9 rounded-lg object-cover flex-shrink-0" />
+                    <img src={p.media?.thumbnail ?? p.img} alt="" className="w-9 h-9 rounded-lg object-cover flex-shrink-0" onError={e => { (e.target as HTMLImageElement).src = '/placeholder-property.svg' }} />
                     <div className="flex-1 min-w-0">
                       <p className="text-sm font-medium text-neutral-900 truncate">{p.title}</p>
                       <div className="flex items-center gap-2 mt-0.5">
@@ -453,7 +453,7 @@ export default function DashboardClient({ properties, posts, contactMessages, wh
                   >
                     <span className="text-xs font-bold text-neutral-300 w-5 flex-shrink-0 text-center">{i + 1}</span>
                     {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img src={p.image} alt="" className="w-9 h-9 rounded-lg object-cover flex-shrink-0" />
+                    <img src={p.image} alt="" className="w-9 h-9 rounded-lg object-cover flex-shrink-0" onError={e => { (e.target as HTMLImageElement).src = '/placeholder-property.svg' }} />
                     <div className="flex-1 min-w-0">
                       <p className="text-sm font-medium text-neutral-900 truncate">{p.title}</p>
                       <div className="flex items-center gap-2 mt-0.5">

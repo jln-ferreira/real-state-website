@@ -112,6 +112,7 @@ export default function UserDashboardClient({ properties }: Props) {
                   src={property.media.thumbnail || property.img}
                   alt={property.title}
                   className="w-full h-full object-cover"
+                  onError={e => { (e.target as HTMLImageElement).src = '/placeholder-property.svg' }}
                 />
               </div>
 

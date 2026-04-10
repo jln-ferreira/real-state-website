@@ -260,7 +260,7 @@ export default function PropertiesClient({ initialProperties }: { initialPropert
             >
               <div className="flex items-center gap-3 px-4 py-3">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src={p.media?.thumbnail ?? p.img} alt="" className="w-12 h-12 rounded-lg object-cover flex-shrink-0" />
+                <img src={p.media?.thumbnail ?? p.img} alt="" className="w-12 h-12 rounded-lg object-cover flex-shrink-0" onError={e => { (e.target as HTMLImageElement).src = '/placeholder-property.svg' }} />
                 <div className="flex-1 min-w-0">
                   <p className="font-semibold text-sm text-neutral-900 line-clamp-1">{p.title}</p>
                   <div className="flex flex-wrap items-center gap-x-2 gap-y-0.5 mt-0.5">
@@ -308,7 +308,7 @@ export default function PropertiesClient({ initialProperties }: { initialPropert
                 <td className="px-4 py-3">
                   <div className="flex items-center gap-3">
                     {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img src={p.media?.thumbnail ?? p.img} alt="" className="w-10 h-10 rounded-lg object-cover flex-shrink-0" />
+                    <img src={p.media?.thumbnail ?? p.img} alt="" className="w-10 h-10 rounded-lg object-cover flex-shrink-0" onError={e => { (e.target as HTMLImageElement).src = '/placeholder-property.svg' }} />
                     <div>
                       <p className="font-semibold text-sm text-neutral-900 line-clamp-1">{p.title}</p>
                       <p className="text-xs text-neutral-400">{p.location.city}, {p.location.province}</p>
