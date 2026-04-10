@@ -55,7 +55,7 @@ export default function ApprovalsClient({ initialUsers, initialProperties, userM
         body: JSON.stringify({ status }),
       })
       if (res.ok) {
-        setUsers(prev => prev.map(u => u.id === id ? { ...u, status } : u))
+        setUsers(prev => prev.filter(u => u.id !== id))
         showToast(status === 'approved' ? 'Usuário aprovado.' : 'Usuário recusado.', 'success')
       } else {
         showToast('Erro ao atualizar status.', 'error')
@@ -76,7 +76,7 @@ export default function ApprovalsClient({ initialUsers, initialProperties, userM
         body: JSON.stringify({ adminStatus }),
       })
       if (res.ok) {
-        setProperties(prev => prev.map(p => p.id === id ? { ...p, adminStatus } : p))
+        setProperties(prev => prev.filter(p => p.id !== id))
         showToast(adminStatus === 'approved' ? 'Imóvel aprovado.' : 'Imóvel recusado.', 'success')
       } else {
         showToast('Erro ao atualizar status.', 'error')

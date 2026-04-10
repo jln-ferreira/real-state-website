@@ -37,6 +37,8 @@ export const authConfig: NextAuthConfig = {
         return Response.redirect(new URL('/admin/dashboard', nextUrl))
       if (isUserLoginPage && isLoggedIn && role === 'user')
         return Response.redirect(new URL('/user/dashboard', nextUrl))
+      if (isUserLoginPage && isLoggedIn && role === 'admin')
+        return Response.redirect(new URL('/admin/dashboard', nextUrl))
       return true
     },
   },

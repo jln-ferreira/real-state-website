@@ -7,6 +7,16 @@ import type { Property } from '@/data/properties'
 const TABS = ['Info Básica', 'Preço', 'Localização', 'Detalhes', 'Características', 'Mídia', 'Status & Agente'] as const
 type Tab = typeof TABS[number]
 
+const TAB_ERROR_KEYS: Record<Tab, string[]> = {
+  'Info Básica':     ['title', 'description'],
+  'Preço':           ['price.amount'],
+  'Localização':     ['location.address', 'location.city', 'location.province', 'location.residential'],
+  'Detalhes':        [],
+  'Características': [],
+  'Mídia':           ['media.thumbnail'],
+  'Status & Agente': ['agent.name', 'agent.phone', 'agent.email'],
+}
+
 const ALL_FEATURES: { value: string; label: string }[] = [
   { value: 'baccarat',    label: 'Exclusivo Baccarat' },
   { value: 'balcony',     label: 'Varanda'            },
@@ -168,7 +178,7 @@ function emptyProperty(): Property {
     propertyDetails: { type: 'apartment', bedrooms: 0, bathrooms: 0, areaSqFt: 0, lavabo: 0, escritorio: 0 },
     features: [],
     media: { images: [''], thumbnail: '' },
-    status: { isActive: true, isFeatured: false, isSpecial: false },
+    status: { isActive: false, isFeatured: false, isSpecial: false },
     metrics: { views: 0, favorites: 0, searchAppearances: 0 },
     timestamps: { createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() },
     agent: { name: '', phone: '', email: '' },
@@ -217,7 +227,7 @@ export default function PropertyForm({ property: initial }: { property?: Propert
     setTimeout(() => setToast(null), 3000)
   }
 
-  function validate(): boolean {
+  function validate(): Record<string, string> {
     const e: Record<string, string> = {}
     if (!form.title.trim()) e.title = 'Título é obrigatório'
     if (!form.description.trim()) e.description = 'Descrição é obrigatória'
@@ -231,11 +241,17 @@ export default function PropertyForm({ property: initial }: { property?: Propert
     if (!form.agent.phone.trim()) e['agent.phone'] = 'Telefone do agente é obrigatório'
     if (!form.agent.email.trim()) e['agent.email'] = 'E-mail do agente é obrigatório'
     setErrors(e)
-    return Object.keys(e).length === 0
+    return e
   }
 
   async function handleSave() {
-    if (!validate()) { showToast('Corrija os erros antes de salvar.', 'error'); return }
+    const errs = validate()
+    if (Object.keys(errs).length > 0) {
+      const firstErrorTab = TABS.find(tab => TAB_ERROR_KEYS[tab].some(key => key in errs))
+      if (firstErrorTab) setActiveTab(firstErrorTab)
+      showToast(`Corrija os erros${firstErrorTab ? ` na aba "${firstErrorTab}"` : ''} antes de salvar.`, 'error')
+      return
+    }
     setIsSaving(true)
     setSaveState('saving')
     const payload = { ...form, img: form.media.thumbnail }
@@ -383,12 +399,16 @@ export default function PropertyForm({ property: initial }: { property?: Propert
 
       {/* Tabs */}
       <div className="flex border-b border-neutral-200 mb-6 overflow-x-auto">
-        {TABS.map(tab => (
-          <button key={tab} onClick={() => setActiveTab(tab)}
-            className={`px-4 py-2.5 text-sm whitespace-nowrap transition-colors ${activeTab === tab ? 'border-b-2 border-[#1E3A5F] text-[#1E3A5F] font-semibold' : 'text-neutral-500 hover:text-neutral-700'}`}>
-            {tab}
-          </button>
-        ))}
+        {TABS.map(tab => {
+          const hasError = TAB_ERROR_KEYS[tab].some(key => errors[key])
+          return (
+            <button key={tab} onClick={() => setActiveTab(tab)}
+              className={`relative px-4 py-2.5 text-sm whitespace-nowrap transition-colors ${activeTab === tab ? 'border-b-2 border-[#1E3A5F] text-[#1E3A5F] font-semibold' : 'text-neutral-500 hover:text-neutral-700'}`}>
+              {tab}
+              {hasError && <span className="absolute top-2 right-1 w-1.5 h-1.5 rounded-full bg-red-500" />}
+            </button>
+          )
+        })}
       </div>
 
       <div className="space-y-4">
@@ -509,22 +529,22 @@ export default function PropertyForm({ property: initial }: { property?: Propert
             <Counter
               label="Número de Suítes"
               value={form.propertyDetails.bedrooms}
-              onChange={n => set('propertyDetails', { ...form.propertyDetails, bedrooms: n })}
+              onChange={n => setForm(f => ({ ...f, propertyDetails: { ...f.propertyDetails, bedrooms: n } }))}
               required
             />
             <Counter
               label="Lavabo"
               value={form.propertyDetails.lavabo ?? 0}
-              onChange={n => set('propertyDetails', { ...form.propertyDetails, lavabo: n })}
+              onChange={n => setForm(f => ({ ...f, propertyDetails: { ...f.propertyDetails, lavabo: n } }))}
               required
             />
             <Counter
               label="Escritório"
               value={form.propertyDetails.escritorio ?? 0}
-              onChange={n => set('propertyDetails', { ...form.propertyDetails, escritorio: n })}
+              onChange={n => setForm(f => ({ ...f, propertyDetails: { ...f.propertyDetails, escritorio: n } }))}
             />
-            <Input label="Área (m²)" required type="number" value={form.propertyDetails.areaSqFt || ''} onChange={v => set('propertyDetails', { ...form.propertyDetails, areaSqFt: parseFloat(v) || 0 })} />
-            <Input label="Ano de Construção" type="number" value={form.propertyDetails.yearBuilt ?? ''} onChange={v => set('propertyDetails', { ...form.propertyDetails, yearBuilt: parseInt(v) || undefined })} placeholder="ex. 2018" />
+            <Input label="Área (m²)" required type="number" value={form.propertyDetails.areaSqFt || ''} onChange={v => setForm(f => ({ ...f, propertyDetails: { ...f.propertyDetails, areaSqFt: parseFloat(v) || 0 } }))} />
+            <Input label="Ano de Construção" type="number" value={form.propertyDetails.yearBuilt ?? ''} onChange={v => setForm(f => ({ ...f, propertyDetails: { ...f.propertyDetails, yearBuilt: parseInt(v) || undefined } }))} placeholder="ex. 2018" />
           </>
         )}
 

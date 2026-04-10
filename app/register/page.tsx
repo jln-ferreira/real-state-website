@@ -62,17 +62,17 @@ export default function RegisterPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[#F7F7FA] flex items-center justify-center px-4 py-12">
+    <div className="min-h-screen bg-[#F7F7FA] flex items-start justify-center px-4 py-6">
       <div className="w-full max-w-md">
         {/* Logo / brand */}
-        <div className="text-center mb-8">
+        <div className="text-center mb-5">
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src="/logo.png" alt="Casa Baccarat" className="h-16 w-auto mx-auto mb-4" />
+          <img src="/logo.png" alt="Casa Baccarat" className="h-12 w-auto mx-auto mb-3" />
           <h1 className="text-2xl font-bold text-[#1E3A5F]">Criar conta</h1>
           <p className="text-sm text-[#6B6B99] mt-1">Cadastre-se para anunciar seu imóvel</p>
         </div>
 
-        <div className="bg-white rounded-2xl shadow-sm border border-[#E6E6EF] p-8">
+        <div className="bg-white rounded-2xl shadow-sm border border-[#E6E6EF] p-6">
           {success ? (
             <div className="text-center py-4">
               <div className="w-14 h-14 rounded-full bg-green-100 flex items-center justify-center mx-auto mb-4">
@@ -92,7 +92,7 @@ export default function RegisterPage() {
               </Link>
             </div>
           ) : (
-            <form onSubmit={handleSubmit} className="space-y-4">
+            <form onSubmit={handleSubmit} className="space-y-3">
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className="block text-xs font-semibold text-[#4F4F6B] mb-1.5">

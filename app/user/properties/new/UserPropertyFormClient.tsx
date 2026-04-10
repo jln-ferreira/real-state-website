@@ -101,6 +101,7 @@ export default function UserPropertyFormClient() {
   const [errors, setErrors] = useState<Record<string, string>>({})
   const [saving, setSaving] = useState(false)
   const [apiError, setApiError] = useState('')
+  const [submitError, setSubmitError] = useState('')
 
   function set(field: keyof FormState) {
     return (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) =>
@@ -150,7 +151,12 @@ export default function UserPropertyFormClient() {
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
     setApiError('')
-    if (!validate()) return
+    setSubmitError('')
+    if (!validate()) {
+      setSubmitError('Preencha todos os campos obrigatórios destacados abaixo.')
+      window.scrollTo({ top: 0, behavior: 'smooth' })
+      return
+    }
 
     // Parse price: strip non-numeric except dot/comma
     const rawPrice = form.priceAmount.replace(/\./g, '').replace(',', '.')
@@ -234,6 +240,12 @@ export default function UserPropertyFormClient() {
 
       <form onSubmit={handleSubmit} className="bg-white rounded-2xl border border-[#E6E6EF] p-6 space-y-6">
 
+        {submitError && (
+          <div className="bg-red-50 border border-red-200 rounded-xl px-4 py-3 text-sm text-red-700 font-medium">
+            {submitError}
+          </div>
+        )}
+
         {/* Basic info */}
         <div>
           <SectionTitle>Informações Básicas</SectionTitle>
@@ -242,7 +254,7 @@ export default function UserPropertyFormClient() {
               <input type="text" value={form.title} onChange={set('title')} placeholder="Ex: Apartamento de 3 quartos no centro" className={inputCls} />
             </Field>
             <Field label="Descrição" required error={errors.description}>
-              <textarea value={form.description} onChange={set('description')} rows={4} placeholder="Descreva o imóvel..." className={inputCls + ' resize-none'} />
+              <textarea value={form.description} onChange={set('description')} rows={4} placeholder="Descreva o imóvel..." className="w-full px-3 py-2.5 bg-white border border-neutral-300 rounded-xl text-sm outline-none focus:ring-2 focus:ring-[#6B6B99]/30 focus:border-[#6B6B99] transition resize-none" />
             </Field>
             <Field label="Tipo de Imóvel" required>
               <select value={form.propertyType} onChange={set('propertyType')} className={selectCls}>
