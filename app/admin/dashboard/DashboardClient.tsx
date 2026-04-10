@@ -13,6 +13,7 @@ interface Props {
   auditLog: unknown[]
   contactMessages: EventRow[]
   whatsappClicks: EventRow[]
+  userMap: Record<string, string>
 }
 
 function toDateKey(iso: string): string {
@@ -25,7 +26,7 @@ function addDays(date: Date, n: number): Date {
   return d
 }
 
-export default function DashboardClient({ properties, posts, contactMessages, whatsappClicks }: Props) {
+export default function DashboardClient({ properties, posts, contactMessages, whatsappClicks, userMap }: Props) {
   const [velocityPeriod, setVelocityPeriod] = useState<'30d' | '12w' | '12m'>('30d')
 
   // ── Velocity: new listings over time ─────────────────────────────────────────
@@ -244,6 +245,42 @@ export default function DashboardClient({ properties, posts, contactMessages, wh
                 )}
               </div>
             ))}
+          </div>
+        )}
+
+        {/* Recent registrations list */}
+        {datedProperties.length > 0 && (
+          <div className="mt-8">
+            <h3 className="text-xs font-semibold text-neutral-500 uppercase tracking-wide mb-3">Cadastros recentes</h3>
+            <div className="space-y-2">
+              {[...datedProperties]
+                .sort((a, b) => new Date(b.timestamps!.createdAt).getTime() - new Date(a.timestamps!.createdAt).getTime())
+                .slice(0, 8)
+                .map(p => (
+                  <div key={p.id} className="flex items-center gap-3 py-2 border-b border-[#F0F0F5] last:border-0">
+                    <div className="w-8 h-8 rounded-lg overflow-hidden flex-shrink-0 bg-[#F7F7FA]">
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img
+                        src={p.media?.thumbnail || p.img}
+                        alt={p.title}
+                        className="w-full h-full object-cover"
+                        onError={e => { (e.target as HTMLImageElement).src = '/placeholder-property.svg' }}
+                      />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-xs font-semibold text-[#1E3A5F] truncate">{p.title}</p>
+                      <p className="text-[10px] text-[#A3A3C2]">
+                        {p.ownerId
+                          ? `Cadastrado por ${userMap[p.ownerId] ?? 'Usuário'}`
+                          : 'Cadastrado pelo admin'}
+                      </p>
+                    </div>
+                    <span className="text-[10px] text-[#A3A3C2] flex-shrink-0">
+                      {new Date(p.timestamps!.createdAt).toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' })}
+                    </span>
+                  </div>
+                ))}
+            </div>
           </div>
         )}
 
