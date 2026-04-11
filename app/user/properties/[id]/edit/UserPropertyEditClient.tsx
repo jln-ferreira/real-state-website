@@ -168,6 +168,7 @@ export default function UserPropertyEditClient({ property, user }: { property: P
     if (!form.agentPhone.trim()) e.agentPhone = 'Telefone é obrigatório'
     if (!form.agentEmail.trim()) e.agentEmail = 'E-mail é obrigatório'
     if (form.bedrooms < 1) e.bedrooms = 'Mínimo 1 suíte'
+    if (form.lavabo < 1) e.lavabo = 'Mínimo 1 lavabo'
     setErrors(e)
     return Object.keys(e).length === 0
   }
@@ -350,7 +351,7 @@ export default function UserPropertyEditClient({ property, user }: { property: P
             <div className="grid grid-cols-2 gap-6">
               <Counter label="Suítes" value={form.bedrooms} min={1} required error={errors.bedrooms}
                 onChange={v => setForm(f => ({ ...f, bedrooms: v }))} />
-              <Counter label="Lavabos" value={form.lavabo} min={0}
+              <Counter label="Lavabos" value={form.lavabo} min={1} required error={errors.lavabo}
                 onChange={v => setForm(f => ({ ...f, lavabo: v }))} />
             </div>
             <div className="grid grid-cols-2 gap-4">

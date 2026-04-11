@@ -28,6 +28,7 @@ export async function PATCH(
       ...existing.status,
       isActive: adminStatus === 'approved',
     },
+    editSnapshot: undefined,
     ...(adminStatus === 'rejected' && rejectionReason
       ? { rejectionReason }
       : adminStatus === 'approved'

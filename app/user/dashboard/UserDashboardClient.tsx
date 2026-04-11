@@ -141,16 +141,10 @@ export default function UserDashboardClient({ properties: initialProperties }: P
 
                 {/* Info */}
                 <div className="flex-1 min-w-0">
-                  <div className="flex items-start gap-2 flex-wrap">
-                    <div className="flex-1 min-w-0">
-                      <p className="text-sm font-semibold text-[#1E3A5F] truncate">{property.title}</p>
-                      <p className="text-xs text-[#6B6B99] mt-0.5">
-                        {typeLabel(property.propertyDetails.type)} · {formatPrice(property)}
-                      </p>
-                    </div>
-                    <StatusBadge status={property.adminStatus ?? 'pending'} />
-                  </div>
-
+                  <p className="text-sm font-semibold text-[#1E3A5F] truncate">{property.title}</p>
+                  <p className="text-xs text-[#6B6B99] mt-0.5">
+                    {typeLabel(property.propertyDetails.type)} · {formatPrice(property)}
+                  </p>
                   {/* View count */}
                   {(property.metrics?.views ?? 0) > 0 && (
                     <div className="flex items-center gap-1 mt-1.5 text-xs text-[#A3A3C2]">
@@ -163,8 +157,9 @@ export default function UserDashboardClient({ properties: initialProperties }: P
                   )}
                 </div>
 
-                {/* Actions */}
+                {/* Actions — status badge aligned with buttons */}
                 <div className="flex-shrink-0 flex items-center gap-2">
+                  <StatusBadge status={property.adminStatus ?? 'pending'} />
                   <Link
                     href={`/user/properties/${property.id}/edit`}
                     className="text-xs text-[#6B6B99] hover:text-[#4F4F6B] border border-[#E6E6EF] rounded-lg px-3 py-1.5 transition-colors whitespace-nowrap"

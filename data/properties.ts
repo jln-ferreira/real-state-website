@@ -54,6 +54,17 @@ export interface Property {
   ownerId?: string
   adminStatus?: 'pending' | 'approved' | 'rejected'
   rejectionReason?: string
+  /** Snapshot of previous values stored when a user submits an edit for re-approval */
+  editSnapshot?: {
+    title?: string
+    description?: string
+    price?: Property['price']
+    location?: Property['location']
+    propertyDetails?: Property['propertyDetails']
+    features?: string[]
+    media?: Property['media']
+    agent?: Property['agent']
+  }
 }
 
 // ── Helpers ───────────────────────────────────────────────────────────────────

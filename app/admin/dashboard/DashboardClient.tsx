@@ -26,8 +26,31 @@ function addDays(date: Date, n: number): Date {
   return d
 }
 
+function getWeekStart(dateStr: string): string {
+  const d = new Date(dateStr)
+  const day = d.getDay() // 0=Sun
+  const diff = day === 0 ? -6 : 1 - day // shift to Monday
+  const monday = new Date(d)
+  monday.setDate(d.getDate() + diff)
+  return monday.toISOString().slice(0, 10)
+}
+
+function formatWeekRange(weekStartStr: string): string {
+  const start = new Date(weekStartStr + 'T00:00:00')
+  const end = new Date(weekStartStr + 'T00:00:00')
+  end.setDate(start.getDate() + 6)
+  const sameMonth = start.getMonth() === end.getMonth()
+  const startLabel = start.toLocaleDateString('pt-BR', {
+    day: '2-digit',
+    ...(sameMonth ? {} : { month: 'short' }),
+  })
+  const endLabel = end.toLocaleDateString('pt-BR', { day: '2-digit', month: 'short' })
+  return `${startLabel}–${endLabel}`
+}
+
 export default function DashboardClient({ properties, posts, contactMessages, whatsappClicks, userMap }: Props) {
   const [velocityPeriod, setVelocityPeriod] = useState<'30d' | '12w' | '12m'>('30d')
+  const [recentOpen, setRecentOpen] = useState(false)
 
   // ── Velocity: new listings over time ─────────────────────────────────────────
   const now   = new Date()
@@ -248,39 +271,76 @@ export default function DashboardClient({ properties, posts, contactMessages, wh
           </div>
         )}
 
-        {/* Recent registrations list */}
+        {/* Recent registrations — toggleable, grouped by week */}
         {datedProperties.length > 0 && (
           <div className="mt-8">
-            <h3 className="text-xs font-semibold text-neutral-500 uppercase tracking-wide mb-3">Cadastros recentes</h3>
-            <div className="space-y-2">
-              {[...datedProperties]
-                .sort((a, b) => new Date(b.timestamps!.createdAt).getTime() - new Date(a.timestamps!.createdAt).getTime())
-                .slice(0, 8)
-                .map(p => (
-                  <div key={p.id} className="flex items-center gap-3 py-2 border-b border-[#F0F0F5] last:border-0">
-                    <div className="w-8 h-8 rounded-lg overflow-hidden flex-shrink-0 bg-[#F7F7FA]">
-                      {/* eslint-disable-next-line @next/next/no-img-element */}
-                      <img
-                        src={p.media?.thumbnail || p.img}
-                        alt={p.title}
-                        className="w-full h-full object-cover"
-                        onError={e => { (e.target as HTMLImageElement).src = '/placeholder-property.svg' }}
-                      />
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <p className="text-xs font-semibold text-[#1E3A5F] truncate">{p.title}</p>
-                      <p className="text-[10px] text-[#A3A3C2]">
-                        {p.ownerId
-                          ? `Cadastrado por ${userMap[p.ownerId] ?? 'Usuário'}`
-                          : 'Cadastrado pelo admin'}
+            <button
+              onClick={() => setRecentOpen(o => !o)}
+              className="flex items-center gap-2 w-full text-left group mb-3"
+            >
+              <h3 className="text-xs font-semibold text-neutral-500 uppercase tracking-wide flex-1">Cadastros recentes</h3>
+              <svg
+                className={`w-4 h-4 text-neutral-400 transition-transform ${recentOpen ? 'rotate-180' : ''}`}
+                fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor"
+              >
+                <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
+              </svg>
+            </button>
+
+            {recentOpen && (() => {
+              const sorted = [...datedProperties].sort(
+                (a, b) => new Date(b.timestamps!.createdAt).getTime() - new Date(a.timestamps!.createdAt).getTime()
+              )
+              const weekMap = new Map<string, typeof sorted>()
+              for (const p of sorted) {
+                const key = getWeekStart(p.timestamps!.createdAt)
+                if (!weekMap.has(key)) weekMap.set(key, [])
+                weekMap.get(key)!.push(p)
+              }
+              const weeks = [...weekMap.entries()].sort(([a], [b]) => b.localeCompare(a))
+
+              return (
+                <div className="space-y-4">
+                  {weeks.map(([weekKey, props]) => (
+                    <div key={weekKey}>
+                      <p className="text-[10px] font-bold text-neutral-400 uppercase tracking-wider mb-2">
+                        {formatWeekRange(weekKey)}
                       </p>
+                      <div className="space-y-1">
+                        {props.map(p => (
+                          <Link
+                            key={p.id}
+                            href={`/property/${p.id}`}
+                            className="flex items-center gap-3 py-2 border-b border-[#F0F0F5] last:border-0 hover:bg-[#F7F7FA] rounded-lg px-1 transition-colors group"
+                          >
+                            <div className="w-8 h-8 rounded-lg overflow-hidden flex-shrink-0 bg-[#F7F7FA]">
+                              {/* eslint-disable-next-line @next/next/no-img-element */}
+                              <img
+                                src={p.media?.thumbnail || p.img}
+                                alt={p.title}
+                                className="w-full h-full object-cover"
+                                onError={e => { (e.target as HTMLImageElement).src = '/placeholder-property.svg' }}
+                              />
+                            </div>
+                            <div className="flex-1 min-w-0">
+                              <p className="text-xs font-semibold text-[#1E3A5F] truncate group-hover:underline">{p.title}</p>
+                              <p className="text-[10px] text-[#A3A3C2]">
+                                {p.ownerId
+                                  ? `Cadastrado por ${userMap[p.ownerId] ?? 'Usuário'}`
+                                  : 'Cadastrado pelo admin'}
+                              </p>
+                            </div>
+                            <span className="text-[10px] text-[#A3A3C2] flex-shrink-0">
+                              {new Date(p.timestamps!.createdAt).toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' })}
+                            </span>
+                          </Link>
+                        ))}
+                      </div>
                     </div>
-                    <span className="text-[10px] text-[#A3A3C2] flex-shrink-0">
-                      {new Date(p.timestamps!.createdAt).toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' })}
-                    </span>
-                  </div>
-                ))}
-            </div>
+                  ))}
+                </div>
+              )
+            })()}
           </div>
         )}
 

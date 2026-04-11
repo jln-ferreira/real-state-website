@@ -11,7 +11,7 @@ const TAB_ERROR_KEYS: Record<Tab, string[]> = {
   'Info Básica':     ['title', 'description'],
   'Preço':           ['price.amount'],
   'Localização':     ['location.address', 'location.city', 'location.province', 'location.residential'],
-  'Detalhes':        [],
+  'Detalhes':        ['propertyDetails.bedrooms', 'propertyDetails.lavabo'],
   'Características': [],
   'Mídia':           ['media.thumbnail'],
   'Status & Agente': ['agent.name', 'agent.phone', 'agent.email'],
@@ -115,8 +115,8 @@ function Toggle({ label, description, checked, onChange }: {
 
 // ── Counter input used for bedrooms / suites / lavabo / escritório ─────────────
 
-function Counter({ label, value, onChange, required = false }: {
-  label: string; value: number; onChange: (n: number) => void; required?: boolean
+function Counter({ label, value, onChange, required = false, error, min = 0 }: {
+  label: string; value: number; onChange: (n: number) => void; required?: boolean; error?: string; min?: number
 }) {
   return (
     <div>
@@ -124,12 +124,13 @@ function Counter({ label, value, onChange, required = false }: {
         {label}{required && <span className="text-red-500 ml-0.5">*</span>}
       </label>
       <div className="flex items-center gap-3">
-        <button type="button" onClick={() => onChange(Math.max(0, value - 1))}
+        <button type="button" onClick={() => onChange(Math.max(min, value - 1))}
           className="w-9 h-9 rounded-lg bg-neutral-100 hover:bg-neutral-200 flex items-center justify-center text-neutral-600 font-bold transition-colors">−</button>
         <span className="w-8 text-center text-sm font-semibold">{value}</span>
         <button type="button" onClick={() => onChange(value + 1)}
           className="w-9 h-9 rounded-lg bg-neutral-100 hover:bg-neutral-200 flex items-center justify-center text-neutral-600 font-bold transition-colors">+</button>
       </div>
+      {error && <p className="text-xs text-red-500 mt-1">{error}</p>}
     </div>
   )
 }
@@ -187,7 +188,7 @@ function emptyProperty(): Property {
 
 // ── Main form component ───────────────────────────────────────────────────────
 
-export default function PropertyForm({ property: initial }: { property?: Property }) {
+export default function PropertyForm({ property: initial, readOnly = false }: { property?: Property; readOnly?: boolean }) {
   const router = useRouter()
   const isEdit = !!initial
   const [form, setForm] = useState<Property>(initial ?? emptyProperty())
@@ -246,6 +247,8 @@ export default function PropertyForm({ property: initial }: { property?: Propert
     if (!form.agent.name.trim()) e['agent.name'] = 'Nome do agente é obrigatório'
     if (!form.agent.phone.trim()) e['agent.phone'] = 'Telefone do agente é obrigatório'
     if (!form.agent.email.trim()) e['agent.email'] = 'E-mail do agente é obrigatório'
+    if (form.propertyDetails.bedrooms < 1) e['propertyDetails.bedrooms'] = 'Mínimo 1 suíte'
+    if ((form.propertyDetails.lavabo ?? 0) < 1) e['propertyDetails.lavabo'] = 'Mínimo 1 lavabo'
     setErrors(e)
     return e
   }
@@ -380,24 +383,87 @@ export default function PropertyForm({ property: initial }: { property?: Propert
             )}
           </div>
         </div>
-        <div className="flex items-center gap-2 flex-shrink-0">
-          <button onClick={() => router.push('/admin/properties')}
-            className="px-4 py-2 border border-neutral-200 rounded-xl text-sm font-medium hover:bg-neutral-50 transition-colors">
-            Descartar
-          </button>
-          <button onClick={handleSave} disabled={isSaving}
-            className={`px-4 py-2 rounded-xl text-sm font-semibold text-white transition-colors flex items-center gap-2 disabled:opacity-60
-              ${saveState === 'saved' ? 'bg-green-600' : saveState === 'error' ? 'bg-red-600' : 'bg-[#1E3A5F] hover:bg-[#141d3a]'}`}>
-            {isSaving && (
-              <svg className="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
-                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
-              </svg>
-            )}
-            {saveState === 'saving' ? 'Salvando...' : saveState === 'saved' ? 'Salvo ✓' : 'Salvar alterações'}
-          </button>
-        </div>
+        {!readOnly && (
+          <div className="flex items-center gap-2 flex-shrink-0">
+            <button onClick={() => router.push('/admin/properties')}
+              className="px-4 py-2 border border-neutral-200 rounded-xl text-sm font-medium hover:bg-neutral-50 transition-colors">
+              Descartar
+            </button>
+            <button onClick={handleSave} disabled={isSaving}
+              className={`px-4 py-2 rounded-xl text-sm font-semibold text-white transition-colors flex items-center gap-2 disabled:opacity-60
+                ${saveState === 'saved' ? 'bg-green-600' : saveState === 'error' ? 'bg-red-600' : 'bg-[#1E3A5F] hover:bg-[#141d3a]'}`}>
+              {isSaving && (
+                <svg className="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                </svg>
+              )}
+              {saveState === 'saving' ? 'Salvando...' : saveState === 'saved' ? 'Salvo ✓' : 'Salvar alterações'}
+            </button>
+          </div>
+        )}
       </div>
+
+      {/* ── Edit changes diff (review mode only) ── */}
+      {readOnly && initial?.editSnapshot && (() => {
+        const snap = initial.editSnapshot!
+        const changes: { label: string; old: string; cur: string }[] = []
+        if (snap.title !== undefined && snap.title !== form.title)
+          changes.push({ label: 'Título', old: snap.title, cur: form.title })
+        if (snap.description !== undefined && snap.description !== form.description)
+          changes.push({ label: 'Descrição', old: snap.description.slice(0, 60) + (snap.description.length > 60 ? '…' : ''), cur: form.description.slice(0, 60) + (form.description.length > 60 ? '…' : '') })
+        if (snap.price?.amount !== undefined && snap.price.amount !== form.price.amount)
+          changes.push({ label: 'Preço', old: `${snap.price.amount.toLocaleString('pt-BR')}`, cur: `${form.price.amount.toLocaleString('pt-BR')}` })
+        if (snap.price?.type !== undefined && snap.price.type !== form.price.type)
+          changes.push({ label: 'Tipo de negócio', old: snap.price.type === 'sale' ? 'Venda' : 'Aluguel', cur: form.price.type === 'sale' ? 'Venda' : 'Aluguel' })
+        if (snap.location?.address !== undefined && snap.location.address !== form.location.address)
+          changes.push({ label: 'Endereço', old: snap.location.address, cur: form.location.address })
+        if (snap.location?.city !== undefined && snap.location.city !== form.location.city)
+          changes.push({ label: 'Cidade', old: snap.location.city, cur: form.location.city })
+        if (snap.location?.province !== undefined && snap.location.province !== form.location.province)
+          changes.push({ label: 'Estado', old: snap.location.province, cur: form.location.province })
+        if (snap.location?.residential !== undefined && snap.location.residential !== form.location.residential)
+          changes.push({ label: 'Residencial', old: snap.location.residential, cur: form.location.residential })
+        if (snap.propertyDetails?.bedrooms !== undefined && snap.propertyDetails.bedrooms !== form.propertyDetails.bedrooms)
+          changes.push({ label: 'Suítes', old: String(snap.propertyDetails.bedrooms), cur: String(form.propertyDetails.bedrooms) })
+        if (snap.propertyDetails?.lavabo !== undefined && snap.propertyDetails.lavabo !== (form.propertyDetails.lavabo ?? 0))
+          changes.push({ label: 'Lavabos', old: String(snap.propertyDetails.lavabo), cur: String(form.propertyDetails.lavabo ?? 0) })
+        if (snap.propertyDetails?.areaSqFt !== undefined && snap.propertyDetails.areaSqFt !== form.propertyDetails.areaSqFt)
+          changes.push({ label: 'Área (m²)', old: String(snap.propertyDetails.areaSqFt), cur: String(form.propertyDetails.areaSqFt) })
+        if (snap.features !== undefined) {
+          const added = form.features.filter(f => !snap.features!.includes(f))
+          const removed = snap.features.filter(f => !form.features.includes(f))
+          if (added.length > 0) changes.push({ label: 'Características +', old: '—', cur: added.join(', ') })
+          if (removed.length > 0) changes.push({ label: 'Características −', old: removed.join(', '), cur: '—' })
+        }
+        if (snap.agent?.name !== undefined && snap.agent.name !== form.agent.name)
+          changes.push({ label: 'Agente', old: snap.agent.name, cur: form.agent.name })
+        if (snap.media?.thumbnail !== undefined && snap.media.thumbnail !== form.media.thumbnail)
+          changes.push({ label: 'Miniatura', old: '(imagem anterior)', cur: '(nova imagem)' })
+
+        if (changes.length === 0) return (
+          <div className="mb-5 bg-neutral-50 border border-neutral-200 rounded-2xl px-4 py-3 text-xs text-neutral-500">
+            Edição enviada — nenhuma alteração detectada nos campos comparados.
+          </div>
+        )
+        return (
+          <div className="mb-5 bg-amber-50 border border-amber-200 rounded-2xl p-4">
+            <p className="text-xs font-bold text-amber-800 uppercase tracking-wider mb-3">
+              {changes.length} campo{changes.length !== 1 ? 's' : ''} alterado{changes.length !== 1 ? 's' : ''}
+            </p>
+            <div className="space-y-2">
+              {changes.map((c, i) => (
+                <div key={i} className="grid grid-cols-[100px_1fr_12px_1fr] items-start gap-2 text-xs">
+                  <span className="font-semibold text-amber-700 truncate">{c.label}</span>
+                  <span className="text-neutral-500 line-through truncate">{c.old}</span>
+                  <span className="text-amber-400 text-center">→</span>
+                  <span className="text-amber-900 font-medium truncate">{c.cur}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        )
+      })()}
 
       {/* Tabs */}
       <div className="flex border-b border-neutral-200 mb-6 overflow-x-auto">
@@ -413,7 +479,7 @@ export default function PropertyForm({ property: initial }: { property?: Propert
         })}
       </div>
 
-      <div className="space-y-4">
+      <div className={`space-y-4${readOnly ? ' pointer-events-none select-none opacity-80' : ''}`}>
 
         {/* ── Info Básica ── */}
         {activeTab === 'Info Básica' && (
@@ -531,14 +597,18 @@ export default function PropertyForm({ property: initial }: { property?: Propert
             <Counter
               label="Número de Suítes"
               value={form.propertyDetails.bedrooms}
+              min={1}
               onChange={n => setForm(f => ({ ...f, propertyDetails: { ...f.propertyDetails, bedrooms: n } }))}
               required
+              error={errors['propertyDetails.bedrooms']}
             />
             <Counter
               label="Lavabo"
               value={form.propertyDetails.lavabo ?? 0}
+              min={1}
               onChange={n => setForm(f => ({ ...f, propertyDetails: { ...f.propertyDetails, lavabo: n } }))}
               required
+              error={errors['propertyDetails.lavabo']}
             />
             <Counter
               label="Escritório"
@@ -660,7 +730,7 @@ export default function PropertyForm({ property: initial }: { property?: Propert
                 <Input label="E-mail do Agente" required value={form.agent.email} onChange={v => set('agent', { ...form.agent, email: v })} error={errors['agent.email']} />
               </div>
             </div>
-            {isEdit && (
+            {isEdit && !readOnly && (
               <div className="mt-8 border-2 border-red-200 rounded-2xl p-6">
                 <h3 className="text-sm font-semibold text-red-600 mb-1">Zona de Perigo</h3>
                 <p className="text-sm font-medium text-neutral-700 mb-0.5">Excluir este imóvel</p>

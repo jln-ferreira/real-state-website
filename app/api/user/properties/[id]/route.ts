@@ -66,6 +66,17 @@ export async function PATCH(
       adminStatus: 'pending',
       status: { ...existing.status, isActive: false },
       rejectionReason: undefined,
+      // Store previous values so admin can see what changed
+      editSnapshot: {
+        title: existing.title,
+        description: existing.description,
+        price: existing.price,
+        location: existing.location,
+        propertyDetails: existing.propertyDetails,
+        features: existing.features,
+        media: existing.media,
+        agent: existing.agent,
+      },
     })
 
     revalidatePath('/user/dashboard')

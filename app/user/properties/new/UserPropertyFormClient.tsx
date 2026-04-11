@@ -63,7 +63,7 @@ function emptyForm(user: UserInfo): FormState {
     title: '', description: '', propertyType: 'apartment', priceType: 'sale',
     priceAmount: '', currency: 'BRL', condominio: '', iptu: '',
     address: '', city: '', province: '', residential: '',
-    bedrooms: 1, lavabo: 0, areaSqFt: '', yearBuilt: '',
+    bedrooms: 1, lavabo: 1, areaSqFt: '', yearBuilt: '',
     features: [], thumbnail: '', images: [''],
     agentName: user.name, agentPhone: user.phone, agentEmail: user.email,
   }
@@ -191,6 +191,7 @@ export default function UserPropertyFormClient({ user }: { user: UserInfo }) {
     if (!form.agentPhone.trim()) e.agentPhone = 'Telefone é obrigatório'
     if (!form.agentEmail.trim()) e.agentEmail = 'E-mail é obrigatório'
     if (form.bedrooms < 1) e.bedrooms = 'Mínimo 1 suíte'
+    if (form.lavabo < 1) e.lavabo = 'Mínimo 1 lavabo'
     setErrors(e)
     return Object.keys(e).length === 0
   }
@@ -404,7 +405,9 @@ export default function UserPropertyFormClient({ user }: { user: UserInfo }) {
               <Counter
                 label="Lavabos"
                 value={form.lavabo}
-                min={0}
+                min={1}
+                required
+                error={errors.lavabo}
                 onChange={v => setForm(f => ({ ...f, lavabo: v }))}
               />
             </div>
