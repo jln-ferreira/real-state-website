@@ -19,7 +19,10 @@ async function ensureTable() {
 export async function getContactMessages(): Promise<{ property_id: string; created_at: string }[]> {
   await ensureTable()
   const result = await db.execute('SELECT property_id, created_at FROM contact_messages ORDER BY created_at DESC')
-  return result.rows as unknown as { property_id: string; created_at: string }[]
+  return result.rows.map(r => ({
+    property_id: r.property_id as string,
+    created_at:  r.created_at  as string,
+  }))
 }
 
 export async function saveContactMessage(data: z.infer<typeof ContactSchema>) {

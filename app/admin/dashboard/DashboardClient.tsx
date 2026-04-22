@@ -7,6 +7,8 @@ import type { Post } from '@/data/posts'
 
 interface EventRow { property_id: string; created_at: string }
 
+interface TopImage { property_id: string; image_url: string; views: number }
+
 interface Props {
   properties: Property[]
   posts: Post[]
@@ -14,6 +16,7 @@ interface Props {
   contactMessages: EventRow[]
   whatsappClicks: EventRow[]
   userMap: Record<string, string>
+  topImages: TopImage[]
 }
 
 function toDateKey(iso: string): string {
@@ -48,9 +51,13 @@ function formatWeekRange(weekStartStr: string): string {
   return `${startLabel}–${endLabel}`
 }
 
-export default function DashboardClient({ properties, posts, contactMessages, whatsappClicks, userMap }: Props) {
+export default function DashboardClient({ properties, posts, contactMessages, whatsappClicks, userMap, topImages }: Props) {
   const [velocityPeriod, setVelocityPeriod] = useState<'7d' | '30d' | '12w' | '12m'>('30d')
   const [recentOpen, setRecentOpen] = useState(false)
+
+  // ── Property status counts ───────────────────────────────────────────────────
+  const activeCount   = properties.filter(p => p.status?.isActive).length
+  const inactiveCount = properties.length - activeCount
 
   // ── Velocity: new listings over time ─────────────────────────────────────────
   const now   = new Date()
@@ -214,6 +221,50 @@ export default function DashboardClient({ properties, posts, contactMessages, wh
             Novo Post
           </Link>
         </div>
+      </div>
+
+      {/* ── Active / Inactive stat row ──────────────────────────────────────── */}
+      <div className="grid grid-cols-3 gap-3">
+        {[
+          {
+            label: 'Total de Imóveis',
+            value: properties.length,
+            color: 'text-[#4F4F6B]',
+            bg: 'bg-white',
+            icon: (
+              <svg className="w-4 h-4 text-[#6D6D85]" fill="none" viewBox="0 0 24 24" strokeWidth={1.8} stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 12l8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25" />
+              </svg>
+            ),
+          },
+          {
+            label: 'Ativos',
+            value: activeCount,
+            color: 'text-emerald-600',
+            bg: 'bg-white',
+            icon: (
+              <svg className="w-4 h-4 text-emerald-500" fill="none" viewBox="0 0 24 24" strokeWidth={1.8} stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+            ),
+          },
+          {
+            label: 'Inativos',
+            value: inactiveCount,
+            color: 'text-neutral-500',
+            bg: 'bg-white',
+            icon: (
+              <svg className="w-4 h-4 text-neutral-400" fill="none" viewBox="0 0 24 24" strokeWidth={1.8} stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636" />
+              </svg>
+            ),
+          },
+        ].map(({ label, value, color, bg, icon }) => (
+          <div key={label} className={`${bg} rounded-2xl shadow-sm border border-[#E6E6EF] px-4 py-4`}>
+            <div className="flex items-center gap-1.5 mb-1">{icon}<span className="text-xs text-neutral-500">{label}</span></div>
+            <p className={`text-3xl font-bold ${color}`}>{value}</p>
+          </div>
+        ))}
       </div>
 
       {/* ── New Listings Velocity ────────────────────────────────────────────── */}
@@ -607,6 +658,64 @@ export default function DashboardClient({ properties, posts, contactMessages, wh
         </div>
 
       </div>
+      {/* ── Foto mais acessada por imóvel ───────────────────────────────────── */}
+      <div className="bg-white rounded-2xl shadow-sm border border-[#E6E6EF] overflow-hidden">
+        <div className="flex items-center justify-between px-4 py-3 border-b border-[#E6E6EF]">
+          <div>
+            <h2 className="text-sm font-bold text-neutral-800">Foto mais vista por imóvel</h2>
+            <p className="text-xs text-neutral-400 mt-0.5">Imagem do anúncio com mais visualizações no lightbox</p>
+          </div>
+          <svg className="w-4 h-4 text-[#6D6D85]" fill="none" viewBox="0 0 24 24" strokeWidth={1.8} stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.409a2.25 2.25 0 013.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 001.5-1.5V6a1.5 1.5 0 00-1.5-1.5H3.75A1.5 1.5 0 002.25 6v12a1.5 1.5 0 001.5 1.5zm10.5-11.25h.008v.008h-.008V8.25zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z" />
+          </svg>
+        </div>
+
+        {topImages.length === 0 ? (
+          <p className="text-sm text-neutral-400 text-center py-10">
+            Nenhuma foto visualizada ainda — os dados aparecem conforme usuários abrem o lightbox dos imóveis.
+          </p>
+        ) : (
+          <div className="divide-y divide-[#E6E6EF]">
+            {topImages.map(row => {
+              const prop = properties.find(p => p.id === row.property_id)
+              return (
+                <Link
+                  key={row.property_id}
+                  href={`/admin/properties/${row.property_id}`}
+                  className="flex items-center gap-3 px-4 py-3 hover:bg-[#F7F7FA] transition-colors"
+                >
+                  {/* Property thumbnail */}
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src={prop?.media?.thumbnail ?? prop?.img ?? ''}
+                    alt=""
+                    className="w-9 h-9 rounded-lg object-cover flex-shrink-0"
+                    onError={e => { (e.target as HTMLImageElement).src = '/placeholder-property.svg' }}
+                  />
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-medium text-neutral-900 truncate">{prop?.title ?? row.property_id}</p>
+                    <p className="text-xs text-neutral-400 mt-0.5">
+                      {row.views.toLocaleString('pt-BR')} {row.views === 1 ? 'visualização' : 'visualizações'} nesta foto
+                    </p>
+                  </div>
+                  {/* Most viewed image preview */}
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src={row.image_url}
+                    alt="foto mais vista"
+                    className="w-16 h-11 rounded-lg object-cover flex-shrink-0 border border-[#E6E6EF]"
+                    onError={e => { (e.target as HTMLImageElement).src = '/placeholder-property.svg' }}
+                  />
+                  <span className="text-xs font-bold text-[#4F4F6B] flex-shrink-0 w-10 text-right">
+                    {row.views.toLocaleString('pt-BR')}
+                  </span>
+                </Link>
+              )
+            })}
+          </div>
+        )}
+      </div>
+
     </div>
   )
 }

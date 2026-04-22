@@ -50,7 +50,7 @@ export default function PostsClient({ initialPosts }: { initialPosts: Post[] }) 
     total:      posts.length,
     published:  posts.filter(p => p.published !== false).length,
     drafts:     posts.filter(p => p.published === false).length,
-    categories: new Set(posts.map(p => p.category)).size,
+    totalViews: posts.reduce((sum, p) => sum + (p.views ?? 0), 0),
   }
 
   async function handleDelete() {
@@ -122,8 +122,8 @@ export default function PostsClient({ initialPosts }: { initialPosts: Post[] }) 
           )
         })}
         <div className="bg-white rounded-2xl p-4 shadow-sm border border-[#E6E6EF]">
-          <p className="text-2xl font-bold text-[#4F4F6B]">{stats.categories}</p>
-          <p className="text-xs text-neutral-500 mt-0.5">Categorias</p>
+          <p className="text-2xl font-bold text-[#4F4F6B]">{stats.totalViews.toLocaleString('pt-BR')}</p>
+          <p className="text-xs text-neutral-500 mt-0.5">Visualizações totais</p>
         </div>
       </div>
 
@@ -221,6 +221,13 @@ export default function PostsClient({ initialPosts }: { initialPosts: Post[] }) 
                       <span className={`w-1.5 h-1.5 rounded-full inline-block ${p.published !== false ? 'bg-green-500' : 'bg-neutral-300'}`} />
                       {p.published !== false ? 'Publicado' : 'Rascunho'}
                     </span>
+                    <span className="flex items-center gap-0.5 text-[10px] text-neutral-500 font-medium">
+                      <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z" />
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                      </svg>
+                      {(p.views ?? 0).toLocaleString('pt-BR')}
+                    </span>
                   </div>
                 </div>
               </div>
@@ -238,6 +245,7 @@ export default function PostsClient({ initialPosts }: { initialPosts: Post[] }) 
               <th className="text-left px-4 py-3 text-xs font-semibold text-neutral-500 uppercase tracking-wider hidden sm:table-cell">Categoria</th>
               <th className="text-left px-4 py-3 text-xs font-semibold text-neutral-500 uppercase tracking-wider hidden md:table-cell">Data</th>
               <th className="text-left px-4 py-3 text-xs font-semibold text-neutral-500 uppercase tracking-wider hidden lg:table-cell">Status</th>
+              <th className="text-left px-4 py-3 text-xs font-semibold text-neutral-500 uppercase tracking-wider hidden lg:table-cell">Visualizações</th>
               <th className="text-left px-4 py-3 text-xs font-semibold text-neutral-500 uppercase tracking-wider hidden xl:table-cell">Cadastro</th>
               <th className="text-right px-4 py-3 text-xs font-semibold text-neutral-500 uppercase tracking-wider">Ações</th>
             </tr>
@@ -279,6 +287,15 @@ export default function PostsClient({ initialPosts }: { initialPosts: Post[] }) 
                     <span className={`text-xs ${p.published !== false ? 'text-green-600' : 'text-neutral-400'}`}>
                       {p.published !== false ? 'Publicado' : 'Rascunho'}
                     </span>
+                  </div>
+                </td>
+                <td className="px-4 py-3 hidden lg:table-cell">
+                  <div className="flex items-center gap-1.5">
+                    <svg className="w-3.5 h-3.5 text-neutral-400 flex-shrink-0" fill="none" viewBox="0 0 24 24" strokeWidth={1.8} stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z" />
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                    </svg>
+                    <span className="text-sm font-semibold text-[#4F4F6B]">{(p.views ?? 0).toLocaleString('pt-BR')}</span>
                   </div>
                 </td>
                 <td className="px-4 py-3 hidden xl:table-cell">

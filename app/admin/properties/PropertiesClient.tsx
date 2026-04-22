@@ -94,10 +94,11 @@ export default function PropertiesClient({
   const paginated = filtered.slice((page - 1) * PER_PAGE, page * PER_PAGE)
 
   const stats = {
-    total: properties.length,
-    sale: properties.filter(p => p.price.type === 'sale').length,
-    rent: properties.filter(p => p.price.type === 'rent').length,
-    featured: properties.filter(p => p.status.isFeatured).length,
+    total:    properties.length,
+    sale:     properties.filter(p => p.price.type === 'sale').length,
+    rent:     properties.filter(p => p.price.type === 'rent').length,
+    baccarat: properties.filter(p => p.status.isFeatured).length,
+    outros:   properties.filter(p => !p.status.isFeatured).length,
   }
 
   async function handleDuplicate(id: string) {
@@ -146,7 +147,7 @@ export default function PropertiesClient({
       </div>
 
       {/* Stats */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-6">
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4 mb-6">
         <button
           onClick={() => { setStatFilter(null); setPage(1) }}
           className={`rounded-2xl p-4 shadow-sm border text-left transition-colors ${
@@ -161,17 +162,20 @@ export default function PropertiesClient({
         {([
           { label: 'À Venda',     value: stats.sale,     key: 'sale'     },
           { label: 'Para Alugar', value: stats.rent,     key: 'rent'     },
-          { label: 'Destaque',    value: stats.featured, key: 'featured' },
+          { label: 'Baccarat',    value: stats.baccarat, key: 'featured' },
+          { label: 'Outros',      value: stats.outros,   key: null       },
         ] as const).map(s => {
-          const active = statFilter === s.key
+          const active = s.key !== null && statFilter === s.key
           return (
             <button
-              key={s.key}
-              onClick={() => toggleStat(s.key)}
+              key={s.label}
+              onClick={() => s.key !== null ? toggleStat(s.key) : null}
               className={`rounded-2xl p-4 shadow-sm border text-left transition-colors ${
                 active
-                  ? 'bg-[#4F4F6B] border-[#4F4F6B] text-white'
-                  : 'bg-white border-[#E6E6EF] hover:border-[#6D6D85]'
+                  ? 'bg-[#4F4F6B] border-[#4F4F6B]'
+                  : s.key === null
+                    ? 'bg-white border-[#E6E6EF] cursor-default'
+                    : 'bg-white border-[#E6E6EF] hover:border-[#6D6D85]'
               }`}
             >
               <p className={`text-2xl font-bold ${active ? 'text-white' : 'text-[#4F4F6B]'}`}>{s.value}</p>
@@ -201,7 +205,7 @@ export default function PropertiesClient({
           <option value="all">Todos os Status</option>
           <option value="active">Ativo</option>
           <option value="inactive">Inativo</option>
-          <option value="featured">Destaque</option>
+          <option value="featured">Baccarat</option>
         </select>
         {ownerOptions.length > 0 && (
           <select value={ownerFilter} onChange={e => { setOwnerFilter(e.target.value); setPage(1) }}
@@ -312,14 +316,24 @@ export default function PropertiesClient({
                       {p.propertyDetails.type}
                     </span>
                     <span className="text-xs font-semibold text-[#4F4F6B]">
-                      {p.price.currency} {p.price.amount.toLocaleString()}
+                      R$ {p.price.amount.toLocaleString('pt-BR')}
                       {p.price.type === 'rent' && <span className="font-normal text-neutral-400">/mo</span>}
                     </span>
                     <span className={`flex items-center gap-1 text-[10px] ${p.status.isActive ? 'text-green-600' : 'text-neutral-400'}`}>
                       <span className={`w-1.5 h-1.5 rounded-full inline-block ${p.status.isActive ? 'bg-green-500' : 'bg-neutral-300'}`} />
                       {p.status.isActive ? 'Ativo' : 'Inativo'}
-                      {p.status.isFeatured && <span className="text-amber-400 ml-0.5">★</span>}
                     </span>
+                    {p.status.isFeatured && (
+                      <span className="text-[10px] font-medium text-[#4A5240] bg-[#F5F0E8] px-1.5 py-0.5 rounded tracking-wide">Baccarat</span>
+                    )}
+                    {p.timestamps?.createdAt && (() => {
+                      const days = Math.floor((Date.now() - new Date(p.timestamps!.createdAt).getTime()) / 86_400_000)
+                      return (
+                        <span className="text-[10px] text-neutral-400">
+                          {new Date(p.timestamps!.createdAt).toLocaleDateString('pt-BR', { day: '2-digit', month: 'short', year: 'numeric' })} · {days}d
+                        </span>
+                      )
+                    })()}
                     {p.ownerId && userMap.get(p.ownerId) && (
                       <span className="text-[10px] text-[#6B6B99] bg-[#F0F0F8] px-1.5 py-0.5 rounded font-medium">
                         {userMap.get(p.ownerId)}
@@ -344,7 +358,7 @@ export default function PropertiesClient({
               <th className="text-left px-4 py-3 text-xs font-semibold text-neutral-500 uppercase tracking-wider hidden md:table-cell">Preço</th>
               <th className="text-left px-4 py-3 text-xs font-semibold text-neutral-500 uppercase tracking-wider hidden lg:table-cell">Status</th>
               <th className="text-left px-4 py-3 text-xs font-semibold text-neutral-500 uppercase tracking-wider hidden xl:table-cell">Anunciante</th>
-              <th className="text-left px-4 py-3 text-xs font-semibold text-neutral-500 uppercase tracking-wider hidden xl:table-cell">Cadastro</th>
+              <th className="text-left px-4 py-3 text-xs font-semibold text-neutral-500 uppercase tracking-wider hidden lg:table-cell">Cadastro</th>
               <th className="text-right px-4 py-3 text-xs font-semibold text-neutral-500 uppercase tracking-wider">Ações</th>
             </tr>
           </thead>
@@ -371,17 +385,21 @@ export default function PropertiesClient({
                 </td>
                 <td className="px-4 py-3 hidden md:table-cell">
                   <span className="font-semibold text-[#4F4F6B] text-sm">
-                    {p.price.currency} {p.price.amount.toLocaleString()}
+                    R$ {p.price.amount.toLocaleString('pt-BR')}
                     {p.price.type === 'rent' && <span className="text-neutral-400 font-normal text-xs">/mo</span>}
                   </span>
                 </td>
                 <td className="px-4 py-3 hidden lg:table-cell">
-                  <div className="flex items-center gap-1.5">
-                    <span className={`w-1.5 h-1.5 rounded-full ${p.status.isActive ? 'bg-green-500' : 'bg-neutral-300'}`} />
-                    <span className={`text-xs ${p.status.isActive ? 'text-green-600' : 'text-neutral-400'}`}>
-                      {p.status.isActive ? 'Ativo' : 'Inativo'}
-                    </span>
-                    {p.status.isFeatured && <span className="text-amber-400 text-xs ml-1">★</span>}
+                  <div className="flex flex-wrap items-center gap-1.5">
+                    <div className="flex items-center gap-1">
+                      <span className={`w-1.5 h-1.5 rounded-full ${p.status.isActive ? 'bg-green-500' : 'bg-neutral-300'}`} />
+                      <span className={`text-xs ${p.status.isActive ? 'text-green-600' : 'text-neutral-400'}`}>
+                        {p.status.isActive ? 'Ativo' : 'Inativo'}
+                      </span>
+                    </div>
+                    {p.status.isFeatured && (
+                      <span className="text-[10px] font-medium text-[#4A5240] bg-[#F5F0E8] px-1.5 py-0.5 rounded tracking-wide">Baccarat</span>
+                    )}
                   </div>
                 </td>
                 <td className="px-4 py-3 hidden xl:table-cell">
@@ -394,12 +412,18 @@ export default function PropertiesClient({
                     <span className="text-xs text-neutral-400">Admin</span>
                   )}
                 </td>
-                <td className="px-4 py-3 hidden xl:table-cell">
-                  <span className="text-xs text-neutral-500">
-                    {p.timestamps?.createdAt
-                      ? new Date(p.timestamps.createdAt).toLocaleDateString('pt-BR', { day: '2-digit', month: 'short', year: 'numeric' })
-                      : '—'}
-                  </span>
+                <td className="px-4 py-3 hidden lg:table-cell">
+                  {p.timestamps?.createdAt ? (() => {
+                    const days = Math.floor((Date.now() - new Date(p.timestamps!.createdAt).getTime()) / 86_400_000)
+                    return (
+                      <div>
+                        <p className="text-xs text-neutral-500">
+                          {new Date(p.timestamps!.createdAt).toLocaleDateString('pt-BR', { day: '2-digit', month: 'short', year: 'numeric' })}
+                        </p>
+                        <p className="text-[10px] text-neutral-400 mt-0.5">{days} dia{days !== 1 ? 's' : ''} ativo</p>
+                      </div>
+                    )
+                  })() : <span className="text-xs text-neutral-400">—</span>}
                 </td>
                 <td className="px-4 py-3" onClick={e => e.stopPropagation()}>
                   <div className="flex items-center justify-end gap-3">
