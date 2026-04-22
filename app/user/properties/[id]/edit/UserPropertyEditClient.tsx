@@ -33,7 +33,7 @@ interface FormState {
   title: string; description: string; propertyType: string; priceType: string
   priceAmount: string; currency: string; condominio: string; iptu: string
   address: string; city: string; province: string; residential: string
-  bedrooms: number; lavabo: number; areaSqFt: string; yearBuilt: string
+  bedrooms: number; lavabo: number; escritorio: number; areaSqFt: string; yearBuilt: string
   features: string[]; thumbnail: string; images: string[]
   agentName: string; agentPhone: string; agentEmail: string
 }
@@ -63,7 +63,9 @@ function numToBRL(n: number): string {
 }
 
 function fromProperty(p: Property, user: UserInfo): FormState {
-  const extraImages = (p.media?.images ?? []).filter(i => i !== p.media?.thumbnail)
+  const extraImages = (p.media?.images ?? [])
+    .map(i => i.url)
+    .filter(url => url !== p.media?.thumbnail)
   return {
     title: p.title ?? '',
     description: p.description ?? '',
@@ -79,6 +81,7 @@ function fromProperty(p: Property, user: UserInfo): FormState {
     residential: p.location?.residential ?? '',
     bedrooms: p.propertyDetails?.bedrooms ?? 1,
     lavabo: p.propertyDetails?.lavabo ?? p.propertyDetails?.bathrooms ?? 0,
+    escritorio: p.propertyDetails?.escritorio ?? 0,
     areaSqFt: p.propertyDetails?.areaSqFt ? String(p.propertyDetails.areaSqFt) : '',
     yearBuilt: p.propertyDetails?.yearBuilt ? String(p.propertyDetails.yearBuilt) : '',
     features: p.features ?? [],
@@ -169,6 +172,7 @@ export default function UserPropertyEditClient({ property, user }: { property: P
     if (!form.agentEmail.trim()) e.agentEmail = 'E-mail é obrigatório'
     if (form.bedrooms < 1) e.bedrooms = 'Mínimo 1 suíte'
     if (form.lavabo < 1) e.lavabo = 'Mínimo 1 lavabo'
+    if (!form.areaSqFt.trim() || parseFloat(form.areaSqFt) <= 0) e.areaSqFt = 'Área é obrigatória'
     setErrors(e)
     return Object.keys(e).length === 0
   }
@@ -207,11 +211,12 @@ export default function UserPropertyEditClient({ property, user }: { property: P
         bedrooms: form.bedrooms,
         bathrooms: form.lavabo,
         lavabo: form.lavabo,
+        escritorio: form.escritorio,
         areaSqFt: parseFloat(form.areaSqFt) || 0,
         ...(form.yearBuilt ? { yearBuilt: parseInt(form.yearBuilt) } : {}),
       },
       features: form.features,
-      media: { thumbnail: form.thumbnail, images: allImages },
+      media: { thumbnail: form.thumbnail, images: allImages.map((url: string) => ({ url })) },
       agent: { name: form.agentName, phone: form.agentPhone, email: form.agentEmail },
     }
 
@@ -348,15 +353,17 @@ export default function UserPropertyEditClient({ property, user }: { property: P
         <div>
           <SectionTitle>Detalhes</SectionTitle>
           <div className="space-y-4">
-            <div className="grid grid-cols-2 gap-6">
+            <div className="grid grid-cols-3 gap-4">
               <Counter label="Suítes" value={form.bedrooms} min={1} required error={errors.bedrooms}
                 onChange={v => setForm(f => ({ ...f, bedrooms: v }))} />
               <Counter label="Lavabos" value={form.lavabo} min={1} required error={errors.lavabo}
                 onChange={v => setForm(f => ({ ...f, lavabo: v }))} />
+              <Counter label="Escritórios" value={form.escritorio} min={0}
+                onChange={v => setForm(f => ({ ...f, escritorio: v }))} />
             </div>
             <div className="grid grid-cols-2 gap-4">
-              <Field label="Área (m²)">
-                <input type="number" value={form.areaSqFt} onChange={set('areaSqFt')} min="0" className={inputCls} />
+              <Field label="Área (m²)" required error={errors.areaSqFt}>
+                <input type="number" value={form.areaSqFt} onChange={set('areaSqFt')} min="0" className={errors.areaSqFt ? inputErrCls : inputCls} />
               </Field>
               <Field label="Ano de construção">
                 <input type="number" value={form.yearBuilt} onChange={set('yearBuilt')} min="1800" max={new Date().getFullYear()} className={inputCls} />

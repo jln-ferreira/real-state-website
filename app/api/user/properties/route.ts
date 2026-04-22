@@ -64,6 +64,8 @@ export async function POST(req: NextRequest) {
         type: body.propertyDetails?.type ?? 'apartment',
         bedrooms: body.propertyDetails?.bedrooms ?? 0,
         bathrooms: body.propertyDetails?.bathrooms ?? 0,
+        lavabo: body.propertyDetails?.lavabo ?? 0,
+        escritorio: body.propertyDetails?.escritorio ?? 0,
         areaSqFt: body.propertyDetails?.areaSqFt ?? 0,
         ...(body.propertyDetails?.yearBuilt ? { yearBuilt: body.propertyDetails.yearBuilt } : {}),
       },

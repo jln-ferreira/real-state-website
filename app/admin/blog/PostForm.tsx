@@ -52,6 +52,7 @@ export default function PostForm({ post: initial }: { post?: Post }) {
   const [toast,           setToast]           = useState<{ msg: string; type: 'success' | 'error' } | null>(null)
   const [allCategories,   setAllCategories]   = useState<string[]>([])
   const [customCatInput,  setCustomCatInput]  = useState('')
+  const [coverUploading,  setCoverUploading]  = useState(false)
 
   useEffect(() => {
     fetch('/api/admin/categories')
@@ -414,14 +415,41 @@ export default function PostForm({ post: initial }: { post?: Post }) {
             <div className="bg-white rounded-2xl shadow-sm border border-neutral-100 p-6 space-y-4">
               <h2 className="text-xs font-bold text-neutral-500 uppercase tracking-widest">Imagem de Capa</h2>
               <div>
-                <label className={labelCls}>URL da Imagem *</label>
-                <input
-                  type="url"
-                  value={form.image}
-                  onChange={e => set('image', e.target.value)}
-                  className={inputCls}
-                  placeholder="https://..."
-                />
+                <label className={labelCls}>Imagem de Capa *</label>
+                <div className="flex gap-2">
+                  <input
+                    type="url"
+                    value={form.image}
+                    onChange={e => set('image', e.target.value)}
+                    className={inputCls}
+                    placeholder="Cole uma URL ou faça upload..."
+                  />
+                  <label className={`flex-shrink-0 flex items-center gap-1.5 px-3 py-2.5 rounded-xl text-sm font-medium cursor-pointer transition-colors ${coverUploading ? 'bg-neutral-200 text-neutral-400' : 'bg-[#1E3A5F] text-white hover:bg-[#141d3a]'}`}>
+                    {coverUploading ? (
+                      <svg className="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"/><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"/></svg>
+                    ) : (
+                      <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5m-13.5-9L12 3m0 0l4.5 4.5M12 3v13.5"/></svg>
+                    )}
+                    <span className="hidden sm:inline">Upload</span>
+                    <input type="file" accept="image/*" className="sr-only" disabled={coverUploading}
+                      onChange={async e => {
+                        const file = e.target.files?.[0]
+                        if (!file) return
+                        setCoverUploading(true)
+                        try {
+                          const fd = new FormData()
+                          fd.append('file', file)
+                          const res = await fetch('/api/admin/upload', { method: 'POST', body: fd })
+                          const data = await res.json()
+                          if (data.url) setForm(f => ({ ...f, image: data.url }))
+                          else alert(data.error ?? 'Erro ao enviar arquivo.')
+                        } finally {
+                          setCoverUploading(false)
+                          e.target.value = ''
+                        }
+                      }} />
+                  </label>
+                </div>
                 {errors.image && <p className={errCls}>{errors.image}</p>}
               </div>
               {form.image && (

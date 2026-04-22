@@ -1,4 +1,4 @@
-﻿import Link from 'next/link'
+import Link from 'next/link'
 import { type Property, formatPrice } from '@/data/properties'
 
 const TYPE_LABELS: Record<Property['propertyDetails']['type'], string> = {
@@ -9,8 +9,6 @@ const TYPE_LABELS: Record<Property['propertyDetails']['type'], string> = {
 }
 
 export default function PropertyCard({ p }: { p: Property }) {
-  const isSale = p.price.type === 'sale'
-
   return (
     <Link href={`/property/${p.id}`} className="block">
       <article
@@ -34,77 +32,49 @@ export default function PropertyCard({ p }: { p: Property }) {
           <div aria-hidden="true"
                className="absolute inset-0 bg-gradient-to-t from-black/35 via-transparent to-transparent" />
 
-          {/* Transaction badge */}
-          <span className={`absolute top-3 left-3 rounded-full px-2.5 py-1 text-[11px] font-semibold
-                            text-white backdrop-blur-sm
-                            ${isSale ? 'bg-emerald-500' : 'bg-[#6B6B99]'}`}>
-            {isSale ? 'À Venda' : 'Para Alugar'}
-          </span>
-
-          {/* Featured badge */}
+          {/* Seleção Casa Baccarat badge */}
           {p.status.isFeatured && (
-            <span className="absolute top-10 left-3 rounded-full bg-amber-400 px-2.5 py-1
-                             text-[11px] font-semibold text-white">
-              ★ Destaque
+            <span className="absolute bottom-0 left-0 bg-[#F5F0E8]/90 px-3 py-1.5
+                             text-[9px] font-light tracking-[0.2em] uppercase text-[#4A5240]">
+              Seleção Casa Baccarat
             </span>
           )}
 
           {/* Property ID */}
-          <span className="absolute bottom-3 left-3 rounded-md bg-black/40 px-2 py-0.5
-                           text-[10px] font-mono text-white/80 backdrop-blur-sm">
+          <span className={[
+            'absolute rounded-md bg-black/40 px-2 py-0.5 text-[10px] font-mono text-white/80 backdrop-blur-sm',
+            p.status.isFeatured ? 'bottom-3 right-3' : 'bottom-3 left-3',
+          ].join(' ')}>
             {p.id}
           </span>
         </div>
 
         {/* ── Body ─────────────────────────────────────────────────────────────── */}
-        <div className="flex flex-1 flex-col p-5">
+        <div className="flex flex-1 flex-col p-5 gap-1">
+
+          {/* Type · Residential */}
+          <p className="text-xs text-[#9898BB]">
+            {TYPE_LABELS[p.propertyDetails.type]}
+            {p.location.residential ? ` · ${p.location.residential}` : ''}
+          </p>
+
+          {/* City · State */}
+          <p className="text-xs text-[#9898BB]">
+            {p.location.city}{p.location.province ? ` · ${p.location.province}` : ''}
+          </p>
+
+          {/* Area · Suites */}
+          <p className="text-xs text-[#9898BB]">
+            {p.propertyDetails.areaSqFt.toLocaleString()} m²
+            {p.propertyDetails.bedrooms > 0 && (
+              <> · {p.propertyDetails.bedrooms} suíte{p.propertyDetails.bedrooms !== 1 ? 's' : ''}</>
+            )}
+          </p>
+
           {/* Price */}
-          <p className="text-xl font-extrabold text-[#4E6B5E] leading-tight">
+          <p className="mt-2 text-base font-extrabold text-[#4E6B5E] leading-tight">
             {formatPrice(p)}
           </p>
-
-          {/* Title */}
-          <h3 className="mt-1.5 text-sm font-semibold text-[#4A5240] leading-snug
-                         group-hover:text-[#6B6B99] transition-colors duration-200 line-clamp-1">
-            {p.title}
-          </h3>
-
-          {/* Address */}
-          <p className="mt-1 flex items-center gap-1 text-xs text-[#9898BB] line-clamp-1">
-            <svg className="h-3.5 w-3.5 shrink-0" fill="none" viewBox="0 0 24 24"
-                 strokeWidth={1.8} stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round"
-                    d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0zM19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z" />
-            </svg>
-            {p.location.address}
-          </p>
-
-          {/* Specs */}
-          <div className="mt-auto pt-4 flex items-center gap-3 text-xs text-[#9898BB] border-t border-[#E0DACE]">
-            {p.propertyDetails.bedrooms > 0 && (
-              <span className="flex items-center gap-1">
-                <svg className="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none"
-                     strokeWidth={1.8} stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round"
-                        d="M2 9V6a1 1 0 011-1h18a1 1 0 011 1v3M2 9h20M2 9v9m20-9v9M2 18h20M7 13h10" />
-                </svg>
-                {p.propertyDetails.bedrooms} suíte{p.propertyDetails.bedrooms !== 1 ? 's' : ''}
-              </span>
-            )}
-            {p.propertyDetails.lavabo != null && p.propertyDetails.lavabo > 0 && (
-              <span className="flex items-center gap-1">
-                <svg className="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none"
-                     strokeWidth={1.8} stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round"
-                        d="M4 12h16M4 12V7a2 2 0 012-2h3m-5 7v5a2 2 0 002 2h12a2 2 0 002-2v-5M10 5V4a1 1 0 011-1h2a1 1 0 011 1v1" />
-                </svg>
-                {p.propertyDetails.lavabo} lavabo{p.propertyDetails.lavabo !== 1 ? 's' : ''}
-              </span>
-            )}
-            <span className="ml-auto font-medium text-[#6B6B99]">
-              {p.propertyDetails.areaSqFt.toLocaleString()} m²
-            </span>
-          </div>
         </div>
       </article>
     </Link>

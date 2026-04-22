@@ -127,7 +127,7 @@ export default function UserDashboardClient({ properties: initialProperties }: P
         <div className="space-y-3">
           {properties.map(property => (
             <div key={property.id} className="bg-white rounded-2xl border border-[#E6E6EF] p-4">
-              <div className="flex items-center gap-4">
+              <div className="flex gap-4">
                 {/* Thumbnail */}
                 <div className="w-20 h-16 rounded-xl overflow-hidden flex-shrink-0 bg-[#F7F7FA]">
                   {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -139,7 +139,7 @@ export default function UserDashboardClient({ properties: initialProperties }: P
                   />
                 </div>
 
-                {/* Info */}
+                {/* Info + actions */}
                 <div className="flex-1 min-w-0">
                   <p className="text-sm font-semibold text-[#1E3A5F] truncate">{property.title}</p>
                   <p className="text-xs text-[#6B6B99] mt-0.5">
@@ -155,23 +155,25 @@ export default function UserDashboardClient({ properties: initialProperties }: P
                       {property.metrics.views} visualizaç{property.metrics.views === 1 ? 'ão' : 'ões'}
                     </div>
                   )}
-                </div>
 
-                {/* Actions — status badge aligned with buttons */}
-                <div className="flex-shrink-0 flex items-center gap-2">
-                  <StatusBadge status={property.adminStatus ?? 'pending'} />
-                  <Link
-                    href={`/user/properties/${property.id}/edit`}
-                    className="text-xs text-[#6B6B99] hover:text-[#4F4F6B] border border-[#E6E6EF] rounded-lg px-3 py-1.5 transition-colors whitespace-nowrap"
-                  >
-                    Editar
-                  </Link>
-                  <button
-                    onClick={() => setConfirmDelete(property.id)}
-                    className="text-xs text-red-500 hover:text-red-700 border border-red-100 hover:border-red-200 rounded-lg px-3 py-1.5 transition-colors whitespace-nowrap"
-                  >
-                    Excluir
-                  </button>
+                  {/* Status badge + action buttons — always on the same row */}
+                  <div className="flex items-center gap-2 mt-2">
+                    <StatusBadge status={property.adminStatus ?? 'pending'} />
+                    <div className="ml-auto flex items-center gap-2">
+                      <Link
+                        href={`/user/properties/${property.id}/edit`}
+                        className="text-xs text-[#6B6B99] hover:text-[#4F4F6B] border border-[#E6E6EF] rounded-lg px-3 py-1.5 transition-colors whitespace-nowrap"
+                      >
+                        Editar
+                      </Link>
+                      <button
+                        onClick={() => setConfirmDelete(property.id)}
+                        className="text-xs text-red-500 hover:text-red-700 border border-red-100 hover:border-red-200 rounded-lg px-3 py-1.5 transition-colors whitespace-nowrap"
+                      >
+                        Excluir
+                      </button>
+                    </div>
+                  </div>
                 </div>
               </div>
 

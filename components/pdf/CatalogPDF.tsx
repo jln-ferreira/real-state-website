@@ -123,7 +123,7 @@ function formatPrice(p: Property): string {
 
 function PropertyPage({ p }: { p: Property }) {
   const isSale     = p.price.type === 'sale'
-  const galleryImgs = (p.media?.images ?? []).filter(Boolean).slice(1, 5) // skip hero, show next 4
+  const galleryImgs = (p.media?.images ?? []).map(i => i.url).filter(Boolean).slice(1, 5)
   const features   = (p.features ?? []).filter(Boolean)
 
   const typeLabel: Record<string, string> = {

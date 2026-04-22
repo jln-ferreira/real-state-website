@@ -103,7 +103,9 @@ export default function PropertyDetailClient({ property }: { property: Property 
     .filter(p => p.propertyDetails.type === property.propertyDetails.type && p.id !== property.id)
     .slice(0, 4)
 
-  const images = property.media?.images?.length ? property.media.images : [property.img]
+  const images = property.media?.images?.length
+    ? property.media.images
+    : [{ url: property.img }]
 
   const [lightboxOpen,  setLightboxOpen]  = useState(false)
   const [lightboxIndex, setLightboxIndex] = useState(0)
@@ -253,7 +255,7 @@ export default function PropertyDetailClient({ property }: { property: Property 
           {/* Main large photo */}
           <div className="col-span-2 row-span-2 relative h-[360px] cursor-pointer" onClick={() => openLightbox(0)}>
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={images[0]} alt={property.title} className="w-full h-full object-cover" />
+            <img src={images[0].url} alt={images[0].caption ?? property.title} className="w-full h-full object-cover" />
             <div className="absolute top-4 left-4 flex gap-2 z-10">
               <span className="px-3 py-1 text-xs font-bold text-white bg-[#1E3A5F] rounded-md">
                 Ref: {property.id}
@@ -271,7 +273,7 @@ export default function PropertyDetailClient({ property }: { property: Property 
           {images.slice(1, 4).map((img, i) => (
             <div key={i} className="relative h-[176px] overflow-hidden cursor-pointer" onClick={() => openLightbox(i + 1)}>
               {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={img} alt="" className="w-full h-full object-cover hover:opacity-95 transition-opacity" />
+              <img src={img.url} alt={img.caption ?? ''} className="w-full h-full object-cover hover:opacity-95 transition-opacity" />
             </div>
           ))}
 
@@ -279,7 +281,7 @@ export default function PropertyDetailClient({ property }: { property: Property 
           {images[4] && (
             <div className="relative h-[176px] overflow-hidden cursor-pointer" onClick={() => openLightbox(4)}>
               {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={images[4]} alt="" className="w-full h-full object-cover brightness-50" />
+              <img src={images[4].url} alt={images[4].caption ?? ''} className="w-full h-full object-cover brightness-50" />
               <span className="absolute inset-0 flex items-center justify-center text-white text-lg font-semibold">
                 +{images.length - 4} fotos
               </span>
@@ -290,7 +292,7 @@ export default function PropertyDetailClient({ property }: { property: Property 
         {/* ── Mobile carousel ──────────────────────────────────────────────── */}
         <div className="md:hidden relative aspect-[4/3] rounded-2xl overflow-hidden">
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src={images[activeImg]} alt={property.title} className="w-full h-full object-cover" />
+          <img src={images[activeImg].url} alt={images[activeImg].caption ?? property.title} className="w-full h-full object-cover" />
           <div className="absolute bottom-3 left-0 right-0 flex justify-center gap-1">
             {images.map((_, i) => (
               <button
@@ -560,8 +562,8 @@ export default function PropertyDetailClient({ property }: { property: Property 
           </button>
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
-            src={images[lightboxIndex]}
-            alt={property.title}
+            src={images[lightboxIndex].url}
+            alt={images[lightboxIndex].caption ?? property.title}
             className="max-h-[85vh] max-w-[90vw] object-contain rounded-lg"
           />
           <button
@@ -570,9 +572,12 @@ export default function PropertyDetailClient({ property }: { property: Property 
           >
             <ChevronRightIcon className="w-5 h-5" />
           </button>
-          <span className="absolute bottom-4 left-1/2 -translate-x-1/2 text-white/70 text-sm">
-            {lightboxIndex + 1} / {images.length}
-          </span>
+          <div className="absolute bottom-4 left-1/2 -translate-x-1/2 text-center">
+            {images[lightboxIndex].caption && (
+              <p className="text-white text-sm mb-1">{images[lightboxIndex].caption}</p>
+            )}
+            <span className="text-white/70 text-xs">{lightboxIndex + 1} / {images.length}</span>
+          </div>
         </div>
       )}
 

@@ -231,7 +231,7 @@ export default function PropertyDetailView({ property, similarProperties }: { pr
         ? 'familias que valorizam espaco e qualidade de vida'
         : 'casais e investidores que buscam sofisticacao'
 
-    const photo = property.media?.thumbnail || property.media?.images?.[0] || ''
+    const photo = property.media?.thumbnail || property.media?.images?.[0]?.url || ''
 
     const lines: string[] = [
       '*CASA BACCARAT IMOVEIS*',
@@ -355,7 +355,7 @@ export default function PropertyDetailView({ property, similarProperties }: { pr
           {/* Main large photo */}
           <div className="col-span-2 row-span-2 relative h-[360px] cursor-pointer bg-neutral-100" onClick={() => openLightbox(0)}>
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={images[0]} alt={property.title} className="w-full h-full object-contain" onError={e => { (e.target as HTMLImageElement).src = '/placeholder-property.svg' }} />
+            <img src={images[0].url} alt={images[0].caption ?? property.title} className="w-full h-full object-contain" onError={e => { (e.target as HTMLImageElement).src = '/placeholder-property.svg' }} />
             <div className="absolute top-4 left-4 flex gap-2 z-10">
               <span className="px-3 py-1 text-xs font-bold text-white bg-[#6B6B99] rounded-md">
                 Ref: {property.id}
@@ -373,7 +373,7 @@ export default function PropertyDetailView({ property, similarProperties }: { pr
           {images.slice(1, 4).map((img, i) => (
             <div key={i} className="relative h-[176px] overflow-hidden cursor-pointer bg-neutral-100" onClick={() => openLightbox(i + 1)}>
               {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={img} alt="" className="w-full h-full object-contain hover:opacity-95 transition-opacity" onError={e => { (e.target as HTMLImageElement).src = '/placeholder-property.svg' }} />
+              <img src={img.url} alt={img.caption ?? ''} className="w-full h-full object-contain hover:opacity-95 transition-opacity" onError={e => { (e.target as HTMLImageElement).src = '/placeholder-property.svg' }} />
             </div>
           ))}
 
@@ -381,7 +381,7 @@ export default function PropertyDetailView({ property, similarProperties }: { pr
           {images[4] && (
             <div className="relative h-[176px] overflow-hidden cursor-pointer bg-neutral-900" onClick={() => openLightbox(4)}>
               {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={images[4]} alt="" className="w-full h-full object-contain opacity-50" onError={e => { (e.target as HTMLImageElement).src = '/placeholder-property.svg' }} />
+              <img src={images[4].url} alt={images[4].caption ?? ''} className="w-full h-full object-contain opacity-50" onError={e => { (e.target as HTMLImageElement).src = '/placeholder-property.svg' }} />
               <span className="absolute inset-0 flex items-center justify-center text-white text-lg font-semibold">
                 +{images.length - 4} fotos
               </span>
@@ -392,7 +392,7 @@ export default function PropertyDetailView({ property, similarProperties }: { pr
         {/* ── Mobile carousel ──────────────────────────────────────────────── */}
         <div className="md:hidden relative aspect-[4/3] rounded-2xl overflow-hidden">
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src={images[activeImg]} alt={property.title} className="w-full h-full object-cover" onError={e => { (e.target as HTMLImageElement).src = '/placeholder-property.svg' }} />
+          <img src={images[activeImg].url} alt={images[activeImg].caption ?? property.title} className="w-full h-full object-cover" onError={e => { (e.target as HTMLImageElement).src = '/placeholder-property.svg' }} />
           <div className="absolute bottom-3 left-0 right-0 flex justify-center gap-1">
             {images.map((_, i) => (
               <button
@@ -681,8 +681,8 @@ export default function PropertyDetailView({ property, similarProperties }: { pr
           </button>
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
-            src={images[lightboxIndex]}
-            alt={property.title}
+            src={images[lightboxIndex].url}
+            alt={images[lightboxIndex].caption ?? property.title}
             className="max-h-[85vh] max-w-[90vw] object-contain rounded-lg"
           />
           <button
@@ -691,9 +691,12 @@ export default function PropertyDetailView({ property, similarProperties }: { pr
           >
             <ChevronRightIcon className="w-5 h-5" />
           </button>
-          <span className="absolute bottom-4 left-1/2 -translate-x-1/2 text-white/70 text-sm">
-            {lightboxIndex + 1} / {images.length}
-          </span>
+          <div className="absolute bottom-4 left-1/2 -translate-x-1/2 text-center">
+            {images[lightboxIndex].caption && (
+              <p className="text-white text-sm mb-1">{images[lightboxIndex].caption}</p>
+            )}
+            <span className="text-white/70 text-xs">{lightboxIndex + 1} / {images.length}</span>
+          </div>
         </div>
       )}
 

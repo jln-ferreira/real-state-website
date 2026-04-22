@@ -11,7 +11,7 @@ const TAB_ERROR_KEYS: Record<Tab, string[]> = {
   'Info Básica':     ['title', 'description'],
   'Preço':           ['price.amount'],
   'Localização':     ['location.address', 'location.city', 'location.province', 'location.residential'],
-  'Detalhes':        ['propertyDetails.bedrooms', 'propertyDetails.lavabo'],
+  'Detalhes':        ['propertyDetails.quartos', 'propertyDetails.bedrooms', 'propertyDetails.lavabo'],
   'Características': [],
   'Mídia':           ['media.thumbnail'],
   'Status & Agente': ['agent.name', 'agent.phone', 'agent.email'],
@@ -166,6 +166,184 @@ function BRLInput({ label, display, onChangeDisplay, error, placeholder = '0,00'
   )
 }
 
+// ── Media tab ─────────────────────────────────────────────────────────────────
+
+type ImageEntry = { url: string; caption?: string }
+
+function MediaTab({
+  thumbnail, images, thumbnailError,
+  onThumbnailChange, onImagesChange,
+}: {
+  thumbnail: string
+  images: ImageEntry[]
+  thumbnailError?: string
+  onThumbnailChange: (v: string) => void
+  onImagesChange: (imgs: ImageEntry[]) => void
+}) {
+  const [uploading, setUploading] = useState<Record<number, boolean>>({})
+  const [thumbUploading, setThumbUploading] = useState(false)
+
+  async function uploadFile(file: File, onUrl: (url: string) => void, setProgress: (v: boolean) => void) {
+    setProgress(true)
+    try {
+      const fd = new FormData()
+      fd.append('file', file)
+      const res = await fetch('/api/admin/upload', { method: 'POST', body: fd })
+      const data = await res.json()
+      if (data.url) onUrl(data.url)
+      else alert(data.error ?? 'Erro ao enviar arquivo.')
+    } finally {
+      setProgress(false)
+    }
+  }
+
+  function updateImage(i: number, patch: Partial<ImageEntry>) {
+    const next = [...images]
+    next[i] = { ...next[i], ...patch }
+    onImagesChange(next)
+  }
+
+  function removeImage(i: number) {
+    onImagesChange(images.filter((_, j) => j !== i))
+  }
+
+  return (
+    <>
+      {/* Thumbnail */}
+      <div>
+        <label className="block text-xs font-semibold text-neutral-600 mb-1">
+          Miniatura <span className="text-red-500">*</span>
+          <span className="font-normal text-neutral-400 ml-1">(imagem principal do card)</span>
+        </label>
+        <div className="flex gap-3 items-start">
+          <div className="flex-1 space-y-1.5">
+            <div className="flex gap-2">
+              <input type="text" value={thumbnail} placeholder="Cole uma URL ou faça upload..."
+                onChange={e => onThumbnailChange(e.target.value)}
+                className={`flex-1 px-3 py-2.5 bg-neutral-100 rounded-lg text-sm border-0 outline-none focus:ring-2 ${thumbnailError ? 'ring-2 ring-red-300' : 'focus:ring-[#1E3A5F]/20'}`} />
+              <label className={`flex items-center gap-1.5 px-3 py-2.5 rounded-lg text-sm font-medium cursor-pointer transition-colors ${thumbUploading ? 'bg-neutral-200 text-neutral-400' : 'bg-[#1E3A5F] text-white hover:bg-[#141d3a]'}`}>
+                {thumbUploading ? (
+                  <svg className="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"/><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"/></svg>
+                ) : (
+                  <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5m-13.5-9L12 3m0 0l4.5 4.5M12 3v13.5"/></svg>
+                )}
+                <span className="hidden sm:inline">Upload</span>
+                <input type="file" accept="image/*" className="sr-only" disabled={thumbUploading}
+                  onChange={e => { const f = e.target.files?.[0]; if (f) uploadFile(f, onThumbnailChange, setThumbUploading); e.target.value = '' }} />
+              </label>
+            </div>
+            {thumbnailError && <p className="text-xs text-red-500">{thumbnailError}</p>}
+          </div>
+          {thumbnail && (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img src={thumbnail} alt="" className="w-20 h-20 rounded-xl object-cover flex-shrink-0 border border-neutral-200" />
+          )}
+        </div>
+      </div>
+
+      {/* Images */}
+      <div>
+        <label className="block text-xs font-semibold text-neutral-600 mb-2">
+          Fotos do imóvel
+          <span className="font-normal text-neutral-400 ml-1">({images.length} foto{images.length !== 1 ? 's' : ''})</span>
+        </label>
+
+        {images.length > 0 && (
+          <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 mb-3">
+            {images.map((img, i) => (
+              <div key={i} className="relative group rounded-xl overflow-hidden border border-neutral-200 bg-neutral-50">
+                {/* Preview */}
+                <div className="aspect-[4/3] bg-neutral-100">
+                  {img.url ? (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img src={img.url} alt={img.caption ?? ''} className="w-full h-full object-cover" />
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center text-neutral-300">
+                      <svg className="w-8 h-8" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.409a2.25 2.25 0 013.182 0l2.909 2.909M13.5 12h.008v.008H13.5V12zm-6 6h.008v.008H6V18zm12 0h.008v.008H18V18z" />
+                      </svg>
+                    </div>
+                  )}
+                  {uploading[i] && (
+                    <div className="absolute inset-0 bg-white/70 flex items-center justify-center">
+                      <svg className="w-6 h-6 animate-spin text-[#1E3A5F]" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"/><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"/></svg>
+                    </div>
+                  )}
+                </div>
+                {/* Delete button */}
+                <button type="button" onClick={() => removeImage(i)}
+                  className="absolute top-1.5 right-1.5 w-6 h-6 rounded-full bg-red-500 text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity shadow">
+                  <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+                {/* Caption + URL */}
+                <div className="p-2 space-y-1.5">
+                  <input type="text" value={img.caption ?? ''} placeholder="Legenda (opcional)"
+                    onChange={e => updateImage(i, { caption: e.target.value })}
+                    className="w-full px-2 py-1.5 bg-neutral-100 rounded-md text-xs border-0 outline-none focus:ring-2 focus:ring-[#1E3A5F]/20" />
+                  <div className="flex gap-1">
+                    <input type="text" value={img.url} placeholder="URL..."
+                      onChange={e => updateImage(i, { url: e.target.value })}
+                      className="flex-1 min-w-0 px-2 py-1.5 bg-neutral-100 rounded-md text-xs border-0 outline-none focus:ring-2 focus:ring-[#1E3A5F]/20" />
+                    <label className={`flex-shrink-0 flex items-center justify-center w-7 h-7 rounded-md cursor-pointer transition-colors ${uploading[i] ? 'bg-neutral-200' : 'bg-neutral-200 hover:bg-[#1E3A5F] hover:text-white text-neutral-500'}`}>
+                      <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5m-13.5-9L12 3m0 0l4.5 4.5M12 3v13.5"/>
+                      </svg>
+                      <input type="file" accept="image/*" className="sr-only" disabled={!!uploading[i]}
+                        onChange={e => {
+                          const f = e.target.files?.[0]
+                          if (f) uploadFile(f, url => updateImage(i, { url }), v => setUploading(u => ({ ...u, [i]: v })))
+                          e.target.value = ''
+                        }} />
+                    </label>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+
+        {/* Add buttons */}
+        <div className="flex gap-2 flex-wrap">
+          <button type="button"
+            onClick={() => onImagesChange([...images, { url: '' }])}
+            className="flex items-center gap-1.5 text-sm text-[#1E3A5F] hover:underline font-medium">
+            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+            </svg>
+            Adicionar URL
+          </button>
+          <span className="text-neutral-300">|</span>
+          <label className="flex items-center gap-1.5 text-sm text-[#1E3A5F] hover:underline font-medium cursor-pointer">
+            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5m-13.5-9L12 3m0 0l4.5 4.5M12 3v13.5"/>
+            </svg>
+            Enviar do computador
+            <input type="file" accept="image/*" multiple className="sr-only"
+              onChange={e => {
+                const files = Array.from(e.target.files ?? [])
+                const startIdx = images.length
+                const placeholders: ImageEntry[] = files.map(() => ({ url: '' }))
+                const next = [...images, ...placeholders]
+                onImagesChange(next)
+                files.forEach((file, fi) => {
+                  const idx = startIdx + fi
+                  uploadFile(
+                    file,
+                    url => { const n = [...next]; n[idx] = { ...n[idx], url }; onImagesChange(n) },
+                    v => setUploading(u => ({ ...u, [idx]: v }))
+                  )
+                })
+                e.target.value = ''
+              }} />
+          </label>
+        </div>
+      </div>
+    </>
+  )
+}
+
 // ── Empty property factory ────────────────────────────────────────────────────
 
 function emptyProperty(): Property {
@@ -178,7 +356,7 @@ function emptyProperty(): Property {
     location: { address: '', city: '', province: '', country: 'Brasil', postalCode: '', residential: '' },
     propertyDetails: { type: 'apartment', bedrooms: 0, bathrooms: 0, areaSqFt: 0, lavabo: 0, escritorio: 0 },
     features: [],
-    media: { images: [''], thumbnail: '' },
+    media: { images: [], thumbnail: '' },
     status: { isActive: false, isFeatured: false, isSpecial: false },
     metrics: { views: 0, favorites: 0, searchAppearances: 0 },
     timestamps: { createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() },
@@ -211,6 +389,10 @@ export default function PropertyForm({ property: initial, readOnly = false }: { 
     initial?.price.condominio ? formatBRLDisplay(initial.price.condominio) : '')
   const [iptuDisplay, setIptuDisplay] = useState<string>(() =>
     initial?.price.iptu ? formatBRLDisplay(initial.price.iptu) : '')
+  const [valorPacoteDisplay, setValorPacoteDisplay] = useState<string>(() =>
+    initial?.price.valorPacote ? formatBRLDisplay(initial.price.valorPacote) : '')
+  const [valoresAdicionaisDisplay, setValoresAdicionaisDisplay] = useState<string>(() =>
+    initial?.price.valoresAdicionais ? formatBRLDisplay(initial.price.valoresAdicionais) : '')
 
   useEffect(() => {
     fetch('/api/admin/features')
@@ -247,6 +429,7 @@ export default function PropertyForm({ property: initial, readOnly = false }: { 
     if (!form.agent.name.trim()) e['agent.name'] = 'Nome do agente é obrigatório'
     if (!form.agent.phone.trim()) e['agent.phone'] = 'Telefone do agente é obrigatório'
     if (!form.agent.email.trim()) e['agent.email'] = 'E-mail do agente é obrigatório'
+    if ((form.propertyDetails.quartos ?? 0) < 1) e['propertyDetails.quartos'] = 'Mínimo 1 quarto'
     if (form.propertyDetails.bedrooms < 1) e['propertyDetails.bedrooms'] = 'Mínimo 1 suíte'
     if ((form.propertyDetails.lavabo ?? 0) < 1) e['propertyDetails.lavabo'] = 'Mínimo 1 lavabo'
     setErrors(e)
@@ -523,54 +706,81 @@ export default function PropertyForm({ property: initial, readOnly = false }: { 
               </div>
             </div>
 
+            <BRLInput
+              label="Preço"
+              required
+              display={brlDisplay}
+              onChangeDisplay={raw => handleBRLChange(raw, setBrlDisplay, amount => set('price', { ...form.price, amount }))}
+              error={errors['price.amount']}
+            />
+
+            {/* Condomínio + IPTU na mesma linha */}
+            <div className="grid grid-cols-2 gap-4">
+              <BRLInput
+                label="Condomínio (mensal)"
+                display={condominioDisplay}
+                onChangeDisplay={raw => handleBRLChange(raw, setCondominioDisplay, amount => set('price', { ...form.price, condominio: amount || undefined }))}
+              />
+              <BRLInput
+                label="IPTU (anual)"
+                display={iptuDisplay}
+                onChangeDisplay={raw => handleBRLChange(raw, setIptuDisplay, amount => set('price', { ...form.price, iptu: amount || undefined }))}
+              />
+            </div>
+
+            {/* Valor do pacote + Valores adicionais + Observações na mesma linha */}
+            <div className="grid grid-cols-3 gap-4">
+              <BRLInput
+                label="Valor do pacote"
+                display={valorPacoteDisplay}
+                onChangeDisplay={raw => handleBRLChange(raw, setValorPacoteDisplay, amount => set('price', { ...form.price, valorPacote: amount || undefined }))}
+              />
+              <BRLInput
+                label="Valores adicionais"
+                display={valoresAdicionaisDisplay}
+                onChangeDisplay={raw => handleBRLChange(raw, setValoresAdicionaisDisplay, amount => set('price', { ...form.price, valoresAdicionais: amount || undefined }))}
+              />
+              <div>
+                <label className="block text-xs font-semibold text-neutral-600 mb-1">Observações</label>
+                <input
+                  type="text"
+                  value={form.price.observacoesPacote ?? ''}
+                  placeholder="Ex: inclui água e gás"
+                  onChange={e => set('price', { ...form.price, observacoesPacote: e.target.value || undefined })}
+                  className="w-full px-3 py-2.5 bg-neutral-100 rounded-lg text-sm border-0 outline-none focus:ring-2 focus:ring-[#1E3A5F]/20"
+                />
+              </div>
+            </div>
+
+            {/* Tipo de garantia */}
             <div>
-              <label className="block text-xs font-semibold text-neutral-600 mb-1">Moeda</label>
+              <label className="block text-xs font-semibold text-neutral-600 mb-1">Tipo de garantia</label>
               <select
-                value={form.price.currency}
-                onChange={e => {
-                  const curr = e.target.value as 'BRL' | 'CAD' | 'USD'
-                  if (curr === 'BRL' && form.price.amount) setBrlDisplay(formatBRLDisplay(form.price.amount))
-                  set('price', { ...form.price, currency: curr })
-                }}
-                className="w-full px-3 py-2.5 bg-neutral-100 rounded-lg text-sm border-0 outline-none focus:ring-2 focus:ring-[#1E3A5F]/20">
-                <option value="BRL">BRL – Real Brasileiro</option>
-                <option value="CAD">CAD – Dólar Canadense</option>
-                <option value="USD">USD – Dólar Americano</option>
+                value={form.price.tipoGarantia ?? ''}
+                onChange={e => set('price', { ...form.price, tipoGarantia: e.target.value || undefined })}
+                className="w-full px-3 py-2.5 bg-neutral-100 rounded-lg text-sm border-0 outline-none focus:ring-2 focus:ring-[#1E3A5F]/20"
+              >
+                <option value="">Selecionar...</option>
+                <option value="Caução">Caução</option>
+                <option value="Fiança">Fiança</option>
+                <option value="Seguro Fiança">Seguro Fiança</option>
+                <option value="Cessão Fiduciária de Cotas de Fundo de Investimento">Cessão Fiduciária de Cotas de Fundo de Investimento</option>
+                <option value="Título de Capitalização">Título de Capitalização</option>
+                <option value="Garantidoras">Garantidoras</option>
               </select>
             </div>
 
-            {form.price.currency === 'BRL' ? (
-              <BRLInput
-                label="Preço"
-                required
-                display={brlDisplay}
-                onChangeDisplay={raw => handleBRLChange(raw, setBrlDisplay, amount => set('price', { ...form.price, amount }))}
-                error={errors['price.amount']}
+            {/* Observações gerais */}
+            <div>
+              <label className="block text-xs font-semibold text-neutral-600 mb-1">Observações gerais</label>
+              <textarea
+                value={form.price.observacoes ?? ''}
+                rows={3}
+                placeholder="Informações adicionais sobre o preço ou condições..."
+                onChange={e => set('price', { ...form.price, observacoes: e.target.value || undefined })}
+                className="w-full px-3 py-2.5 bg-neutral-100 rounded-lg text-sm border-0 outline-none focus:ring-2 focus:ring-[#1E3A5F]/20 resize-none"
               />
-            ) : (
-              <div>
-                <label className="block text-xs font-semibold text-neutral-600 mb-1">Preço <span className="text-red-500">*</span></label>
-                <div className="flex gap-2">
-                  <span className="px-3 py-2.5 bg-neutral-100 rounded-lg text-sm text-neutral-500 flex-shrink-0">{form.price.currency}</span>
-                  <input type="number" value={form.price.amount || ''} placeholder="0"
-                    onChange={e => set('price', { ...form.price, amount: parseFloat(e.target.value) || 0 })}
-                    className={`flex-1 px-3 py-2.5 bg-neutral-100 rounded-lg text-sm border-0 outline-none focus:ring-2 ${errors['price.amount'] ? 'ring-2 ring-red-300' : 'focus:ring-[#1E3A5F]/20'}`} />
-                </div>
-                {errors['price.amount'] && <p className="text-xs text-red-500 mt-1">{errors['price.amount']}</p>}
-              </div>
-            )}
-
-            <BRLInput
-              label="Condomínio (mensal)"
-              display={condominioDisplay}
-              onChangeDisplay={raw => handleBRLChange(raw, setCondominioDisplay, amount => set('price', { ...form.price, condominio: amount || undefined }))}
-            />
-
-            <BRLInput
-              label="IPTU (anual)"
-              display={iptuDisplay}
-              onChangeDisplay={raw => handleBRLChange(raw, setIptuDisplay, amount => set('price', { ...form.price, iptu: amount || undefined }))}
-            />
+            </div>
           </>
         )}
 
@@ -580,10 +790,10 @@ export default function PropertyForm({ property: initial, readOnly = false }: { 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <Input label="Endereço" required value={form.location.address} onChange={v => set('location', { ...form.location, address: v })} error={errors['location.address']} />
               <Input label="Cidade" required value={form.location.city} onChange={v => set('location', { ...form.location, city: v })} error={errors['location.city']} />
-              <Input label="Província / Estado" required value={form.location.province} onChange={v => set('location', { ...form.location, province: v })} error={errors['location.province']} />
+              <Input label="Estado" required value={form.location.province} onChange={v => set('location', { ...form.location, province: v })} error={errors['location.province']} />
               <Input label="Código Postal / CEP" value={form.location.postalCode ?? ''} onChange={v => set('location', { ...form.location, postalCode: v })} />
             </div>
-            <Input label="Residencial / Comunidade" required value={form.location.residential} onChange={v => set('location', { ...form.location, residential: v })} error={errors['location.residential']} />
+            <Input label="Residencial / Condomínio" required value={form.location.residential} onChange={v => set('location', { ...form.location, residential: v })} error={errors['location.residential']} />
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <Input label="Latitude" type="number" value={form.location.coordinates?.lat ?? ''} onChange={v => set('location', { ...form.location, coordinates: { lat: parseFloat(v) || 0, lng: form.location.coordinates?.lng ?? 0 } })} />
               <Input label="Longitude" type="number" value={form.location.coordinates?.lng ?? ''} onChange={v => set('location', { ...form.location, coordinates: { lat: form.location.coordinates?.lat ?? 0, lng: parseFloat(v) || 0 } })} />
@@ -594,29 +804,72 @@ export default function PropertyForm({ property: initial, readOnly = false }: { 
         {/* ── Detalhes ── */}
         {activeTab === 'Detalhes' && (
           <>
-            <Counter
-              label="Número de Suítes"
-              value={form.propertyDetails.bedrooms}
-              min={1}
-              onChange={n => setForm(f => ({ ...f, propertyDetails: { ...f.propertyDetails, bedrooms: n } }))}
-              required
-              error={errors['propertyDetails.bedrooms']}
-            />
-            <Counter
-              label="Lavabo"
-              value={form.propertyDetails.lavabo ?? 0}
-              min={1}
-              onChange={n => setForm(f => ({ ...f, propertyDetails: { ...f.propertyDetails, lavabo: n } }))}
-              required
-              error={errors['propertyDetails.lavabo']}
-            />
-            <Counter
-              label="Escritório"
-              value={form.propertyDetails.escritorio ?? 0}
-              onChange={n => setForm(f => ({ ...f, propertyDetails: { ...f.propertyDetails, escritorio: n } }))}
-            />
-            <Input label="Área (m²)" required type="number" value={form.propertyDetails.areaSqFt || ''} onChange={v => setForm(f => ({ ...f, propertyDetails: { ...f.propertyDetails, areaSqFt: parseFloat(v) || 0 } }))} />
-            <Input label="Ano de Construção" type="number" value={form.propertyDetails.yearBuilt ?? ''} onChange={v => setForm(f => ({ ...f, propertyDetails: { ...f.propertyDetails, yearBuilt: parseInt(v) || undefined } }))} placeholder="ex. 2018" />
+            <div className="grid grid-cols-2 gap-4">
+              <Counter
+                label="Nº de Quartos (total)"
+                value={form.propertyDetails.quartos ?? 0}
+                min={1}
+                required
+                onChange={n => setForm(f => ({ ...f, propertyDetails: { ...f.propertyDetails, quartos: n } }))}
+                error={errors['propertyDetails.quartos']}
+              />
+              <Counter
+                label="Nº de Suítes"
+                value={form.propertyDetails.bedrooms}
+                onChange={n => setForm(f => ({ ...f, propertyDetails: { ...f.propertyDetails, bedrooms: n } }))}
+                error={errors['propertyDetails.bedrooms']}
+              />
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+              <Counter
+                label="Lavabo"
+                value={form.propertyDetails.lavabo ?? 0}
+                min={1}
+                required
+                onChange={n => setForm(f => ({ ...f, propertyDetails: { ...f.propertyDetails, lavabo: n } }))}
+                error={errors['propertyDetails.lavabo']}
+              />
+              <Counter
+                label="Escritório"
+                value={form.propertyDetails.escritorio ?? 0}
+                onChange={n => setForm(f => ({ ...f, propertyDetails: { ...f.propertyDetails, escritorio: n } }))}
+              />
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+              <Counter
+                label="Vagas (cobertas ou descobertas)"
+                value={form.propertyDetails.vagas ?? 0}
+                onChange={n => setForm(f => ({ ...f, propertyDetails: { ...f.propertyDetails, vagas: n } }))}
+              />
+              <div className="flex items-center gap-3 px-4 py-3 bg-neutral-100 rounded-lg">
+                <input
+                  id="mobiliado"
+                  type="checkbox"
+                  checked={form.propertyDetails.mobiliado ?? false}
+                  onChange={e => setForm(f => ({ ...f, propertyDetails: { ...f.propertyDetails, mobiliado: e.target.checked } }))}
+                  className="h-4 w-4 rounded border-neutral-300 text-[#1E3A5F] focus:ring-[#1E3A5F]"
+                />
+                <label htmlFor="mobiliado" className="text-sm font-medium text-neutral-600 cursor-pointer">
+                  Mobiliado
+                </label>
+              </div>
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+              <Input
+                label="Área construída (m²)"
+                type="number"
+                value={form.propertyDetails.areaSqFt || ''}
+                onChange={v => setForm(f => ({ ...f, propertyDetails: { ...f.propertyDetails, areaSqFt: parseFloat(v) || 0 } }))}
+                placeholder="0"
+              />
+              <Input
+                label="Área de terreno (m²)"
+                type="number"
+                value={form.propertyDetails.areaTerrenoSqFt ?? ''}
+                onChange={v => setForm(f => ({ ...f, propertyDetails: { ...f.propertyDetails, areaTerrenoSqFt: parseFloat(v) || undefined } }))}
+                placeholder="0"
+              />
+            </div>
           </>
         )}
 
@@ -625,12 +878,25 @@ export default function PropertyForm({ property: initial, readOnly = false }: { 
           <>
             <p className="text-xs text-neutral-500">Clique para selecionar características</p>
             <div className="flex flex-wrap gap-2">
-              {ALL_FEATURES.map(({ value, label }) => (
-                <button key={value} type="button" onClick={() => toggleFeature(value)}
-                  className={`px-3 py-1.5 rounded-full text-xs font-medium border transition-colors ${form.features.includes(value) ? 'bg-[#1E3A5F] text-white border-[#1E3A5F]' : 'bg-white text-neutral-600 border-neutral-200 hover:border-[#1E3A5F]'}`}>
-                  {label}
-                </button>
-              ))}
+              {ALL_FEATURES.map(({ value, label }) => {
+                const active = form.features.includes(value)
+                const locked = value === 'baccarat' && form.status.isFeatured
+                return (
+                  <button key={value} type="button"
+                    onClick={() => !locked && toggleFeature(value)}
+                    disabled={locked}
+                    title={locked ? 'Ativado automaticamente por Seleção Casa Baccarat' : undefined}
+                    className={`px-3 py-1.5 rounded-full text-xs font-medium border transition-colors ${
+                      locked
+                        ? 'bg-[#1E3A5F] text-white border-[#1E3A5F] opacity-60 cursor-not-allowed'
+                        : active
+                          ? 'bg-[#1E3A5F] text-white border-[#1E3A5F]'
+                          : 'bg-white text-neutral-600 border-neutral-200 hover:border-[#1E3A5F]'
+                    }`}>
+                    {locked ? `🔒 ${label}` : label}
+                  </button>
+                )
+              })}
               {savedCustomFeatures.map(({ value, label }) => {
                 const active = form.features.includes(value)
                 return (
@@ -660,50 +926,13 @@ export default function PropertyForm({ property: initial, readOnly = false }: { 
 
         {/* ── Mídia ── */}
         {activeTab === 'Mídia' && (
-          <>
-            <div>
-              <label className="block text-xs font-semibold text-neutral-600 mb-1">URL da Miniatura <span className="text-red-500">*</span></label>
-              <div className="flex gap-3 items-start">
-                <input type="text" value={form.media.thumbnail} placeholder="https://..."
-                  onChange={e => set('media', { ...form.media, thumbnail: e.target.value })}
-                  className={`flex-1 px-3 py-2.5 bg-neutral-100 rounded-lg text-sm border-0 outline-none focus:ring-2 ${errors['media.thumbnail'] ? 'ring-2 ring-red-300' : 'focus:ring-[#1E3A5F]/20'}`} />
-                {form.media.thumbnail && (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img src={form.media.thumbnail} alt="" className="w-16 h-16 rounded-lg object-cover flex-shrink-0" />
-                )}
-              </div>
-              {errors['media.thumbnail'] && <p className="text-xs text-red-500 mt-1">{errors['media.thumbnail']}</p>}
-            </div>
-            <div>
-              <label className="block text-xs font-semibold text-neutral-600 mb-2">Imagens</label>
-              <div className="space-y-2">
-                {form.media.images.map((img, i) => (
-                  <div key={i} className="flex gap-2 items-center">
-                    <input type="text" value={img} placeholder="https://..."
-                      onChange={e => { const imgs = [...form.media.images]; imgs[i] = e.target.value; set('media', { ...form.media, images: imgs }) }}
-                      className="flex-1 px-3 py-2 bg-neutral-100 rounded-lg text-sm border-0 outline-none focus:ring-2 focus:ring-[#1E3A5F]/20" />
-                    {img && (
-                      // eslint-disable-next-line @next/next/no-img-element
-                      <img src={img} alt="" className="w-12 h-12 rounded-lg object-cover flex-shrink-0" />
-                    )}
-                    <button type="button" onClick={() => set('media', { ...form.media, images: form.media.images.filter((_, j) => j !== i) })}
-                      className="text-neutral-400 hover:text-red-500 transition-colors flex-shrink-0">
-                      <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
-                      </svg>
-                    </button>
-                  </div>
-                ))}
-              </div>
-              <button type="button" onClick={() => set('media', { ...form.media, images: [...form.media.images, ''] })}
-                className="mt-2 flex items-center gap-1.5 text-sm text-[#1E3A5F] hover:underline font-medium">
-                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
-                </svg>
-                Adicionar URL de imagem
-              </button>
-            </div>
-          </>
+          <MediaTab
+            thumbnail={form.media.thumbnail}
+            images={form.media.images}
+            thumbnailError={errors['media.thumbnail']}
+            onThumbnailChange={v => set('media', { ...form.media, thumbnail: v })}
+            onImagesChange={imgs => set('media', { ...form.media, images: imgs })}
+          />
         )}
 
         {/* ── Status & Agente ── */}
@@ -717,7 +946,15 @@ export default function PropertyForm({ property: initial, readOnly = false }: { 
             )}
             <div className="bg-white rounded-xl border border-neutral-100 px-4 divide-y divide-neutral-100">
               <Toggle label="Anúncio ativo" description="Visível nos resultados de busca públicos" checked={form.status.isActive} onChange={v => set('status', { ...form.status, isActive: v })} />
-              <Toggle label="Imóvel em destaque" description="Destacado na página inicial" checked={form.status.isFeatured} onChange={v => set('status', { ...form.status, isFeatured: v })} />
+              <Toggle label="Seleção Casa Baccarat" description="Exibido em card maior na curadoria" checked={form.status.isFeatured} onChange={v => {
+                set('status', { ...form.status, isFeatured: v })
+                setForm(prev => ({
+                  ...prev,
+                  features: v
+                    ? prev.features.includes('baccarat') ? prev.features : [...prev.features, 'baccarat']
+                    : prev.features.filter(f => f !== 'baccarat'),
+                }))
+              }} />
               <Toggle label="Promoção especial" description="Marcado com um selo especial" checked={form.status.isSpecial ?? false} onChange={v => set('status', { ...form.status, isSpecial: v })} />
             </div>
             <div>

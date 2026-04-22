@@ -43,11 +43,14 @@ export async function PATCH(
   try {
     const body = await req.json()
 
-    const extraImages: string[] = (body.media?.images ?? []).filter(Boolean)
+    const rawImages: Array<{ url: string } | string> = body.media?.images ?? []
     const thumbnail: string = body.media?.thumbnail ?? body.img ?? ''
+    const imageObjs = rawImages
+      .map(i => (typeof i === 'string' ? { url: i } : i))
+      .filter(i => i.url)
     const allImages = thumbnail
-      ? [thumbnail, ...extraImages.filter((i: string) => i !== thumbnail)]
-      : extraImages
+      ? [{ url: thumbnail }, ...imageObjs.filter(i => i.url !== thumbnail)]
+      : imageObjs
 
     const updated = await updateProperty(id, {
       title: body.title,

@@ -4,9 +4,8 @@ import { useEffect } from 'react'
 import Link from 'next/link'
 
 const NAV_LINKS = [
-  { label: 'Início',   hash: 'home'     },
-  { label: 'Anúncios', hash: 'listings'  },
-  { label: 'Contato',  hash: 'contact'   },
+  { label: 'Início',  hash: 'home'     },
+  { label: 'Imóveis', hash: 'listings'  },
 ]
 
 interface MobileMenuProps {
@@ -89,6 +88,16 @@ export default function MobileMenu({ isOpen, onClose, isHome }: MobileMenuProps)
             ))}
             <li>
               <Link
+                href="/sobre-nos"
+                onClick={onClose}
+                className="flex items-center gap-3 rounded-xl px-4 py-3 text-base font-medium text-[#6B6B99]
+                           hover:bg-[#F5F0E8] hover:text-[#4E6B5E] transition-colors"
+              >
+                Sobre
+              </Link>
+            </li>
+            <li>
+              <Link
                 href="/blog"
                 onClick={onClose}
                 className="flex items-center gap-3 rounded-xl px-4 py-3 text-base font-medium text-[#6B6B99]
@@ -97,20 +106,18 @@ export default function MobileMenu({ isOpen, onClose, isHome }: MobileMenuProps)
                 Blog
               </Link>
             </li>
+            <li>
+              <a
+                href={isHome ? '#contact' : '/#contact'}
+                onClick={e => handleHashNav(e, 'contact')}
+                className="flex items-center gap-3 rounded-xl px-4 py-3 text-base font-medium text-[#6B6B99]
+                           hover:bg-[#F5F0E8] hover:text-[#4E6B5E] transition-colors"
+              >
+                Contato
+              </a>
+            </li>
           </ul>
         </nav>
-
-        {/* CTA */}
-        <div className="px-6 pb-8">
-          <Link
-            href="/register"
-            onClick={onClose}
-            className="block w-full rounded-xl bg-[#6B6B99] px-4 py-3 text-center
-                       text-sm font-semibold text-white hover:bg-[#5757A0] transition-colors duration-200"
-          >
-            Anuncie seu Imóvel
-          </Link>
-        </div>
       </div>
     </>
   )

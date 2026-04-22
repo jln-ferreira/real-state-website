@@ -132,7 +132,7 @@ function EmptyState({ onReset }: { onReset: () => void }) {
 // ── Featured highlight card ────────────────────────────────────────────────────
 
 function FeaturedCard({ p }: { p: Property }) {
-  const isSale = p.price.type === 'sale'
+  const hasParking = p.features.includes('parking')
 
   return (
     <Link href={`/property/${p.id}`} className="block">
@@ -155,68 +155,39 @@ function FeaturedCard({ p }: { p: Property }) {
             className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
           />
           <div aria-hidden="true"
-               className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent" />
-          <div className="absolute top-3 left-3 flex flex-col gap-1.5">
-            <span className="rounded-full bg-amber-400 px-3 py-1 text-[11px] font-bold text-white">
-              ★ Destaque
-            </span>
-            <span className={`rounded-full px-3 py-1 text-[11px] font-semibold text-white
-              ${isSale ? 'bg-emerald-500' : 'bg-[#6B6B99]'}`}>
-              {isSale ? 'À Venda' : 'Para Alugar'}
-            </span>
-          </div>
-          <span className="absolute bottom-3 left-3 rounded-md bg-black/40 px-2 py-0.5
+               className="absolute inset-0 bg-gradient-to-t from-black/35 via-transparent to-transparent" />
+
+          {/* Seleção Casa Baccarat badge */}
+          <span className="absolute bottom-0 left-0 bg-[#F5F0E8]/90 px-3 py-1.5
+                           text-[9px] font-light tracking-[0.2em] uppercase text-[#4A5240]">
+            Seleção Casa Baccarat
+          </span>
+
+          <span className="absolute bottom-3 right-3 rounded-md bg-black/40 px-2 py-0.5
                            text-[10px] font-mono text-white/80 backdrop-blur-sm">
             {p.id}
           </span>
         </div>
 
-        {/* Body */}
-        <div className="flex flex-1 flex-col justify-between p-7">
-          <div>
-            <span className="text-xs font-semibold uppercase tracking-wider text-[#9898BB]">
-              {p.propertyDetails.type.charAt(0).toUpperCase() + p.propertyDetails.type.slice(1)}
-            </span>
-            <p className="mt-2 font-monument text-2xl leading-tight text-[#4E6B5E]">
-              {formatPrice(p)}
-            </p>
-            <h3 className="mt-1.5 text-lg font-normal text-[#4A5240] transition-colors duration-200
-                           group-hover:text-[#6B6B99]">
-              {p.title}
-            </h3>
-            <p className="mt-2 flex items-center gap-1.5 text-sm text-[#9898BB]">
-              <svg className="h-4 w-4 shrink-0" fill="none" viewBox="0 0 24 24"
-                   strokeWidth={1.8} stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round"
-                      d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0zM19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z" />
-              </svg>
-              {p.location.address}
-            </p>
-          </div>
-
-          <div className="mt-6 flex items-center gap-3 border-t border-[#E0DACE] pt-5 text-xs text-[#9898BB]">
+        {/* Body — same structure as PropertyCard */}
+        <div className="flex flex-1 flex-col px-5 pt-4 pb-5 gap-1">
+          <p className="text-xs text-[#9898BB]">
+            {TIPO_LABELS[p.propertyDetails.type] ?? p.propertyDetails.type}
+            {p.location.residential ? ` · ${p.location.residential}` : ''}
+          </p>
+          <p className="text-xs text-[#9898BB]">
+            {p.location.city}{p.location.province ? ` · ${p.location.province}` : ''}
+          </p>
+          <p className="text-xs text-[#9898BB]">
+            {p.propertyDetails.areaSqFt.toLocaleString()} m²
             {p.propertyDetails.bedrooms > 0 && (
-              <span className="flex items-center gap-1">
-                <svg className="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" strokeWidth={1.8} stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round"
-                        d="M2 9V6a1 1 0 011-1h18a1 1 0 011 1v3M2 9h20M2 9v9m20-9v9M2 18h20M7 13h10" />
-                </svg>
-                {p.propertyDetails.bedrooms} suíte{p.propertyDetails.bedrooms !== 1 ? 's' : ''}
-              </span>
+              <> · {p.propertyDetails.bedrooms} suíte{p.propertyDetails.bedrooms !== 1 ? 's' : ''}</>
             )}
-            {(p.propertyDetails.lavabo ?? 0) > 0 && (
-              <span className="flex items-center gap-1">
-                <svg className="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" strokeWidth={1.8} stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round"
-                        d="M4 12h16M4 12V7a2 2 0 012-2h3m-5 7v5a2 2 0 002 2h12a2 2 0 002-2v-5M10 5V4a1 1 0 011-1h2a1 1 0 011 1v1" />
-                </svg>
-                {p.propertyDetails.lavabo} lavabo{p.propertyDetails.lavabo !== 1 ? 's' : ''}
-              </span>
-            )}
-            <span className="ml-auto font-medium text-[#6B6B99]">
-              {p.propertyDetails.areaSqFt.toLocaleString()} m²
-            </span>
-          </div>
+            {hasParking && <> · garagem</>}
+          </p>
+          <p className="mt-2 text-base font-extrabold text-[#4E6B5E] leading-tight">
+            {formatPrice(p)}
+          </p>
         </div>
       </article>
     </Link>
@@ -291,8 +262,13 @@ export default function CatalogSection({ properties, filters, onFiltersChange }:
   const visibleResults = isMobile ? results.slice(0, visibleCount) : results
   const hasMore = isMobile && visibleCount < results.length
 
-  const featured    = visibleResults.filter(p => p.status.isFeatured)
-  const nonFeatured = visibleResults.filter(p => !p.status.isFeatured)
+  const baccaratActive = filters.features.includes('baccarat')
+  const featured    = baccaratActive
+    ? visibleResults.filter(p => p.features.includes('baccarat'))
+    : visibleResults.filter(p => p.status.isFeatured)
+  const nonFeatured = baccaratActive
+    ? visibleResults.filter(p => !p.features.includes('baccarat'))
+    : visibleResults.filter(p => !p.status.isFeatured)
 
   return (
     <section id="listings" className="min-h-screen bg-[#F5F0E8] scroll-mt-16">
@@ -301,14 +277,38 @@ export default function CatalogSection({ properties, filters, onFiltersChange }:
         {/* Section heading */}
         <div className="mb-8 flex flex-wrap items-end justify-between gap-4">
           <div>
-            <h2 className="font-monument text-xl text-[#4A5240]">Anúncios de Imóveis</h2>
+            <h2 className="font-monument text-xl text-[#4A5240]">
+              Curadoria atual
+              <span className="ml-2 text-[#9898BB]">|</span>
+              <span className="ml-2 font-light text-[#9898BB]">Imóveis</span>
+            </h2>
             <p className="mt-1 text-sm text-[#9898BB]">
-              {results.length} de {properties.length} imóveis
+              {results.length} imóvel{results.length !== 1 ? 's' : ''} selecionado{results.length !== 1 ? 's' : ''}
             </p>
           </div>
 
           {/* Sort + Download */}
-          <div className="flex items-center gap-2">
+          <div className="flex flex-wrap items-center gap-2">
+            {/* Exclusivo Baccarat toggle */}
+            <button
+              onClick={() => {
+                const active = filters.features.includes('baccarat')
+                onFiltersChange({
+                  ...filters,
+                  features: active
+                    ? (filters.features.filter(f => f !== 'baccarat') as Feature[])
+                    : ([...filters.features, 'baccarat'] as Feature[]),
+                })
+              }}
+              className={[
+                'rounded-full border px-4 py-1.5 text-xs font-medium transition-colors duration-200',
+                filters.features.includes('baccarat')
+                  ? 'border-[#4E6B5E] bg-[#4E6B5E] text-white'
+                  : 'border-[#E0DACE] bg-white text-[#4E6B5E] hover:border-[#4E6B5E]',
+              ].join(' ')}
+            >
+              Exclusivo Baccarat
+            </button>
             <span className="hidden text-sm text-[#9898BB] sm:inline">Ordenar:</span>
             <select
               value={sortKey}

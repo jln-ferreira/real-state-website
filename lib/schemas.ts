@@ -32,7 +32,7 @@ export const PropertySchema = z.object({
   }),
   features: z.array(z.string()),
   media: z.object({
-    images: z.array(z.string().url('Must be a valid URL')),
+    images: z.array(z.object({ url: z.string().url('Must be a valid URL'), caption: z.string().optional() })),
     thumbnail: z.string().url('Must be a valid URL'),
   }),
   status: z.object({

@@ -49,7 +49,7 @@ function formatWeekRange(weekStartStr: string): string {
 }
 
 export default function DashboardClient({ properties, posts, contactMessages, whatsappClicks, userMap }: Props) {
-  const [velocityPeriod, setVelocityPeriod] = useState<'30d' | '12w' | '12m'>('30d')
+  const [velocityPeriod, setVelocityPeriod] = useState<'7d' | '30d' | '12w' | '12m'>('30d')
   const [recentOpen, setRecentOpen] = useState(false)
 
   // ── Velocity: new listings over time ─────────────────────────────────────────
@@ -73,7 +73,17 @@ export default function DashboardClient({ properties, posts, contactMessages, wh
   type Bar = { label: string; count: number; key: string }
   let bars: Bar[] = []
 
-  if (velocityPeriod === '30d') {
+  if (velocityPeriod === '7d') {
+    bars = Array.from({ length: 7 }, (_, i) => {
+      const d = addDays(now, -(6 - i))
+      const key = toDateKey(d.toISOString())
+      return {
+        key,
+        label: d.toLocaleDateString('pt-BR', { weekday: 'short', day: '2-digit' }),
+        count: datedProperties.filter(p => toDateKey(p.timestamps!.createdAt) === key).length,
+      }
+    })
+  } else if (velocityPeriod === '30d') {
     bars = Array.from({ length: 30 }, (_, i) => {
       const d = addDays(now, -(29 - i))
       const key = toDateKey(d.toISOString())
@@ -117,7 +127,9 @@ export default function DashboardClient({ properties, posts, contactMessages, wh
     return rows.filter(r => { const d = new Date(r.created_at); return d >= from && d <= to }).length
   }
 
-  const periodStart = velocityPeriod === '30d'
+  const periodStart = velocityPeriod === '7d'
+    ? addDays(now, -6)
+    : velocityPeriod === '30d'
     ? addDays(now, -29)
     : velocityPeriod === '12w'
     ? addDays(now, -83)
@@ -128,7 +140,7 @@ export default function DashboardClient({ properties, posts, contactMessages, wh
   const totalInPeriod    = contactInPeriod + whatsappInPeriod
 
   const contactBars: Bar[] = bars.map(bar => {
-    if (velocityPeriod === '30d') {
+    if (velocityPeriod === '7d' || velocityPeriod === '30d') {
       const d = new Date(bar.key)
       const next = addDays(d, 1)
       return { ...bar, count: countInPeriod([...contactMessages, ...whatsappClicks], d, next) }
@@ -215,7 +227,7 @@ export default function DashboardClient({ properties, posts, contactMessages, wh
           </div>
           {/* Period toggle */}
           <div className="flex bg-[#F7F7FA] rounded-xl p-0.5 gap-0.5">
-            {([['30d', 'Últimos 30 dias'], ['12w', 'Últimas 12 semanas'], ['12m', 'Últimos 12 meses']] as const).map(([key, label]) => (
+            {([['7d', 'Últimos 7 dias'], ['30d', 'Últimos 30 dias'], ['12w', 'Últimas 12 semanas'], ['12m', 'Últimos 12 meses']] as const).map(([key, label]) => (
               <button
                 key={key}
                 onClick={() => setVelocityPeriod(key)}
@@ -288,23 +300,48 @@ export default function DashboardClient({ properties, posts, contactMessages, wh
             </button>
 
             {recentOpen && (() => {
-              const sorted = [...datedProperties].sort(
+              const periodProps = datedProperties.filter(p => new Date(p.timestamps!.createdAt) >= periodStart)
+              const sorted = [...periodProps].sort(
                 (a, b) => new Date(b.timestamps!.createdAt).getTime() - new Date(a.timestamps!.createdAt).getTime()
               )
-              const weekMap = new Map<string, typeof sorted>()
+              const groupMap = new Map<string, typeof sorted>()
               for (const p of sorted) {
-                const key = getWeekStart(p.timestamps!.createdAt)
-                if (!weekMap.has(key)) weekMap.set(key, [])
-                weekMap.get(key)!.push(p)
+                let key: string
+                if (velocityPeriod === '7d' || velocityPeriod === '30d') {
+                  key = toDateKey(p.timestamps!.createdAt)
+                } else if (velocityPeriod === '12w') {
+                  key = getWeekStart(p.timestamps!.createdAt)
+                } else {
+                  const d = new Date(p.timestamps!.createdAt)
+                  key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`
+                }
+                if (!groupMap.has(key)) groupMap.set(key, [])
+                groupMap.get(key)!.push(p)
               }
-              const weeks = [...weekMap.entries()].sort(([a], [b]) => b.localeCompare(a))
+              const groups = [...groupMap.entries()].sort(([a], [b]) => b.localeCompare(a))
+
+              function groupLabel(key: string): string {
+                if (velocityPeriod === '7d' || velocityPeriod === '30d') {
+                  const d = new Date(key + 'T00:00:00')
+                  return d.toLocaleDateString('pt-BR', { weekday: 'short', day: '2-digit', month: 'short' })
+                } else if (velocityPeriod === '12w') {
+                  return formatWeekRange(key)
+                } else {
+                  const [yr, mo] = key.split('-').map(Number)
+                  return new Date(yr, mo - 1, 1).toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' })
+                }
+              }
+
+              if (sorted.length === 0) {
+                return <p className="text-xs text-neutral-400 py-4">Nenhum cadastro no período selecionado</p>
+              }
 
               return (
                 <div className="space-y-4">
-                  {weeks.map(([weekKey, props]) => (
-                    <div key={weekKey}>
+                  {groups.map(([groupKey, props]) => (
+                    <div key={groupKey}>
                       <p className="text-[10px] font-bold text-neutral-400 uppercase tracking-wider mb-2">
-                        {formatWeekRange(weekKey)}
+                        {groupLabel(groupKey)}
                       </p>
                       <div className="space-y-1">
                         {props.map(p => (
@@ -352,7 +389,7 @@ export default function DashboardClient({ properties, posts, contactMessages, wh
         <div className="flex flex-wrap items-start justify-between gap-3 mb-4">
           <div>
             <h2 className="text-sm font-bold text-neutral-800">Contatos Recebidos</h2>
-            <p className="text-xs text-neutral-400 mt-0.5">WhatsApp e formulário de contato · período: {velocityPeriod === '30d' ? 'últimos 30 dias' : velocityPeriod === '12w' ? 'últimas 12 semanas' : 'últimos 12 meses'}</p>
+            <p className="text-xs text-neutral-400 mt-0.5">WhatsApp e formulário de contato · período: {velocityPeriod === '7d' ? 'últimos 7 dias' : velocityPeriod === '30d' ? 'últimos 30 dias' : velocityPeriod === '12w' ? 'últimas 12 semanas' : 'últimos 12 meses'}</p>
           </div>
           <span className="text-2xl font-bold text-[#4F4F6B]">{totalInPeriod}</span>
         </div>

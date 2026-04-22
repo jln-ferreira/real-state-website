@@ -241,31 +241,37 @@ function HeroSection({ filters, onChange, totalCount }: { filters: Filters; onCh
         />
       </div>
 
-      <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pt-16 pb-14 lg:pt-20 lg:pb-16">
+      <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pt-12 pb-8 lg:pt-16 lg:pb-10">
 
         {/* ── Split hero ──────────────────────────────────────────────────── */}
-        <div className="grid items-center gap-10 lg:grid-cols-2 lg:gap-16">
+        <div className="grid items-stretch gap-6 lg:grid-cols-2 lg:gap-10">
 
           {/* Left — headline + CTA */}
-          <div className="animate-page-in">
-            <p className="font-monument mb-4 text-[10px] text-[#C8DDB8]">
-              Bem-vindo à Casa Baccarat
+          <div className="animate-page-in flex flex-col justify-center py-4">
+            <p className="font-monument mb-3 text-sm font-light tracking-[0.18em] text-[#4A5240]">
+              Curadoria de imóveis de alto padrão · Alphaville e região
             </p>
-            <h1 className="font-monument text-4xl leading-[1.25] text-[#4A5240] sm:text-5xl lg:text-[3.25rem]">
-              Encontre o imóvel<br />
-              <span className="text-[#6B6B99]">ideal para você</span>
+            <h1 className="font-monument font-light tracking-wide text-[#4A5240]
+                           text-[2.4rem] leading-[1.2] sm:text-[2.8rem] lg:text-[3.1rem]">
+              Não vendemos imóveis.
+              <br />
+              <span className="text-[#6B6B99]">
+                Apresentamos o lugar onde<br /> você vai querer viver.
+              </span>
             </h1>
-            <p className="mt-5 max-w-[420px] text-base font-light leading-relaxed text-[#4E6B5E]">
-              Explore centenas de anúncios verificados. Compra, venda ou aluguel — encontramos a opção certa para o seu momento.
+            <p className="mt-4 max-w-[420px] font-monument font-light tracking-wide
+                          text-[0.85rem] leading-relaxed text-[#4E6B5E]">
+              Cada imóvel da nossa curadoria foi selecionado com olhar de arquiteta,
+              para quem entende que viver bem começa pelo lugar certo.
             </p>
-            <div className="mt-8 flex flex-wrap items-center gap-4">
+            <div className="mt-6 flex flex-wrap items-center gap-4">
               <button
                 onClick={scrollToListings}
-                className="inline-flex items-center gap-2 rounded-xl bg-[#6B6B99] px-6 py-3.5
+                className="inline-flex items-center gap-2 rounded-xl bg-[#6B6B99] px-5 py-2.5
                            text-sm font-semibold text-white shadow-sm
                            hover:bg-[#5757A0] transition-colors duration-200"
               >
-                Anuncie seu Imóvel
+                Conhecer imóveis selecionados
                 <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
                 </svg>
@@ -279,13 +285,13 @@ function HeroSection({ filters, onChange, totalCount }: { filters: Filters; onCh
           {/* Right — hero image */}
           <div
             className="relative hidden overflow-hidden rounded-2xl lg:block"
-            style={{ height: '480px', boxShadow: '0 20px 60px rgba(0,0,0,0.12)' }}
+            style={{ boxShadow: '0 20px 60px rgba(0,0,0,0.12)' }}
           >
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
-              src="https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=1200&q=85"
+              src="/heroImage.png"
               alt="Imóveis modernos"
-              className="h-full w-full object-cover"
+              className="absolute inset-0 h-full w-full object-cover object-center"
             />
             {/* Subtle scrim */}
             <div
@@ -297,19 +303,15 @@ function HeroSection({ filters, onChange, totalCount }: { filters: Filters; onCh
             <div className="absolute bottom-5 left-5 rounded-xl bg-white px-4 py-3"
                  style={{ boxShadow: '0 4px 20px rgba(0,0,0,0.12)' }}>
               <p className="font-monument text-[10px] text-[#9898BB]">
-                Imóveis verificados
+                Imóveis selecionados
               </p>
               <p className="mt-0.5 font-monument text-2xl text-[#4A5240]">{totalCount > 0 ? `${totalCount}+` : '—'}</p>
-            </div>
-            {/* Floating badge */}
-            <div className="absolute top-5 right-5 rounded-xl bg-[#6B6B99] px-3 py-1.5">
-              <p className="text-[11px] font-semibold text-white">★ Plataforma verificada</p>
             </div>
           </div>
         </div>
 
         {/* ── Search bar ──────────────────────────────────────────────────── */}
-        <div className="mt-10">
+        <div className="mt-6">
           <div
             className="rounded-2xl bg-white"
             style={{ boxShadow: '0 4px 20px rgba(0,0,0,0.07)', border: '1px solid #E0DACE' }}
@@ -332,18 +334,18 @@ function HeroSection({ filters, onChange, totalCount }: { filters: Filters; onCh
                 onChange={v => set({ tipo: v as 'all' | PropertyType })}
               />
 
-              {/* VALOR MÁX */}
+              {/* FAIXA DE VALOR */}
               <div className="flex flex-1 flex-col border-b border-[#E0DACE]
                               px-4 py-3 text-left
                               md:justify-center md:border-b-0 md:border-r md:border-[#E0DACE]
                               md:px-5 md:py-4">
                 <span className="font-monument text-[10px] text-[#9898BB]">
-                  VALOR MÁX.
+                  FAIXA DE VALOR
                 </span>
                 <input
                   type="text"
-                  value={displayCAD(filters.valorMax)}
-                  placeholder="CA$ Ilimitado"
+                  value={filters.valorMax}
+                  placeholder="Todos"
                   onChange={e => set({ valorMax: e.target.value.replace(/\D/g, '') })}
                   className="mt-0.5 w-full bg-transparent text-sm font-semibold text-[#4A5240]
                              placeholder-[#C8C8D8] outline-none"

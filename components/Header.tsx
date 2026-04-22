@@ -6,9 +6,8 @@ import { usePathname } from 'next/navigation'
 import MobileMenu from './MobileMenu'
 
 const NAV_LINKS = [
-  { label: 'Início',   hash: 'home'     },
-  { label: 'Anúncios', hash: 'listings'  },
-  { label: 'Contato',  hash: 'contact'   },
+  { label: 'Início',  hash: 'home'     },
+  { label: 'Imóveis', hash: 'listings'  },
 ]
 
 export default function Header() {
@@ -90,19 +89,27 @@ export default function Header() {
               </a>
             ))}
             <Link
+              href="/sobre-nos"
+              className="rounded-lg px-4 py-2 text-sm font-light tracking-wide text-white/80
+                         hover:text-white hover:bg-white/10 transition-colors"
+            >
+              Sobre
+            </Link>
+            <Link
               href="/blog"
               className="rounded-lg px-4 py-2 text-sm font-light tracking-wide text-white/80
                          hover:text-white hover:bg-white/10 transition-colors"
             >
               Blog
             </Link>
-            <Link
-              href="/register"
-              className="ml-3 rounded-xl bg-white px-5 py-2 text-sm font-medium
-                         text-[#6B6B99] hover:bg-[#F5F0E8] transition-colors duration-200 shadow-sm"
+            <a
+              href={isHome ? '#contact' : '/#contact'}
+              onClick={e => handleHashNav(e, 'contact')}
+              className="rounded-lg px-4 py-2 text-sm font-light tracking-wide text-white/80
+                         hover:text-white hover:bg-white/10 transition-colors"
             >
-              Anuncie seu Imóvel
-            </Link>
+              Contato
+            </a>
           </nav>
 
           {/* Mobile hamburger */}

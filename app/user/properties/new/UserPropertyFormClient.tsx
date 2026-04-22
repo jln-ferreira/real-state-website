@@ -48,6 +48,7 @@ interface FormState {
   residential: string
   bedrooms: number
   lavabo: number
+  escritorio: number
   areaSqFt: string
   yearBuilt: string
   features: string[]
@@ -63,7 +64,7 @@ function emptyForm(user: UserInfo): FormState {
     title: '', description: '', propertyType: 'apartment', priceType: 'sale',
     priceAmount: '', currency: 'BRL', condominio: '', iptu: '',
     address: '', city: '', province: '', residential: '',
-    bedrooms: 1, lavabo: 1, areaSqFt: '', yearBuilt: '',
+    bedrooms: 1, lavabo: 1, escritorio: 0, areaSqFt: '', yearBuilt: '',
     features: [], thumbnail: '', images: [''],
     agentName: user.name, agentPhone: user.phone, agentEmail: user.email,
   }
@@ -129,7 +130,7 @@ function formatBRL(raw: string): string {
 }
 
 const REQUIRED_FIELDS: (keyof FormState)[] = [
-  'title', 'description', 'priceAmount', 'address', 'city', 'province', 'residential', 'thumbnail', 'agentName', 'agentPhone', 'agentEmail',
+  'title', 'description', 'priceAmount', 'address', 'city', 'province', 'residential', 'thumbnail', 'agentName', 'agentPhone', 'agentEmail', 'areaSqFt',
 ]
 
 export default function UserPropertyFormClient({ user }: { user: UserInfo }) {
@@ -192,6 +193,7 @@ export default function UserPropertyFormClient({ user }: { user: UserInfo }) {
     if (!form.agentEmail.trim()) e.agentEmail = 'E-mail é obrigatório'
     if (form.bedrooms < 1) e.bedrooms = 'Mínimo 1 suíte'
     if (form.lavabo < 1) e.lavabo = 'Mínimo 1 lavabo'
+    if (!form.areaSqFt.trim() || parseFloat(form.areaSqFt) <= 0) e.areaSqFt = 'Área é obrigatória'
     setErrors(e)
     return Object.keys(e).length === 0
   }
@@ -239,13 +241,14 @@ export default function UserPropertyFormClient({ user }: { user: UserInfo }) {
         bedrooms: form.bedrooms,
         bathrooms: form.lavabo,
         lavabo: form.lavabo,
+        escritorio: form.escritorio,
         areaSqFt: parseFloat(form.areaSqFt) || 0,
         ...(form.yearBuilt ? { yearBuilt: parseInt(form.yearBuilt) } : {}),
       },
       features: form.features,
       media: {
         thumbnail: form.thumbnail,
-        images: allImages,
+        images: allImages.map((url: string) => ({ url })),
       },
       agent: {
         name: form.agentName,
@@ -393,7 +396,7 @@ export default function UserPropertyFormClient({ user }: { user: UserInfo }) {
         <div>
           <SectionTitle>Detalhes</SectionTitle>
           <div className="space-y-4">
-            <div className="grid grid-cols-2 gap-6">
+            <div className="grid grid-cols-3 gap-4">
               <Counter
                 label="Suítes"
                 value={form.bedrooms}
@@ -410,10 +413,16 @@ export default function UserPropertyFormClient({ user }: { user: UserInfo }) {
                 error={errors.lavabo}
                 onChange={v => setForm(f => ({ ...f, lavabo: v }))}
               />
+              <Counter
+                label="Escritórios"
+                value={form.escritorio}
+                min={0}
+                onChange={v => setForm(f => ({ ...f, escritorio: v }))}
+              />
             </div>
             <div className="grid grid-cols-2 gap-4">
-              <Field label="Área (m²)">
-                <input type="number" value={form.areaSqFt} onChange={set('areaSqFt')} placeholder="0" min="0" className={inputCls} />
+              <Field label="Área (m²)" required error={errors.areaSqFt}>
+                <input type="number" value={form.areaSqFt} onChange={set('areaSqFt')} placeholder="0" min="0" className={errors.areaSqFt ? inputErrCls : inputCls} />
               </Field>
               <Field label="Ano de construção">
                 <input type="number" value={form.yearBuilt} onChange={set('yearBuilt')} placeholder="2000" min="1800" max={new Date().getFullYear()} className={inputCls} />
