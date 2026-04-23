@@ -14,26 +14,25 @@ export async function POST(req: Request) {
 
   await saveContactMessage(parsed.data)
 
-  const { data: emailData, error: emailError } = await resend.emails.send({
-    from: 'Casa Baccarat <onboarding@resend.dev>',
-    to: process.env.CONTACT_EMAIL!,
-    replyTo: email,
-    subject: `Nova mensagem de contato — ${propertyId}`,
-    html: `
-      <p><strong>Imóvel:</strong> ${propertyId}</p>
-      <p><strong>Nome:</strong> ${name}</p>
-      ${phone ? `<p><strong>Telefone:</strong> ${phone}</p>` : ''}
-      <p><strong>E-mail:</strong> ${email}</p>
-      <p><strong>Mensagem:</strong></p>
-      <p>${message.replace(/\n/g, '<br>')}</p>
-    `,
-  })
-
-  if (emailError) {
-    console.error('Resend error:', emailError)
-    return NextResponse.json({ error: 'Falha ao enviar e-mail', detail: emailError }, { status: 500 })
+  // Email notification is best-effort — contact is already saved to DB
+  if (process.env.RESEND_API_KEY && process.env.CONTACT_EMAIL) {
+    resend.emails.send({
+      from: 'Casa Baccarat <onboarding@resend.dev>',
+      to: process.env.CONTACT_EMAIL,
+      replyTo: email,
+      subject: `Nova mensagem de contato — ${propertyId}`,
+      html: `
+        <p><strong>Imóvel:</strong> ${propertyId}</p>
+        <p><strong>Nome:</strong> ${name}</p>
+        ${phone ? `<p><strong>Telefone:</strong> ${phone}</p>` : ''}
+        <p><strong>E-mail:</strong> ${email}</p>
+        <p><strong>Mensagem:</strong></p>
+        <p>${message.replace(/\n/g, '<br>')}</p>
+      `,
+    }).then(({ error }) => {
+      if (error) console.error('Resend error:', error)
+    }).catch(err => console.error('Resend exception:', err))
   }
 
-  console.log('Email sent:', emailData?.id)
   return NextResponse.json({ ok: true }, { status: 201 })
 }
