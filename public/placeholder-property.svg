@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300" fill="none">
+  <rect width="400" height="300" fill="#F5F5F7"/>
+  <path d="M200 80 L120 150 L120 230 L280 230 L280 150 Z" fill="#E0E0E8" stroke="#C8C8D8" stroke-width="2"/>
+  <path d="M170 230 L170 175 L230 175 L230 230 Z" fill="#C8C8D8"/>
+  <path d="M145 175 L145 155 L175 155 L175 175 Z" fill="#B8C8E0"/>
+  <path d="M225 175 L225 155 L255 155 L255 175 Z" fill="#B8C8E0"/>
+  <path d="M160 145 L200 110 L240 145" fill="#D0D0DC" stroke="#C0C0CC" stroke-width="2"/>
+  <path d="M195 148 L205 148" stroke="#A0A0B0" stroke-width="1.5" stroke-linecap="round"/>
+  <text x="200" y="260" text-anchor="middle" font-family="sans-serif" font-size="13" fill="#A0A0B0">Sem imagem</text>
+</svg>
