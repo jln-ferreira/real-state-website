@@ -6,22 +6,7 @@ export async function getPosts(): Promise<Post[]> {
   const result = await db.execute(
     "SELECT data FROM blog_posts ORDER BY json_extract(data, '$.date') DESC"
   )
-  const posts = result.rows.map(row => JSON.parse(row.data as string) as Post)
-
-  // Auto-seed static posts on first run
-  if (posts.length === 0) {
-    const { POSTS } = await import('@/data/posts')
-    for (const p of POSTS) {
-      const seeded: Post = { ...p, published: p.published ?? true }
-      await db.execute({
-        sql: 'INSERT OR IGNORE INTO blog_posts (slug, data) VALUES (?, ?)',
-        args: [seeded.slug, JSON.stringify(seeded)],
-      })
-    }
-    return POSTS.map(p => ({ ...p, published: p.published ?? true }))
-  }
-
-  return posts
+  return result.rows.map(row => JSON.parse(row.data as string) as Post)
 }
 
 export async function getPost(slug: string): Promise<Post | null> {

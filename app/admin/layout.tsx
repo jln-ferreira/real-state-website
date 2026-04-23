@@ -97,7 +97,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       speed={250}
       shadow="0 0 10px #6D6D85, 0 0 5px #6D6D85"
     />
-    <div className="flex h-screen overflow-hidden bg-[#F7F7FA]">
+    <div className="flex h-screen bg-[#F7F7FA]">
 
       {/* ── Mobile overlay ─────────────────────────────────────────────────── */}
       {open && (
