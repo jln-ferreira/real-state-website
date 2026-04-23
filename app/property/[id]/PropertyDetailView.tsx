@@ -4,6 +4,7 @@ import { useState, useRef, useEffect } from 'react'
 import Link from 'next/link'
 import type { Property } from '@/data/properties'
 import Layout from '@/components/Layout'
+import { BACCARAT_PHONE } from '@/lib/config'
 
 // ── Icons ──────────────────────────────────────────────────────────────────────
 
@@ -262,7 +263,7 @@ export default function PropertyDetailView({ property, similarProperties }: { pr
     return lines.join('\n')
   }
 
-  const whatsappHref = `https://wa.me/?text=${encodeURIComponent(buildWhatsAppMessage())}`
+  const whatsappHref = `https://wa.me/${BACCARAT_PHONE}?text=${encodeURIComponent(buildWhatsAppMessage())}`
 
   return (
     <Layout>
@@ -470,7 +471,7 @@ export default function PropertyDetailView({ property, similarProperties }: { pr
 
             {/* WhatsApp CTA */}
             <a
-              href={`https://wa.me/${property.agent.phone.replace(/\D/g, '')}`}
+              href={`https://wa.me/${BACCARAT_PHONE}`}
               target="_blank"
               rel="noreferrer"
               onClick={trackWhatsApp}

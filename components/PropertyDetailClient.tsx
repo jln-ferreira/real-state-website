@@ -4,6 +4,7 @@ import { useState, useRef, useEffect } from 'react'
 import Link from 'next/link'
 import type { Property } from '@/data/properties'
 import { PROPERTIES } from '@/data/properties'
+import { BACCARAT_PHONE } from '@/lib/config'
 
 // ── Icons ──────────────────────────────────────────────────────────────────────
 
@@ -382,7 +383,7 @@ export default function PropertyDetailClient({ property }: { property: Property 
             {/* WhatsApp CTA */}
             {property.agent?.phone && (
               <a
-                href={`https://wa.me/${property.agent.phone.replace(/\D/g, '')}`}
+                href={`https://wa.me/${BACCARAT_PHONE}`}
                 target="_blank"
                 rel="noreferrer"
                 className="w-full flex items-center justify-center gap-3 px-6 py-3 rounded-xl bg-green-500 hover:bg-green-600 text-white font-semibold transition-colors"

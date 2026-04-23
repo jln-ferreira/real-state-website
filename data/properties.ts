@@ -112,7 +112,7 @@ export const PROPERTIES: Property[] = [
     },
     status: { isActive: true, isFeatured: true, isSpecial: false },
     metrics: { views: 245, favorites: 18, searchAppearances: 120 },
-    agent: { name: 'Sophie Martin', phone: '+14165550101', email: 'sophie@estatefind.com' },
+    agent: { name: 'Casa Baccarat', phone: '+5511982659982', email: 'baccarat.julia@gmail.com' },
   },
   {
     id: 'PROP-002', title: 'Lakefront Retreat',
@@ -133,7 +133,7 @@ export const PROPERTIES: Property[] = [
     },
     status: { isActive: true, isFeatured: true, isSpecial: false },
     metrics: { views: 389, favorites: 42, searchAppearances: 200 },
-    agent: { name: 'James Wilson', phone: '+16045550202', email: 'james@estatefind.com' },
+    agent: { name: 'Casa Baccarat', phone: '+5511982659982', email: 'baccarat.julia@gmail.com' },
   },
   {
     id: 'PROP-003', title: 'Classic Craftsman',
@@ -153,7 +153,7 @@ export const PROPERTIES: Property[] = [
     },
     status: { isActive: true, isFeatured: false, isSpecial: false },
     metrics: { views: 112, favorites: 9, searchAppearances: 78 },
-    agent: { name: 'Laura Chen', phone: '+12505550303', email: 'laura@estatefind.com' },
+    agent: { name: 'Casa Baccarat', phone: '+5511982659982', email: 'baccarat.julia@gmail.com' },
   },
   // ── Houses – Rent ─────────────────────────────────────────────────────────
   {
@@ -174,7 +174,7 @@ export const PROPERTIES: Property[] = [
     },
     status: { isActive: true, isFeatured: true, isSpecial: false },
     metrics: { views: 178, favorites: 21, searchAppearances: 95 },
-    agent: { name: 'Mike Thompson', phone: '+14035550404', email: 'mike@estatefind.com' },
+    agent: { name: 'Casa Baccarat', phone: '+5511982659982', email: 'baccarat.julia@gmail.com' },
   },
   {
     id: 'PROP-005', title: 'Cozy Ranch Home',
@@ -193,7 +193,7 @@ export const PROPERTIES: Property[] = [
     },
     status: { isActive: true, isFeatured: false, isSpecial: false },
     metrics: { views: 88, favorites: 5, searchAppearances: 60 },
-    agent: { name: 'Sandra Lee', phone: '+17805550505', email: 'sandra@estatefind.com' },
+    agent: { name: 'Casa Baccarat', phone: '+5511982659982', email: 'baccarat.julia@gmail.com' },
   },
   {
     id: 'PROP-006', title: 'Modern Farmhouse',
@@ -212,7 +212,7 @@ export const PROPERTIES: Property[] = [
     },
     status: { isActive: true, isFeatured: false, isSpecial: false },
     metrics: { views: 145, favorites: 14, searchAppearances: 88 },
-    agent: { name: 'David Park', phone: '+16135550606', email: 'david@estatefind.com' },
+    agent: { name: 'Casa Baccarat', phone: '+5511982659982', email: 'baccarat.julia@gmail.com' },
   },
   // ── Apartments – Sale ─────────────────────────────────────────────────────
   {
@@ -234,7 +234,7 @@ export const PROPERTIES: Property[] = [
     },
     status: { isActive: true, isFeatured: true, isSpecial: false },
     metrics: { views: 312, favorites: 35, searchAppearances: 175 },
-    agent: { name: 'Rachel Adams', phone: '+14165550707', email: 'rachel@estatefind.com' },
+    agent: { name: 'Casa Baccarat', phone: '+5511982659982', email: 'baccarat.julia@gmail.com' },
   },
   {
     id: 'PROP-008', title: 'High-Rise City View',
@@ -254,7 +254,7 @@ export const PROPERTIES: Property[] = [
     },
     status: { isActive: true, isFeatured: false, isSpecial: false },
     metrics: { views: 201, favorites: 27, searchAppearances: 140 },
-    agent: { name: 'Tom Nguyen', phone: '+14165550808', email: 'tom@estatefind.com' },
+    agent: { name: 'Casa Baccarat', phone: '+5511982659982', email: 'baccarat.julia@gmail.com' },
   },
   {
     id: 'PROP-009', title: 'Open-Plan Urban Flat',
@@ -273,7 +273,7 @@ export const PROPERTIES: Property[] = [
     },
     status: { isActive: true, isFeatured: false, isSpecial: false },
     metrics: { views: 95, favorites: 8, searchAppearances: 55 },
-    agent: { name: 'Claire Dubois', phone: '+15145550909', email: 'claire@estatefind.com' },
+    agent: { name: 'Casa Baccarat', phone: '+5511982659982', email: 'baccarat.julia@gmail.com' },
   },
   // ── Apartments – Rent ─────────────────────────────────────────────────────
   {
@@ -293,7 +293,7 @@ export const PROPERTIES: Property[] = [
     },
     status: { isActive: true, isFeatured: false, isSpecial: false },
     metrics: { views: 76, favorites: 6, searchAppearances: 42 },
-    agent: { name: 'Alex Kim', phone: '+16045551010', email: 'alex@estatefind.com' },
+    agent: { name: 'Casa Baccarat', phone: '+5511982659982', email: 'baccarat.julia@gmail.com' },
   },
   {
     id: 'PROP-011', title: 'Harbourfront Apartment',
@@ -313,7 +313,7 @@ export const PROPERTIES: Property[] = [
     },
     status: { isActive: true, isFeatured: false, isSpecial: false },
     metrics: { views: 134, favorites: 11, searchAppearances: 72 },
-    agent: { name: 'Nina Patel', phone: '+14165551111', email: 'nina@estatefind.com' },
+    agent: { name: 'Casa Baccarat', phone: '+5511982659982', email: 'baccarat.julia@gmail.com' },
   },
   {
     id: 'PROP-012', title: 'Luxury 2-Bed Flat',
@@ -333,7 +333,7 @@ export const PROPERTIES: Property[] = [
     },
     status: { isActive: true, isFeatured: true, isSpecial: false },
     metrics: { views: 287, favorites: 31, searchAppearances: 155 },
-    agent: { name: 'Marc Lefebvre', phone: '+15145551212', email: 'marc@estatefind.com' },
+    agent: { name: 'Casa Baccarat', phone: '+5511982659982', email: 'baccarat.julia@gmail.com' },
   },
   // ── Commercial – Sale ─────────────────────────────────────────────────────
   {
@@ -353,7 +353,7 @@ export const PROPERTIES: Property[] = [
     },
     status: { isActive: true, isFeatured: true, isSpecial: false },
     metrics: { views: 189, favorites: 22, searchAppearances: 110 },
-    agent: { name: 'Brian Scott', phone: '+14165551313', email: 'brian@estatefind.com' },
+    agent: { name: 'Casa Baccarat', phone: '+5511982659982', email: 'baccarat.julia@gmail.com' },
   },
   {
     id: 'PROP-014', title: 'Retail Corner Unit',
@@ -372,7 +372,7 @@ export const PROPERTIES: Property[] = [
     },
     status: { isActive: true, isFeatured: false, isSpecial: false },
     metrics: { views: 67, favorites: 4, searchAppearances: 38 },
-    agent: { name: 'Keiko Tanaka', phone: '+16045551414', email: 'keiko@estatefind.com' },
+    agent: { name: 'Casa Baccarat', phone: '+5511982659982', email: 'baccarat.julia@gmail.com' },
   },
   // ── Commercial – Rent ─────────────────────────────────────────────────────
   {
@@ -391,7 +391,7 @@ export const PROPERTIES: Property[] = [
     },
     status: { isActive: true, isFeatured: false, isSpecial: false },
     metrics: { views: 53, favorites: 3, searchAppearances: 29 },
-    agent: { name: 'Olivia Brown', phone: '+14165551515', email: 'olivia@estatefind.com' },
+    agent: { name: 'Casa Baccarat', phone: '+5511982659982', email: 'baccarat.julia@gmail.com' },
   },
   // ── Land – Sale ───────────────────────────────────────────────────────────
   {
@@ -411,7 +411,7 @@ export const PROPERTIES: Property[] = [
     },
     status: { isActive: true, isFeatured: false, isSpecial: false },
     metrics: { views: 44, favorites: 2, searchAppearances: 22 },
-    agent: { name: 'Gary Ross', phone: '+12505551616', email: 'gary@estatefind.com' },
+    agent: { name: 'Casa Baccarat', phone: '+5511982659982', email: 'baccarat.julia@gmail.com' },
   },
   {
     id: 'PROP-017', title: 'Waterfront Land Parcel',
@@ -430,7 +430,7 @@ export const PROPERTIES: Property[] = [
     },
     status: { isActive: true, isFeatured: false, isSpecial: false },
     metrics: { views: 61, favorites: 7, searchAppearances: 35 },
-    agent: { name: 'Sarah Hall', phone: '+12505551717', email: 'sarah@estatefind.com' },
+    agent: { name: 'Casa Baccarat', phone: '+5511982659982', email: 'baccarat.julia@gmail.com' },
   },
   {
     id: 'PROP-018', title: 'Urban Infill Lot',
@@ -449,7 +449,7 @@ export const PROPERTIES: Property[] = [
     },
     status: { isActive: true, isFeatured: true, isSpecial: false },
     metrics: { views: 99, favorites: 13, searchAppearances: 58 },
-    agent: { name: 'Derek Chang', phone: '+16045551818', email: 'derek@estatefind.com' },
+    agent: { name: 'Casa Baccarat', phone: '+5511982659982', email: 'baccarat.julia@gmail.com' },
   },
 ]
 
