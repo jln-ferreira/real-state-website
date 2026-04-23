@@ -128,7 +128,12 @@ const FEATURE_LABELS: Record<string, string> = {
 // ── View ───────────────────────────────────────────────────────────────────────
 
 export default function PropertyDetailView({ property, similarProperties }: { property: Property; similarProperties: Property[] }) {
-  const images = property.media.images
+  const rawImages = property.media?.images ?? []
+  const images: Array<{ url: string; caption?: string }> = (
+    rawImages.length
+      ? rawImages.map(i => typeof i === 'string' ? { url: i as string } : i as { url: string; caption?: string })
+      : [{ url: property.media?.thumbnail || property.img }]
+  ).filter(i => i.url)
 
   const [lightboxOpen,  setLightboxOpen]  = useState(false)
   const [lightboxIndex, setLightboxIndex] = useState(0)
