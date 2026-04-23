@@ -480,11 +480,11 @@ export default function PropertyDetailView({ property, similarProperties }: { pr
               <div className="text-sm text-neutral-600 leading-relaxed prose prose-sm max-w-none">
                 <p>{property.description}</p>
                 {property.features.length > 0 && (
-                  <ul className="mt-3 space-y-1 not-prose">
+                  <ul className="mt-3 grid grid-cols-2 sm:grid-cols-4 gap-x-3 gap-y-1.5 not-prose">
                     {property.features.map(f => (
-                      <li key={f} className="flex items-start gap-2">
-                        <span className="mt-1.5 w-1.5 h-1.5 rounded-full bg-[#6B6B99] flex-shrink-0" />
-                        <span>{FEATURE_LABELS[f] ?? f}</span>
+                      <li key={f} className="flex items-center gap-1.5">
+                        <span className="w-1.5 h-1.5 rounded-full bg-[#6B6B99] flex-shrink-0" />
+                        <span className="text-xs">{FEATURE_LABELS[f] ?? f}</span>
                       </li>
                     ))}
                   </ul>
@@ -569,7 +569,7 @@ export default function PropertyDetailView({ property, similarProperties }: { pr
                     {property.price.type === 'rent' ? 'Aluguel Mensal' : 'Preço de Venda'}
                   </p>
                   <p className="text-2xl font-bold text-[#6B6B99]">
-                    {property.price.currency} {property.price.amount.toLocaleString()}
+                    R$ {property.price.amount.toLocaleString('pt-BR')}
                     {property.price.type === 'rent' && (
                       <span className="text-sm font-normal text-neutral-400">/mês</span>
                     )}
@@ -735,7 +735,7 @@ export default function PropertyDetailView({ property, similarProperties }: { pr
                       </div>
                       <div className="pt-2 border-t border-neutral-100 mt-auto">
                         <span className="text-base font-bold text-[#6B6B99]">
-                          {p.price.currency} {p.price.amount.toLocaleString()}
+                          R$ {p.price.amount.toLocaleString('pt-BR')}
                           {p.price.type === 'rent' && (
                             <span className="text-xs font-normal text-neutral-400">/mês</span>
                           )}
