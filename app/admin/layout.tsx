@@ -57,7 +57,20 @@ const NAV_ITEMS = [
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname()
   const [open, setOpen] = useState(false)
+  const [collapsed, setCollapsed] = useState(false)
   const [pendingCount, setPendingCount] = useState(0)
+
+  useEffect(() => {
+    const saved = localStorage.getItem('admin-sidebar-collapsed')
+    if (saved === 'true') setCollapsed(true)
+  }, [])
+
+  function toggleCollapsed() {
+    setCollapsed(c => {
+      localStorage.setItem('admin-sidebar-collapsed', String(!c))
+      return !c
+    })
+  }
 
   useEffect(() => {
     Promise.all([
@@ -95,37 +108,57 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         />
       )}
 
-      {/* ── Sidebar — light theme ───────────────────────────────────────────── */}
+      {/* ── Sidebar ─────────────────────────────────────────────────────────── */}
       <aside className={[
         'fixed inset-y-0 left-0 z-40 w-60 flex-shrink-0 bg-white flex flex-col',
-        'transition-transform duration-300 ease-in-out',
-        'md:static md:translate-x-0',
-        open ? 'translate-x-0' : '-translate-x-full',
+        'transition-all duration-300 ease-in-out',
+        open ? 'translate-x-0' : '-translate-x-full md:translate-x-0',
+        collapsed ? 'md:w-14' : 'md:w-60',
       ].join(' ')}
-      style={{ borderRight: '1px solid #E6E6EF' }}
+        style={{ borderRight: '1px solid #E6E6EF' }}
       >
-        {/* Logo */}
-        <div className="px-5 py-5 flex items-center justify-between"
+        {/* Logo row */}
+        <div className="h-14 flex items-center justify-between px-4 flex-shrink-0"
              style={{ borderBottom: '1px solid #E6E6EF' }}>
-          <div className="flex items-center gap-2.5">
+          <div className={['flex items-center gap-2.5 min-w-0 transition-all duration-300', collapsed ? 'md:hidden' : ''].join(' ')}>
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/logo.png" alt="Casa Baccarat" className="h-9 w-auto rounded-lg flex-shrink-0" />
-            <p className="text-[10px] font-semibold text-[#A3A3C2] leading-tight">Painel Admin</p>
+            <img src="/logo.png" alt="Casa Baccarat" className="h-8 w-auto rounded-lg flex-shrink-0" />
+            <p className="text-[10px] font-semibold text-[#A3A3C2] leading-tight truncate">Painel Admin</p>
           </div>
-          <button
-            onClick={() => setOpen(false)}
-            className="md:hidden text-[#A3A3C2] hover:text-[#6D6D85] transition-colors"
-            aria-label="Fechar menu"
-          >
+          {/* Collapsed: centred logo */}
+          <div className={['hidden items-center justify-center w-full', collapsed ? 'md:flex' : ''].join(' ')}>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src="/logo.png" alt="Casa Baccarat" className="h-8 w-auto rounded-lg" />
+          </div>
+          {/* Mobile close */}
+          <button onClick={() => setOpen(false)} className="md:hidden text-[#A3A3C2] hover:text-[#6D6D85] transition-colors" aria-label="Fechar menu">
             <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
             </svg>
           </button>
+          {/* Desktop collapse */}
+          <button onClick={toggleCollapsed} className={['hidden md:block text-[#A3A3C2] hover:text-[#6D6D85] transition-colors', collapsed ? 'md:hidden' : ''].join(' ')} aria-label="Recolher menu">
+            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
+            </svg>
+          </button>
         </div>
 
+        {/* Expand button (desktop, collapsed only) */}
+        <button
+          onClick={toggleCollapsed}
+          className={['hidden items-center justify-center py-2.5 text-[#A3A3C2] hover:text-[#6D6D85] hover:bg-[#F7F7FA] transition-colors', collapsed ? 'md:flex' : ''].join(' ')}
+          style={{ borderBottom: '1px solid #E6E6EF' }}
+          aria-label="Expandir menu"
+        >
+          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
+          </svg>
+        </button>
+
         {/* Nav */}
-        <nav className="flex-1 px-3 py-4 space-y-0.5 overflow-y-auto">
-          <p className="text-[10px] font-bold uppercase tracking-widest text-[#A3A3C2] px-3 mb-3">
+        <nav className="flex-1 py-4 space-y-0.5 overflow-y-auto px-3">
+          <p className={['text-[10px] font-bold uppercase tracking-widest text-[#A3A3C2] px-3 mb-3', collapsed ? 'md:hidden' : ''].join(' ')}>
             Menu
           </p>
           {NAV_ITEMS.map(item => {
@@ -136,18 +169,23 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                 key={item.href}
                 href={item.href}
                 onClick={() => setOpen(false)}
+                title={collapsed ? item.label : undefined}
                 className={[
                   'flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm transition-colors duration-150',
+                  collapsed ? 'md:justify-center md:px-0' : '',
                   active
                     ? 'bg-[#6D6D85]/10 text-[#4F4F6B] font-semibold'
                     : 'text-[#6D6D85] hover:bg-[#F7F7FA] hover:text-[#4F4F6B]',
                 ].join(' ')}
               >
-                <span className={active ? 'text-[#6D6D85]' : 'text-[#A3A3C2]'}>
+                <span className={['relative flex-shrink-0', active ? 'text-[#6D6D85]' : 'text-[#A3A3C2]'].join(' ')}>
                   {item.icon}
+                  {showBadge && collapsed && (
+                    <span className="absolute -top-0.5 -right-0.5 w-1.5 h-1.5 rounded-full bg-red-500" />
+                  )}
                 </span>
-                <span className="flex-1">{item.label}</span>
-                {showBadge && (
+                <span className={['flex-1', collapsed ? 'md:hidden' : ''].join(' ')}>{item.label}</span>
+                {showBadge && !collapsed && (
                   <span className="w-2 h-2 rounded-full bg-red-500 flex-shrink-0" />
                 )}
               </Link>
@@ -158,14 +196,17 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         {/* User area */}
         <div className="p-4 flex items-center gap-3"
              style={{ borderTop: '1px solid #E6E6EF', background: '#F7F7FA' }}>
-          <div className="w-8 h-8 rounded-full bg-[#6D6D85]/15 flex items-center justify-center
-                          text-sm font-bold text-[#4F4F6B] flex-shrink-0">
-            A
-          </div>
-          <span className="text-sm font-medium text-[#2E2E3A] flex-1">Admin</span>
           <button
             onClick={() => signOut({ callbackUrl: '/admin/login' })}
-            className="text-[#A3A3C2] hover:text-[#6D6D85] transition-colors text-xs"
+            title={collapsed ? 'Sair' : undefined}
+            className="w-8 h-8 rounded-full bg-[#6D6D85]/15 flex items-center justify-center text-sm font-bold text-[#4F4F6B] flex-shrink-0 hover:bg-[#6D6D85]/25 transition-colors"
+          >
+            A
+          </button>
+          <span className={['text-sm font-medium text-[#2E2E3A] flex-1', collapsed ? 'md:hidden' : ''].join(' ')}>Admin</span>
+          <button
+            onClick={() => signOut({ callbackUrl: '/admin/login' })}
+            className={['text-[#A3A3C2] hover:text-[#6D6D85] transition-colors text-xs', collapsed ? 'md:hidden' : ''].join(' ')}
           >
             Sair
           </button>
