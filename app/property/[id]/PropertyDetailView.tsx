@@ -448,7 +448,25 @@ export default function PropertyDetailView({ property, similarProperties }: { pr
                 )}
                 {property.propertyDetails.areaSqFt > 0 && (
                   <span className="flex items-center gap-1 bg-neutral-100 text-neutral-700 px-2 py-0.5 rounded-lg font-medium">
-                    <RulerIcon className="w-3.5 h-3.5" /> {property.propertyDetails.areaSqFt.toLocaleString()} m²
+                    <RulerIcon className="w-3.5 h-3.5" /> {property.propertyDetails.areaSqFt.toLocaleString('pt-BR')} m²
+                  </span>
+                )}
+                {(property.propertyDetails.quartos ?? 0) > 0 && (
+                  <span className="flex items-center gap-1 bg-neutral-100 text-neutral-700 px-2 py-0.5 rounded-lg font-medium">
+                    <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" strokeWidth={1.8} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="M2.25 12l8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75" /></svg>
+                    {property.propertyDetails.quartos} quarto{property.propertyDetails.quartos! > 1 ? 's' : ''}
+                  </span>
+                )}
+                {(property.propertyDetails.vagas ?? 0) > 0 && (
+                  <span className="flex items-center gap-1 bg-neutral-100 text-neutral-700 px-2 py-0.5 rounded-lg font-medium">
+                    <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" strokeWidth={1.8} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="M8.25 18.75a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m3 0h6m-9 0H3.375a1.125 1.125 0 01-1.125-1.125V14.25m17.25 4.5a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m3 0h1.125c.621 0 1.129-.504 1.09-1.124a17.902 17.902 0 00-3.213-9.193 2.056 2.056 0 00-1.58-.86H14.25M16.5 18.75h-2.25m0-11.177v-.958c0-.568-.422-1.048-.987-1.106a48.554 48.554 0 00-10.026 0 1.106 1.106 0 00-.987 1.106v7.635m12-6.677v6.677m0 4.5v-4.5m0 0h-12" /></svg>
+                    {property.propertyDetails.vagas} vaga{property.propertyDetails.vagas! > 1 ? 's' : ''}
+                  </span>
+                )}
+                {property.propertyDetails.mobiliado && (
+                  <span className="flex items-center gap-1 bg-neutral-100 text-neutral-700 px-2 py-0.5 rounded-lg font-medium">
+                    <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" strokeWidth={1.8} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="M20.25 7.5l-.625 10.632a2.25 2.25 0 01-2.247 2.118H6.622a2.25 2.25 0 01-2.247-2.118L3.75 7.5M10 11.25h4M3.375 7.5h17.25c.621 0 1.125-.504 1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125z" /></svg>
+                    Mobiliado
                   </span>
                 )}
               </div>
@@ -471,6 +489,49 @@ export default function PropertyDetailView({ property, similarProperties }: { pr
                     ))}
                   </ul>
                 )}
+              </div>
+            </div>
+
+            {/* ── Detalhes do imóvel ───────────────────────────────────────── */}
+            {(() => {
+              const d = property.propertyDetails
+              const rows: [string, string][] = [
+                ['Tipo', d.type],
+                ...(d.quartos ? [['Quartos (total)', String(d.quartos)] as [string, string]] : []),
+                ['Suítes', String(d.bedrooms)],
+                ...(d.lavabo ? [['Lavabos', String(d.lavabo)] as [string, string]] : []),
+                ...(d.escritorio ? [['Escritório', String(d.escritorio)] as [string, string]] : []),
+                ...(d.vagas ? [['Vagas', String(d.vagas)] as [string, string]] : []),
+                ...(d.areaSqFt ? [['Área construída', `${d.areaSqFt.toLocaleString('pt-BR')} m²`] as [string, string]] : []),
+                ...(d.areaTerrenoSqFt ? [['Área de terreno', `${d.areaTerrenoSqFt.toLocaleString('pt-BR')} m²`] as [string, string]] : []),
+                ...(d.mobiliado !== undefined ? [['Mobiliado', d.mobiliado ? 'Sim' : 'Não'] as [string, string]] : []),
+                ...(d.yearBuilt ? [['Ano de construção', String(d.yearBuilt)] as [string, string]] : []),
+              ]
+              return rows.length > 0 ? (
+                <div className="bg-white rounded-2xl border border-[#E0DACE] shadow-sm p-4">
+                  <h2 className="text-sm font-bold text-neutral-800 uppercase tracking-wide mb-3">Detalhes do Imóvel</h2>
+                  <dl className="grid grid-cols-2 gap-x-4 gap-y-2.5">
+                    {rows.map(([label, value]) => (
+                      <div key={label}>
+                        <dt className="text-[11px] text-neutral-400 uppercase tracking-wide">{label}</dt>
+                        <dd className="text-sm font-semibold text-neutral-800 capitalize">{value}</dd>
+                      </div>
+                    ))}
+                  </dl>
+                </div>
+              ) : null
+            })()}
+
+            {/* ── Localização ─────────────────────────────────────────────── */}
+            <div className="bg-white rounded-2xl border border-[#E0DACE] shadow-sm p-4">
+              <h2 className="text-sm font-bold text-neutral-800 uppercase tracking-wide mb-3">Localização</h2>
+              <div className="space-y-0.5 text-sm text-neutral-600">
+                {property.location.address && <p className="font-medium text-neutral-900">{property.location.address}</p>}
+                {property.location.residential && <p>{property.location.residential}</p>}
+                <p>
+                  {property.location.city}, {property.location.province}
+                  {property.location.postalCode && ` · CEP ${property.location.postalCode}`}
+                </p>
               </div>
             </div>
 
@@ -513,23 +574,43 @@ export default function PropertyDetailView({ property, similarProperties }: { pr
                       <span className="text-sm font-normal text-neutral-400">/mês</span>
                     )}
                   </p>
-                  {(property.price.condominio || property.price.iptu) && (
-                    <div className="mt-2 pt-2 border-t border-neutral-100 space-y-1">
+                  {(property.price.condominio || property.price.iptu || property.price.valorPacote || property.price.valoresAdicionais || property.price.tipoGarantia || property.price.observacoesPacote || property.price.observacoes) && (
+                    <div className="mt-2 pt-2 border-t border-neutral-100 space-y-1.5">
                       {property.price.condominio != null && property.price.condominio > 0 && (
                         <div className="flex justify-between text-xs text-neutral-500">
                           <span>Condomínio</span>
-                          <span className="font-medium text-neutral-700">
-                            R$ {property.price.condominio.toLocaleString('pt-BR')}<span className="text-neutral-400">/mês</span>
-                          </span>
+                          <span className="font-medium text-neutral-700">R$ {property.price.condominio.toLocaleString('pt-BR')}<span className="text-neutral-400">/mês</span></span>
                         </div>
                       )}
                       {property.price.iptu != null && property.price.iptu > 0 && (
                         <div className="flex justify-between text-xs text-neutral-500">
                           <span>IPTU</span>
-                          <span className="font-medium text-neutral-700">
-                            R$ {property.price.iptu.toLocaleString('pt-BR')}<span className="text-neutral-400">/ano</span>
-                          </span>
+                          <span className="font-medium text-neutral-700">R$ {property.price.iptu.toLocaleString('pt-BR')}<span className="text-neutral-400">/ano</span></span>
                         </div>
+                      )}
+                      {property.price.valorPacote != null && property.price.valorPacote > 0 && (
+                        <div className="flex justify-between text-xs text-neutral-500">
+                          <span>Valor do pacote</span>
+                          <span className="font-medium text-neutral-700">R$ {property.price.valorPacote.toLocaleString('pt-BR')}</span>
+                        </div>
+                      )}
+                      {property.price.valoresAdicionais != null && property.price.valoresAdicionais > 0 && (
+                        <div className="flex justify-between text-xs text-neutral-500">
+                          <span>Valores adicionais</span>
+                          <span className="font-medium text-neutral-700">R$ {property.price.valoresAdicionais.toLocaleString('pt-BR')}</span>
+                        </div>
+                      )}
+                      {property.price.tipoGarantia && (
+                        <div className="flex justify-between text-xs text-neutral-500">
+                          <span>Garantia</span>
+                          <span className="font-medium text-neutral-700">{property.price.tipoGarantia}</span>
+                        </div>
+                      )}
+                      {property.price.observacoesPacote && (
+                        <p className="text-xs text-neutral-400 italic">{property.price.observacoesPacote}</p>
+                      )}
+                      {property.price.observacoes && (
+                        <p className="text-xs text-neutral-500 pt-1 border-t border-neutral-50">{property.price.observacoes}</p>
                       )}
                     </div>
                   )}
