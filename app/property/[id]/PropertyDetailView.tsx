@@ -495,18 +495,19 @@ export default function PropertyDetailView({ property, similarProperties }: { pr
             {/* ── Detalhes do imóvel ───────────────────────────────────────── */}
             {(() => {
               const d = property.propertyDetails
+              const typeLabel: Record<string, string> = { apartment: 'Apartamento', house: 'Casa', commercial: 'Comercial', land: 'Terreno' }
               const rows: [string, string][] = [
-                ['Tipo', d.type],
+                ['Tipo', typeLabel[d.type] ?? d.type],
                 ...(d.quartos ? [['Quartos (total)', String(d.quartos)] as [string, string]] : []),
-                ['Suítes', String(d.bedrooms)],
-                ...(d.lavabo ? [['Lavabos', String(d.lavabo)] as [string, string]] : []),
+                d.bedrooms > 0 ? ['Suítes', String(d.bedrooms)] as [string, string] : null,
+                ...(d.lavabo ? [['Lavabo', String(d.lavabo)] as [string, string]] : []),
                 ...(d.escritorio ? [['Escritório', String(d.escritorio)] as [string, string]] : []),
                 ...(d.vagas ? [['Vagas', String(d.vagas)] as [string, string]] : []),
+                ...(d.mobiliado !== undefined ? [['Mobiliado', d.mobiliado ? 'Sim' : 'Não'] as [string, string]] : []),
                 ...(d.areaSqFt ? [['Área construída', `${d.areaSqFt.toLocaleString('pt-BR')} m²`] as [string, string]] : []),
                 ...(d.areaTerrenoSqFt ? [['Área de terreno', `${d.areaTerrenoSqFt.toLocaleString('pt-BR')} m²`] as [string, string]] : []),
-                ...(d.mobiliado !== undefined ? [['Mobiliado', d.mobiliado ? 'Sim' : 'Não'] as [string, string]] : []),
                 ...(d.yearBuilt ? [['Ano de construção', String(d.yearBuilt)] as [string, string]] : []),
-              ]
+              ].filter(Boolean) as [string, string][]
               return rows.length > 0 ? (
                 <div className="bg-white rounded-2xl border border-[#E0DACE] shadow-sm p-4">
                   <h2 className="text-sm font-bold text-neutral-800 uppercase tracking-wide mb-3">Detalhes do Imóvel</h2>
