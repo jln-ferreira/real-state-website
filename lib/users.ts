@@ -75,3 +75,11 @@ export async function updateUserStatus(
     args: [status, id],
   })
 }
+
+export async function deleteUser(id: string): Promise<void> {
+  await ensureInit()
+  await db.execute({
+    sql: 'DELETE FROM user_accounts WHERE id = ?',
+    args: [id],
+  })
+}

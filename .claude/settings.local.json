@@ -18,7 +18,11 @@
       "Bash(node -e \"require\\(''@libsql/client''\\)\")",
       "Bash(wc:*)",
       "Bash(npm run:*)",
-      "Bash(ls .env*)"
+      "Bash(ls .env*)",
+      "Bash(node_modules/.bin/tsc --noEmit)",
+      "Bash(./node_modules/.bin/tsc --noEmit)",
+      "Bash(tsc --version)",
+      "Bash(node ./node_modules/typescript/bin/tsc --noEmit)"
     ]
   }
 }

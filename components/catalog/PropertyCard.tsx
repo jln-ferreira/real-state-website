@@ -42,7 +42,7 @@ export default function PropertyCard({ p }: { p: Property }) {
 
           {/* Property ID */}
           <span className={[
-            'absolute rounded-md bg-black/40 px-2 py-0.5 text-[10px] font-mono text-white/80 backdrop-blur-sm',
+            'absolute rounded-md bg-white/38 px-2 py-0.5 text-[9px] font-mono text-white/78 backdrop-blur-[1px]',
             p.status.isFeatured ? 'bottom-3 right-3' : 'bottom-3 left-3',
           ].join(' ')}>
             {p.id}
@@ -50,21 +50,21 @@ export default function PropertyCard({ p }: { p: Property }) {
         </div>
 
         {/* ── Body ─────────────────────────────────────────────────────────────── */}
-        <div className="flex flex-1 flex-col p-5 gap-1">
+        <div className="flex flex-1 flex-col p-5 gap-1.5">
 
           {/* Type · Residential */}
-          <p className="text-xs text-[#9898BB]">
+          <p className="text-[0.8rem] font-semibold text-[#5E658F]">
             {TYPE_LABELS[p.propertyDetails.type]}
             {p.location.residential ? ` · ${p.location.residential}` : ''}
           </p>
 
           {/* City · State */}
-          <p className="text-xs text-[#9898BB]">
+          <p className="text-[0.95rem] font-medium text-[#4A5240]">
             {p.location.city}{p.location.province ? ` · ${p.location.province}` : ''}
           </p>
 
           {/* Area · Suites */}
-          <p className="text-xs text-[#9898BB]">
+          <p className="text-[0.9rem] text-[#4F5847]">
             {p.propertyDetails.areaSqFt.toLocaleString()} m²
             {p.propertyDetails.bedrooms > 0 && (
               <> · {p.propertyDetails.bedrooms} suíte{p.propertyDetails.bedrooms !== 1 ? 's' : ''}</>
@@ -72,7 +72,7 @@ export default function PropertyCard({ p }: { p: Property }) {
           </p>
 
           {/* Price */}
-          <p className="mt-2 text-base font-extrabold text-[#4E6B5E] leading-tight">
+          <p className="mt-2 text-[1.15rem] font-extrabold text-[#6B6B99] leading-tight">
             {formatPrice(p)}
           </p>
         </div>

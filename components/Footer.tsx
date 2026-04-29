@@ -103,8 +103,8 @@ export default function Footer() {
                     <path strokeLinecap="round" strokeLinejoin="round"
                           d="M2.25 6.75c0 8.284 6.716 15 15 15h2.25a2.25 2.25 0 002.25-2.25v-1.372c0-.516-.351-.966-.852-1.091l-4.423-1.106c-.44-.11-.902.055-1.173.417l-.97 1.293c-.282.376-.769.542-1.21.38a12.035 12.035 0 01-7.143-7.143c-.162-.441.004-.928.38-1.21l1.293-.97c.363-.271.527-.734.417-1.173L6.963 3.102a1.125 1.125 0 00-1.091-.852H4.5A2.25 2.25 0 002.25 4.5v2.25z" />
                   </svg>
-                  <a href="tel:+5511982659982" className={linkCls}>
-                    +55 11 9.8265.9982
+                  <a href="tel:+5511921032731" className={linkCls}>
+                    +55 11 92103-2731
                   </a>
                 </li>
 
@@ -152,7 +152,7 @@ export default function Footer() {
               {/* WhatsApp */}
               <div className="flex flex-col items-center gap-1">
                 <a
-                  href="https://wa.me/5511982659982"
+                  href="https://wa.me/5511921032731"
                   aria-label="WhatsApp"
                   className="flex h-9 w-9 items-center justify-center rounded-lg bg-white/10
                              text-[#C8DDB8] transition-all duration-200 hover:bg-white/20 hover:text-white hover:scale-110"

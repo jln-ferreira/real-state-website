@@ -28,42 +28,6 @@ function useReveal() {
   return { ref, visible }
 }
 
-// ── Animated counter ──────────────────────────────────────────────────────────
-
-function AnimatedCounter({
-  target,
-  suffix = '',
-  prefix = '',
-  duration = 1400,
-}: {
-  target: number
-  suffix?: string
-  prefix?: string
-  duration?: number
-}) {
-  const [count, setCount] = useState(0)
-  const { ref, visible } = useReveal()
-
-  useEffect(() => {
-    if (!visible) return
-    let startTime: number
-    const animate = (ts: number) => {
-      if (!startTime) startTime = ts
-      const progress = Math.min((ts - startTime) / duration, 1)
-      const eased = 1 - Math.pow(1 - progress, 3)
-      setCount(Math.round(eased * target))
-      if (progress < 1) requestAnimationFrame(animate)
-    }
-    requestAnimationFrame(animate)
-  }, [visible, target, duration])
-
-  return (
-    <div ref={ref} className="tabular-nums">
-      {prefix}{count}{suffix}
-    </div>
-  )
-}
-
 // ── Value card ────────────────────────────────────────────────────────────────
 
 function ValueCard({
@@ -157,37 +121,36 @@ export default function SobreNosClient() {
       {/* ── Nossa História ────────────────────────────────────────────────────── */}
       <section ref={storyRef} className="bg-[#F5F0E8] py-20 overflow-hidden">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+          <div className="grid grid-cols-1 gap-10 lg:grid-cols-2 lg:gap-16 items-center">
 
             {/* Photo column */}
             <div
-              className="transition-all duration-700"
+              className="mx-auto w-full max-w-[290px] sm:max-w-[360px] lg:mx-0 lg:max-w-[380px] xl:max-w-[420px] transition-all duration-700"
               style={{
                 opacity: storyVisible ? 1 : 0,
                 transform: storyVisible ? 'translateX(0)' : 'translateX(-40px)',
                 transitionDelay: '100ms',
               }}
             >
-              <div className="relative inline-block">
+              <div className="relative inline-block w-full">
                 {/* Decorative background blob */}
-                <div className="absolute -inset-4 rounded-3xl bg-[#6B6B99]/10 -rotate-3" />
+                <div className="absolute -inset-2 rounded-3xl bg-[#6B6B99]/10 -rotate-2 sm:-inset-4 sm:-rotate-3" />
                 {/* Photo frame */}
-                <div className="relative rounded-2xl overflow-hidden shadow-2xl border-4 border-white rotate-[-2deg] hover:rotate-0 transition-transform duration-500">
+                <div className="relative rounded-2xl overflow-hidden shadow-2xl border-4 border-white rotate-0 sm:rotate-[-2deg] hover:rotate-0 transition-transform duration-500">
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
-                    src="https://upload.wikimedia.org/wikipedia/commons/thumb/f/f3/Tiririca_na_camara.jpg/250px-Tiririca_na_camara.jpg"
-                    alt="Julia Baccarat (foto temporária, obviamente)"
-                    className="w-full h-auto block"
-                    style={{ maxWidth: 420 }}
+                    src="/image.png"
+                    alt="Casa Baccarat"
+                    className="block h-auto w-full"
                   />
                   {/* Fun overlay badge */}
-                  <div className="absolute bottom-4 left-4 bg-white rounded-xl px-4 py-2 shadow-lg border border-[#E0DACE]">
+                  <div className="absolute bottom-3 left-3 rounded-xl bg-white px-3 py-1.5 shadow-lg border border-[#E0DACE] sm:bottom-4 sm:left-4 sm:px-4 sm:py-2">
                     <p className="text-xs font-bold text-[#4A5240]">Julia Baccarat</p>
                     <p className="text-[11px] text-[#9898BB]">Fundador & CEO</p>
                   </div>
                 </div>
                 {/* Floating emoji sticker */}
-                <div className="absolute -top-4 -right-4 w-14 h-14 bg-white rounded-full shadow-lg border border-[#E0DACE] flex items-center justify-center text-2xl animate-float">
+                <div className="absolute -top-3 -right-3 flex h-11 w-11 items-center justify-center rounded-full bg-white text-xl shadow-lg border border-[#E0DACE] animate-float sm:-top-4 sm:-right-4 sm:h-14 sm:w-14 sm:text-2xl">
                   🏡
                 </div>
               </div>
@@ -206,41 +169,48 @@ export default function SobreNosClient() {
                 Nossa História
               </p>
               <h2 className="font-monument text-3xl sm:text-4xl text-[#4A5240] mb-6">
-                Nascemos da vontade<br />de fazer diferente
+                Por que a Casa Baccarat existe
               </h2>
 
-              <div className="space-y-4 text-[##4E6B5E] leading-relaxed">
+              <div className="space-y-4 text-[#4E6B5E] leading-relaxed">
                 <p>
-                  A Casa Baccarat nasceu de um sonho simples: ajudar pessoas a encontrarem
-                  não apenas um imóvel, mas um lar. Após anos trabalhando no mercado
-                  imobiliário e percebendo que faltava humanidade nas transações,
-                  Julia Baccarat decidiu criar algo diferente.
+                  Depois de anos projetando casas, percebi que o maior problema não era o projeto.
+                  Era a escolha errada do imóvel.
                 </p>
                 <p>
-                  Desde o primeiro dia, nossa missão é clara — tratar cada cliente como
-                  família. Aqui, você não é mais um número. Você é uma pessoa com sonhos,
-                  necessidades e uma história única que merece ser ouvida com atenção.
+                  Vi famílias que compraram o lugar errado, bonito por fora, equivocado por dentro.
+                  Que gastaram meses e muito dinheiro tentando adaptar um espaço que nunca foi feito
+                  para elas. E percebi algo que nenhum corretor costuma falar: Comprar um imóvel de
+                  alto padrão sem um olhar técnico é como contratar um arquiteto só para a obra e
+                  ignorar o projeto.
                 </p>
                 <p>
-                  Hoje, com uma equipe apaixonada e uma carteira de imóveis cuidadosamente
-                  selecionados, seguimos fiéis a esse propósito. Cada negócio fechado é
-                  uma conquista compartilhada — e isso nos motiva todos os dias.
+                  Foi por isso que a Casa Baccarat nasceu.
+                </p>
+                <p>
+                  Não somos uma imobiliária de anúncios. Somos uma curadoria, onde cada imóvel
+                  passa pelo olhar de quem passou anos entendendo como os espaços influenciam a
+                  vida das pessoas. Se você está buscando um imóvel em Alphaville e quer alguém
+                  que entenda o seu momento de vida antes de te mostrar qualquer coisa, você
+                  chegou ao seu lugar.
                 </p>
               </div>
 
-              <div className="mt-8 flex flex-wrap gap-3">
-                <span className="inline-flex items-center gap-2 bg-white rounded-full px-4 py-2 text-sm font-medium text-[#6B6B99] border border-[#E0DACE] shadow-sm">
-                  <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              <div className="mt-8 flex items-center gap-3 flex-nowrap">
+                <p className="text-sm font-medium text-[#4A5240] whitespace-nowrap">
+                  Quer conhecer nossa curadoria?
+                </p>
+                <Link
+                  href="/#listings"
+                  className="inline-flex items-center gap-2 rounded-xl bg-[#6B6B99] px-5 py-2.5
+                             whitespace-nowrap text-sm font-semibold text-white shadow-sm
+                             transition-colors duration-200 hover:bg-[#5757A0]"
+                >
+                  botão para página de imóveis
+                  <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
                   </svg>
-                  CRECI Regularizado
-                </span>
-                <span className="inline-flex items-center gap-2 bg-white rounded-full px-4 py-2 text-sm font-medium text-[#6B6B99] border border-[#E0DACE] shadow-sm">
-                  <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M11.48 3.499a.562.562 0 011.04 0l2.125 5.111a.563.563 0 00.475.345l5.518.442c.499.04.701.663.321.988l-4.204 3.602a.563.563 0 00-.182.557l1.285 5.385a.562.562 0 01-.84.61l-4.725-2.885a.563.563 0 00-.586 0L6.982 20.54a.562.562 0 01-.84-.61l1.285-5.386a.562.562 0 00-.182-.557l-4.204-3.602a.562.562 0 01.321-.988l5.518-.442a.563.563 0 00.475-.345L11.48 3.5z" />
-                  </svg>
-                  Avaliação 5 estrelas
-                </span>
+                </Link>
               </div>
             </div>
           </div>
@@ -268,7 +238,7 @@ export default function SobreNosClient() {
                 </svg>
               }
               title="Confiança"
-              description="Construímos relações duradouras baseadas na honestidade e na transparência. Cada palavra nossa é um compromisso que levamos muito a sério."
+              description="Você está tomando uma das decisões mais importantes da sua vida. A Casa Baccarat existe para que você chegue ao imóvel certo com clareza — não com pressa, não com pressão, não com dúvida. Cada palavra nossa é um compromisso que levamos a sério."
             />
             <ValueCard
               delay={120}
@@ -277,8 +247,8 @@ export default function SobreNosClient() {
                   <path strokeLinecap="round" strokeLinejoin="round" d="M11.48 3.499a.562.562 0 011.04 0l2.125 5.111a.563.563 0 00.475.345l5.518.442c.499.04.701.663.321.988l-4.204 3.602a.563.563 0 00-.182.557l1.285 5.385a.562.562 0 01-.84.61l-4.725-2.885a.563.563 0 00-.586 0L6.982 20.54a.562.562 0 01-.84-.61l1.285-5.386a.562.562 0 00-.182-.557l-4.204-3.602a.562.562 0 01.321-.988l5.518-.442a.563.563 0 00.475-.345L11.48 3.5z" />
                 </svg>
               }
-              title="Excelência"
-              description="Não nos contentamos com o suficiente. Buscamos sempre o melhor — nos imóveis que oferecemos, no atendimento que prestamos e nos resultados que entregamos."
+              title="Curadoria"
+              description="Não mostramos tudo. Mostramos o certo. Cada imóvel que chega até você já passou pelo olhar técnico de uma arquiteta — avaliado por função, por conforto, por potencial e por aderência ao seu momento de vida. Isso é o que nos separa de uma imobiliária comum."
             />
             <ValueCard
               delay={240}
@@ -288,39 +258,85 @@ export default function SobreNosClient() {
                   <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                 </svg>
               }
-              title="Transparência"
-              description="Acreditamos que uma transação bem-feita começa com informação clara. Sem letras miúdas, sem surpresas — apenas clareza do início ao fim."
+              title="Discrição"
+              description="O alto padrão não precisa se anunciar. Nosso atendimento é individual, reservado e totalmente focado em você. Sem listas genéricas, sem exposição desnecessária — apenas uma relação de confiança construída com atenção e respeito ao seu tempo."
             />
           </div>
         </div>
       </section>
 
-      {/* ── Em Números ───────────────────────────────────────────────────────── */}
-      <section className="bg-[#4A5240] py-20 overflow-hidden">
+      {/* ── Parceiros ────────────────────────────────────────────────────────── */}
+      <section className="bg-[#F5F0E8] pt-20 pb-10">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-14">
-            <p className="font-monument text-[10px] text-[#9898BB] mb-3">
-              Nossa trajetória
+          <div className="text-center mb-14 animate-fade-up">
+            <p className="font-monument text-[10px] text-[#6B6B99] mb-3">
+              Rede de confiança
             </p>
-            <h2 className="font-monument text-3xl sm:text-4xl text-white">
-              Em Números
+            <h2 className="font-monument text-3xl sm:text-4xl text-[#4A5240]">
+              Parceiros que indicamos
             </h2>
           </div>
 
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-8">
-            {[
-              { target: 12,  suffix: '+', label: 'Anos de experiência', prefix: '' },
-              { target: 340, suffix: '+', label: 'Imóveis negociados',  prefix: '' },
-              { target: 280, suffix: '+', label: 'Clientes satisfeitos', prefix: '' },
-              { target: 98,  suffix: '%', label: 'Taxa de satisfação',  prefix: '' },
-            ].map(({ target, suffix, label, prefix }) => (
-              <div key={label} className="text-center">
-                <div className="text-4xl sm:text-5xl font-extrabold text-white mb-2 tracking-tight">
-                  <AnimatedCounter target={target} suffix={suffix} prefix={prefix} />
-                </div>
-                <p className="text-[#9898BB] text-sm">{label}</p>
+          <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+            <article className="rounded-2xl border border-[#E0DACE] bg-white p-6 shadow-[0_4px_20px_rgba(0,0,0,0.05)]">
+              <div className="mb-5 flex h-28 items-center justify-center overflow-hidden">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src="/placeholder-property.svg"
+                  alt="Asprino & Figueiredo Advogados"
+                  className="h-20 w-20 opacity-45"
+                />
               </div>
-            ))}
+              <h3 className="mb-2 text-xl font-bold text-[#4A5240]">
+                Asprino &amp; Figueiredo Advogados
+              </h3>
+              <p className="mb-4 text-sm font-medium text-[#6B6B99]">
+                Assessoria jurídica especializada em direito imobiliário.
+              </p>
+              <div className="space-y-4 text-sm leading-relaxed text-[#4E6B5E]">
+                <p>
+                  Uma transação bem-feita precisa de respaldo jurídico sólido. O
+                  escritório Asprino &amp; Figueiredo assessora desde a análise de
+                  documentação e elaboração de contratos até questões de locação,
+                  regularização e incorporação imobiliária, com a profundidade técnica
+                  que uma decisão dessa magnitude exige.
+                </p>
+                <p>
+                  Para os clientes da Casa Baccarat que desejam chegar à assinatura com
+                  total segurança jurídica, são os especialistas que indicamos.
+                </p>
+              </div>
+            </article>
+
+            <article className="rounded-2xl border border-[#E0DACE] bg-white p-6 shadow-[0_4px_20px_rgba(0,0,0,0.05)]">
+              <div className="mb-5 flex h-28 items-center justify-center overflow-hidden">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src="/moran.png"
+                  alt="Moran & Anders Arquitetura"
+                  className="max-h-20 w-auto object-contain"
+                />
+              </div>
+              <h3 className="mb-2 text-xl font-bold text-[#4A5240]">
+                Moran &amp; Anders Arquitetura
+              </h3>
+              <p className="mb-4 text-sm font-medium text-[#6B6B99]">
+                Arquitetura e design de interiores desde 2002.
+              </p>
+              <div className="space-y-4 text-sm leading-relaxed text-[#4E6B5E]">
+                <p>
+                  Um escritório que entende que projeto bom começa pela escuta. Com mais
+                  de duas décadas de atuação nos segmentos residencial e corporativo,
+                  Moran &amp; Anders conduz cada projeto do conceito à execução, com a
+                  mesma atenção ao detalhe do início ao fim.
+                </p>
+                <p>
+                  Para os clientes da Casa Baccarat que desejam ir além do imóvel e
+                  transformar o espaço em algo verdadeiramente seu, são parceiros de
+                  confiança que recomendamos com tranquilidade.
+                </p>
+              </div>
+            </article>
           </div>
         </div>
       </section>
@@ -339,7 +355,7 @@ export default function SobreNosClient() {
 function PromisaSection() {
   const { ref, visible } = useReveal()
   return (
-    <section className="bg-[#F5F0E8] py-20">
+    <section className="bg-[#F5F0E8] pt-10 pb-20">
       <div className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8 text-center">
         <div
           ref={ref}
@@ -355,14 +371,14 @@ function PromisaSection() {
               &ldquo;
             </span>
             <p className="relative text-xl sm:text-2xl text-[#4A5240] font-medium leading-relaxed italic">
-              Não vendemos imóveis. Nós ajudamos pessoas a encontrarem o lugar
-              onde a vida vai acontecer. Cada chave entregue é uma história que
-              começa — e isso é o que nos faz levantar todo dia com vontade de fazer mais.
+              Depois de anos projetando casas, entendi que o maior presente que
+              posso oferecer não é um imóvel bonito. É a certeza de que você
+              está no lugar certo.
             </p>
             <div className="mt-8 flex flex-col items-center gap-1">
               <div className="w-10 h-0.5 bg-[#6B6B99] rounded-full mb-4" />
-              <p className="text-sm font-bold text-[#4A5240]">Julia Baccarat</p>
-              <p className="text-xs text-[#9898BB]">Fundador & CEO, Casa Baccarat</p>
+              <p className="text-base sm:text-lg font-bold text-[#4A5240]">Julia Baccarat</p>
+              <p className="text-sm sm:text-base text-[#9898BB]">Arquiteta e fundadora, Casa Baccarat Imóveis</p>
             </div>
           </div>
         </div>
@@ -385,15 +401,16 @@ function CTASection() {
           transform: visible ? 'translateY(0)' : 'translateY(24px)',
         }}
       >
-        <p className="font-monument text-[10px] text-[#6B6B99] mb-3">
-          Vamos conversar?
+        <p className="font-monument text-sm sm:text-base text-[#6B6B99] mb-3">
+          Quando estiver pronta para dar o próximo passo
         </p>
         <h2 className="font-monument text-3xl sm:text-4xl text-[#4A5240] mb-4">
-          Pronto para encontrar seu lar?
+          O lugar certo existe. A Casa Baccarat ajuda você a encontrá-lo.
         </h2>
-        <p className="text-lg text-[#9898BB] max-w-xl mx-auto mb-10">
-          Nossa equipe está pronta para te ajudar a encontrar o imóvel ideal.
-          Entre em contato ou explore nosso catálogo agora mesmo.
+        <p className="text-lg text-[#9898BB] max-w-2xl mx-auto mb-10 leading-relaxed">
+          Cada imóvel foi selecionado com atenção ao que realmente
+          importa — para que você encontre não só um endereço, mas
+          o lugar onde vai querer viver.
         </p>
         <div className="flex flex-wrap justify-center gap-4">
           <Link
@@ -402,7 +419,7 @@ function CTASection() {
                        hover:bg-[#4E6B5E] transition-all duration-200 shadow-[0_4px_14px_rgba(109,109,133,0.35)]
                        hover:shadow-[0_6px_20px_rgba(109,109,133,0.45)] hover:-translate-y-0.5"
           >
-            Ver Imóveis
+            Ver Imóveis Selecionados
             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
             </svg>
@@ -413,7 +430,7 @@ function CTASection() {
                        border border-[#E0DACE] hover:border-[#6B6B99] transition-all duration-200
                        hover:-translate-y-0.5 shadow-[0_2px_8px_rgba(0,0,0,0.06)]"
           >
-            Falar Conosco
+            Falar com Especialista
           </Link>
         </div>
       </div>

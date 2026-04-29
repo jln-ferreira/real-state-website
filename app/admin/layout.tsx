@@ -44,6 +44,15 @@ const NAV_ITEMS = [
     ),
   },
   {
+    label: 'Contas',
+    href: '/admin/accounts',
+    icon: (
+      <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" strokeWidth={1.8} stroke="currentColor">
+        <path strokeLinecap="round" strokeLinejoin="round" d="M18 18.72a9.094 9.094 0 003.742-.479 3 3 0 00-4.682-2.72m.94 3.198v.75A2.25 2.25 0 0115.75 21H8.25A2.25 2.25 0 016 18.75V18a4.5 4.5 0 014.5-4.5h3A4.5 4.5 0 0118 18zm-6-9a3 3 0 110-6 3 3 0 010 6zm6 3a2.25 2.25 0 10-4.5 0 2.25 2.25 0 004.5 0z" />
+      </svg>
+    ),
+  },
+  {
     label: 'Log de Auditoria',
     href: '/admin/audit',
     icon: (

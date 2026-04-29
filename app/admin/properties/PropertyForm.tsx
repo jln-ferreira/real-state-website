@@ -169,6 +169,7 @@ function BRLInput({ label, display, onChangeDisplay, error, placeholder = '0,00'
 // ── Media tab ─────────────────────────────────────────────────────────────────
 
 type ImageEntry = { url: string; caption?: string }
+type ImagesUpdate = ImageEntry[] | ((prev: ImageEntry[]) => ImageEntry[])
 
 function MediaTab({
   thumbnail, images, thumbnailError,
@@ -178,7 +179,7 @@ function MediaTab({
   images: ImageEntry[]
   thumbnailError?: string
   onThumbnailChange: (v: string) => void
-  onImagesChange: (imgs: ImageEntry[]) => void
+  onImagesChange: (update: ImagesUpdate) => void
 }) {
   const [uploading, setUploading] = useState<Record<number, boolean>>({})
   const [thumbUploading, setThumbUploading] = useState(false)
@@ -190,6 +191,10 @@ function MediaTab({
       fd.append('file', file)
       const res = await fetch('/api/admin/upload', { method: 'POST', body: fd })
       const data = await res.json()
+      if (!res.ok) {
+        alert(data.error ?? 'Erro ao enviar arquivo.')
+        return
+      }
       if (data.url) onUrl(data.url)
       else alert(data.error ?? 'Erro ao enviar arquivo.')
     } finally {
@@ -198,13 +203,15 @@ function MediaTab({
   }
 
   function updateImage(i: number, patch: Partial<ImageEntry>) {
-    const next = [...images]
-    next[i] = { ...next[i], ...patch }
-    onImagesChange(next)
+    onImagesChange(prev => {
+      const next = [...prev]
+      next[i] = { ...next[i], ...patch }
+      return next
+    })
   }
 
   function removeImage(i: number) {
-    onImagesChange(images.filter((_, j) => j !== i))
+    onImagesChange(prev => prev.filter((_, j) => j !== i))
   }
 
   return (
@@ -307,7 +314,7 @@ function MediaTab({
         {/* Add buttons */}
         <div className="flex gap-2 flex-wrap">
           <button type="button"
-            onClick={() => onImagesChange([...images, { url: '' }])}
+            onClick={() => onImagesChange(prev => [...prev, { url: '' }])}
             className="flex items-center gap-1.5 text-sm text-[#1E3A5F] hover:underline font-medium">
             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
@@ -325,13 +332,12 @@ function MediaTab({
                 const files = Array.from(e.target.files ?? [])
                 const startIdx = images.length
                 const placeholders: ImageEntry[] = files.map(() => ({ url: '' }))
-                const next = [...images, ...placeholders]
-                onImagesChange(next)
+                onImagesChange(prev => [...prev, ...placeholders])
                 files.forEach((file, fi) => {
                   const idx = startIdx + fi
                   uploadFile(
                     file,
-                    url => { const n = [...next]; n[idx] = { ...n[idx], url }; onImagesChange(n) },
+                    url => updateImage(idx, { url }),
                     v => setUploading(u => ({ ...u, [idx]: v }))
                   )
                 })
@@ -482,7 +488,16 @@ export default function PropertyForm({ property: initial, readOnly = false }: { 
         setTimeout(() => setSaveState('idle'), 2000)
       } else {
         setSaveState('error')
-        showToast('Falha ao salvar. Tente novamente.', 'error')
+        const data = await res.json().catch(() => null)
+        const firstIssue = data?.issues?.[0]
+        const issuePath = Array.isArray(firstIssue?.path) ? firstIssue.path.join('.') : ''
+        const issueMsg = firstIssue?.message as string | undefined
+        showToast(
+          issueMsg
+            ? `Falha ao salvar: ${issuePath ? `${issuePath} - ` : ''}${issueMsg}`
+            : (data?.error ?? 'Falha ao salvar. Tente novamente.'),
+          'error'
+        )
         setTimeout(() => setSaveState('idle'), 2000)
       }
     } catch {
@@ -931,7 +946,13 @@ export default function PropertyForm({ property: initial, readOnly = false }: { 
             images={form.media.images}
             thumbnailError={errors['media.thumbnail']}
             onThumbnailChange={v => set('media', { ...form.media, thumbnail: v })}
-            onImagesChange={imgs => set('media', { ...form.media, images: imgs })}
+            onImagesChange={update => setForm(prev => ({
+              ...prev,
+              media: {
+                ...prev.media,
+                images: typeof update === 'function' ? update(prev.media.images) : update,
+              },
+            }))}
           />
         )}
 

@@ -39,11 +39,11 @@ const FEATURE_OPTIONS: { value: Feature; label: string }[] = [
   { value: 'concierge',    label: 'Portaria'       },
 ]
 
-// ── CA$ display helper ─────────────────────────────────────────────────────────
+// ── BRL display helper ────────────────────────────────────────────────────────
 
-function displayCAD(rawDigits: string): string {
+function displayBRL(rawDigits: string): string {
   if (!rawDigits) return ''
-  return 'CA$ ' + Number(rawDigits).toLocaleString('en-CA')
+  return 'R$' + Number(rawDigits).toLocaleString('pt-BR')
 }
 
 // ── Chevron icon ───────────────────────────────────────────────────────────────
@@ -252,7 +252,7 @@ function HeroSection({ filters, onChange, totalCount }: { filters: Filters; onCh
               Curadoria de imóveis de alto padrão · Alphaville e região
             </p>
             <h1 className="font-monument font-light tracking-wide text-[#4A5240]
-                           text-[2.4rem] leading-[1.2] sm:text-[2.8rem] lg:text-[3.1rem]">
+                           text-[2rem] leading-[1.18] sm:text-[2.4rem] lg:text-[2.75rem]">
               Não vendemos imóveis.
               <br />
               <span className="text-[#6B6B99]">
@@ -318,9 +318,9 @@ function HeroSection({ filters, onChange, totalCount }: { filters: Filters; onCh
           >
             <div className="flex flex-col md:flex-row md:items-stretch">
 
-              {/* NEGÓCIO */}
+              {/* FINALIDADE */}
               <CustomDropdown
-                label="NEGÓCIO"
+                label="FINALIDADE"
                 value={filters.negocio}
                 options={NEGOCIO_OPTIONS}
                 onChange={v => set({ negocio: v as Filters['negocio'] })}
@@ -334,6 +334,14 @@ function HeroSection({ filters, onChange, totalCount }: { filters: Filters; onCh
                 onChange={v => set({ tipo: v as 'all' | PropertyType })}
               />
 
+              {/* RESIDENCIAL */}
+              <CustomDropdown
+                label="RESIDENCIAL"
+                value={filters.residential}
+                options={residentialOpts}
+                onChange={v => set({ residential: v })}
+              />
+
               {/* FAIXA DE VALOR */}
               <div className="flex flex-1 flex-col border-b border-[#E0DACE]
                               px-4 py-3 text-left
@@ -344,21 +352,13 @@ function HeroSection({ filters, onChange, totalCount }: { filters: Filters; onCh
                 </span>
                 <input
                   type="text"
-                  value={filters.valorMax}
-                  placeholder="Todos"
+                  value={displayBRL(filters.valorMax)}
+                  placeholder="R$500.000"
                   onChange={e => set({ valorMax: e.target.value.replace(/\D/g, '') })}
                   className="mt-0.5 w-full bg-transparent text-sm font-semibold text-[#4A5240]
                              placeholder-[#C8C8D8] outline-none"
                 />
               </div>
-
-              {/* RESIDENCIAL */}
-              <CustomDropdown
-                label="RESIDENCIAL"
-                value={filters.residential}
-                options={residentialOpts}
-                onChange={v => set({ residential: v })}
-              />
 
               {/* REF */}
               <div className="flex flex-col px-4 py-3 text-left
