@@ -79,8 +79,9 @@ export interface Property {
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
 export function formatPrice(p: Property): string {
-  const n = p.price.amount.toLocaleString('en-CA')
-  return p.price.type === 'rent' ? `CA$ ${n}/mo` : `CA$ ${n}`
+  const n = p.price.amount.toLocaleString('pt-BR')
+  const currency = p.price.currency === 'BRL' ? 'R$' : p.price.currency === 'USD' ? 'US$' : 'CA$'
+  return p.price.type === 'rent' ? `${currency} ${n}/mês` : `${currency} ${n}`
 }
 
 export function sqftToM2(sqft: number): number {

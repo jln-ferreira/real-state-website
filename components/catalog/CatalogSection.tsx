@@ -47,7 +47,7 @@ function ActiveChips({ filters, onChange }: { filters: Filters; onChange: (f: Fi
     chips.push({ label: TIPO_LABELS[filters.tipo] ?? filters.tipo, clear: () => set({ tipo: 'all' }) })
   if (filters.valorMax) {
     chips.push({
-      label: `≤ CA$ ${Number(filters.valorMax).toLocaleString('en-CA')}`,
+      label: `≤ R$ ${Number(filters.valorMax).toLocaleString('pt-BR')}`,
       clear: () => set({ valorMax: '' }),
     })
   }
