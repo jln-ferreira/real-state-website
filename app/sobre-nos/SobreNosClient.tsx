@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react'
 import Link from 'next/link'
+import { BACCARAT_PHONE } from '@/lib/config'
 
 // ── Scroll-reveal hook ────────────────────────────────────────────────────────
 
@@ -95,11 +96,11 @@ export default function SobreNosClient() {
             Casa Baccarat
           </p>
           <h1 className="font-monument text-5xl sm:text-6xl text-[#4A5240] mb-6">
-            Quem Somos
+            Por que a Casa Baccarat existe
           </h1>
           <p className="text-xl text-[#9898BB] max-w-2xl leading-relaxed mb-8">
-            Mais do que uma imobiliária — somos parceiros na realização do seu sonho.
-            Com paixão pelo que fazemos e compromisso com cada cliente.
+            Não somos uma imobiliária de anúncios. Somos curadoria com olhar de arquiteta -
+            para quem entende que a escolha do imóvel define anos de vida.
           </p>
           {/* Animated underline accent */}
           <div className="flex items-center gap-3">
@@ -133,10 +134,8 @@ export default function SobreNosClient() {
               }}
             >
               <div className="relative inline-block w-full">
-                {/* Decorative background blob */}
-                <div className="absolute -inset-2 rounded-3xl bg-[#6B6B99]/10 -rotate-2 sm:-inset-4 sm:-rotate-3" />
                 {/* Photo frame */}
-                <div className="relative rounded-2xl overflow-hidden shadow-2xl border-4 border-white rotate-0 sm:rotate-[-2deg] hover:rotate-0 transition-transform duration-500">
+                <div className="relative overflow-hidden shadow-2xl">
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
                     src="/image.png"
@@ -146,12 +145,8 @@ export default function SobreNosClient() {
                   {/* Fun overlay badge */}
                   <div className="absolute bottom-3 left-3 rounded-xl bg-white px-3 py-1.5 shadow-lg border border-[#E0DACE] sm:bottom-4 sm:left-4 sm:px-4 sm:py-2">
                     <p className="text-xs font-bold text-[#4A5240]">Julia Baccarat</p>
-                    <p className="text-[11px] text-[#9898BB]">Fundador & CEO</p>
+                    <p className="text-[11px] text-[#9898BB]">Arquiteta, Corretora e fundadora</p>
                   </div>
-                </div>
-                {/* Floating emoji sticker */}
-                <div className="absolute -top-3 -right-3 flex h-11 w-11 items-center justify-center rounded-full bg-white text-xl shadow-lg border border-[#E0DACE] animate-float sm:-top-4 sm:-right-4 sm:h-14 sm:w-14 sm:text-2xl">
-                  🏡
                 </div>
               </div>
             </div>
@@ -206,7 +201,7 @@ export default function SobreNosClient() {
                              whitespace-nowrap text-sm font-semibold text-white shadow-sm
                              transition-colors duration-200 hover:bg-[#5757A0]"
                 >
-                  botão para página de imóveis
+                  Ver Imoveis selecionados
                   <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
                   </svg>
@@ -391,6 +386,8 @@ function PromisaSection() {
 
 function CTASection() {
   const { ref, visible } = useReveal()
+  const whatsappHref = `https://wa.me/${BACCARAT_PHONE}?text=${encodeURIComponent('Olá, gostaria de falar com a especialista da Casa Baccarat.')}`
+
   return (
     <section className="bg-white border-t border-[#E0DACE] py-20">
       <div
@@ -424,14 +421,16 @@ function CTASection() {
               <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
             </svg>
           </Link>
-          <Link
-            href="/#contact"
+          <a
+            href={whatsappHref}
+            target="_blank"
+            rel="noopener noreferrer"
             className="inline-flex items-center gap-2 px-7 py-3.5 rounded-xl bg-white text-[#6B6B99] font-semibold text-sm
                        border border-[#E0DACE] hover:border-[#6B6B99] transition-all duration-200
                        hover:-translate-y-0.5 shadow-[0_2px_8px_rgba(0,0,0,0.06)]"
           >
-            Falar com Especialista
-          </Link>
+            Falar com a Especialista
+          </a>
         </div>
       </div>
     </section>

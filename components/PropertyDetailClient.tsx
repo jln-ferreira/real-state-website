@@ -5,6 +5,7 @@ import Link from 'next/link'
 import type { Property } from '@/data/properties'
 import { PROPERTIES } from '@/data/properties'
 import { BACCARAT_PHONE } from '@/lib/config'
+import { buildPropertyShareMessage } from '@/lib/property-share'
 
 // ── Icons ──────────────────────────────────────────────────────────────────────
 
@@ -145,6 +146,7 @@ export default function PropertyDetailClient({ property }: { property: Property 
 
   const shareText = encodeURIComponent(`${property.title} — Casa Baccarat`)
   const shareUrl  = encodeURIComponent(getPageUrl())
+  const whatsappHref = `https://wa.me/${BACCARAT_PHONE}?text=${encodeURIComponent(buildPropertyShareMessage(property, getPageUrl()))}`
 
   function trackImageView(index: number) {
     const url = images[index]?.url
@@ -201,7 +203,7 @@ export default function PropertyDetailClient({ property }: { property: Property 
             {shareOpen && (
               <div className="absolute right-0 top-full mt-2 w-52 bg-white rounded-xl shadow-lg border border-neutral-100 py-1 z-50">
                 <a
-                  href={`https://wa.me/?text=${shareText}%20${shareUrl}`}
+                  href={whatsappHref}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="flex items-center gap-3 px-4 py-2.5 text-sm text-neutral-700 hover:bg-neutral-50"

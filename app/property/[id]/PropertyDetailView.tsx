@@ -5,6 +5,7 @@ import Link from 'next/link'
 import type { Property } from '@/data/properties'
 import Layout from '@/components/Layout'
 import { BACCARAT_PHONE } from '@/lib/config'
+import { buildPropertyShareMessage } from '@/lib/property-share'
 
 // ── Icons ──────────────────────────────────────────────────────────────────────
 
@@ -215,71 +216,7 @@ export default function PropertyDetailView({ property, similarProperties }: { pr
 
   const shareUrl = encodeURIComponent(getPageUrl())
   const shareText = encodeURIComponent(`${property.title} — Casa Baccarat`)
-
-  function buildWhatsAppMessage(): string {
-    const { amount, currency, type } = property.price
-    const currencyPrefix = currency === 'BRL' ? 'R$' : currency === 'CAD' ? 'CA$' : 'US$'
-    const priceFormatted = amount.toLocaleString('pt-BR')
-    const priceSuffix    = type === 'rent' ? '/mes' : ''
-    const price = `${currencyPrefix} ${priceFormatted}${priceSuffix}`
-
-    const { bedrooms, bathrooms, areaSqFt, lavabo, escritorio } = property.propertyDetails
-    const featureLabelMap: Record<string, string> = {
-      balcony: 'Varanda', parking: 'Estacionamento', gym: 'Academia', pool: 'Piscina',
-      garden: 'Jardim', furnished: 'Mobiliado', 'pet-friendly': 'Aceita Pets',
-      concierge: 'Portaria', baccarat: 'Exclusivo Baccarat', fireplace: 'Lareira',
-      rooftop: 'Cobertura', 'ev charging': 'Carregador Eletrico', storage: 'Deposito',
-      elevator: 'Elevador', security: 'Seguranca', '24h security': 'Seguranca 24h',
-    }
-
-    const bullets: string[] = []
-    if (bedrooms > 0)              bullets.push(`- ${bedrooms} suite${bedrooms > 1 ? 's' : ''}`)
-    if (bathrooms > 0)             bullets.push(`- ${bathrooms} banheiro${bathrooms > 1 ? 's' : ''}`)
-    if (lavabo && lavabo > 0)      bullets.push(`- ${lavabo} lavabo${lavabo > 1 ? 's' : ''}`)
-    if (escritorio && escritorio > 0) bullets.push(`- ${escritorio} escritorio${escritorio > 1 ? 's' : ''}`)
-    if (areaSqFt > 0)              bullets.push(`- ${areaSqFt} m2`)
-    property.features.slice(0, 4).forEach(f => bullets.push(`- ${featureLabelMap[f] ?? f}`))
-
-    const typeMap: Record<string, string> = { house: 'Casa', apartment: 'Apartamento', commercial: 'Imovel Comercial', land: 'Terreno' }
-    const typeLabel = typeMap[property.propertyDetails.type] || 'Imovel'
-    const buyerProfile = type === 'rent'
-      ? 'quem busca conforto e praticidade no dia a dia'
-      : bedrooms >= 3
-        ? 'familias que valorizam espaco e qualidade de vida'
-        : 'casais e investidores que buscam sofisticacao'
-
-    const photo = property.media?.thumbnail || property.media?.images?.[0]?.url || ''
-
-    const lines: string[] = [
-      '*CASA BACCARAT IMOVEIS*',
-      'Excelencia em cada detalhe',
-      '',
-      `*${property.title}*`,
-      `${property.location.residential ? property.location.residential + ' - ' : ''}${property.location.city}, ${property.location.province}`,
-      '',
-      `Preco: *${price}*`,
-      '',
-      `${typeLabel} de alto padrao com acabamentos sofisticados e localizacao privilegiada.`,
-      'Um imovel pensado para quem valoriza o melhor da vida.',
-      '',
-      '*Destaques:*',
-      ...bullets,
-      '',
-      `Ideal para: ${buyerProfile}`,
-      '',
-      'Venha conhecer pessoalmente e se apaixone por cada detalhe.',
-      '',
-      ...(photo ? ['Foto principal:', photo, ''] : []),
-      'Ver imovel completo:',
-      getPageUrl(),
-      '',
-      'Entre em contato e solicite uma visita exclusiva.',
-    ]
-
-    return lines.join('\n')
-  }
-
-  const whatsappHref = `https://wa.me/${BACCARAT_PHONE}?text=${encodeURIComponent(buildWhatsAppMessage())}`
+  const whatsappHref = `https://wa.me/${BACCARAT_PHONE}?text=${encodeURIComponent(buildPropertyShareMessage(property, getPageUrl()))}`
 
   return (
     <Layout>

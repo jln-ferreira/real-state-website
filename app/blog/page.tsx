@@ -7,7 +7,7 @@ import type { Post } from '@/data/posts'
 
 export const metadata: Metadata = {
   title: 'Blog — Casa Baccarat',
-  description: 'Insights, dicas e novidades do mercado imobiliário para ajudar você a tomar as melhores decisões.',
+  description: 'O olhar de arquiteta sobre o mercado Imobiliario de Alphaville - para quem quer decidir bem',
 }
 
 const CATEGORY_COLORS: Record<string, string> = {
@@ -38,13 +38,13 @@ export default async function BlogPage() {
       <section className="bg-white border-b border-[#E0DACE]">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-16 animate-page-in">
           <p className="font-monument text-[10px] text-[#6B6B99] mb-3">
-            Casa Baccarat
+            Casa Baccarat . Conteudo
           </p>
           <h1 className="text-4xl sm:text-5xl font-extrabold text-[#4A5240] tracking-tight mb-4">
             Blog
           </h1>
           <p className="text-lg text-[#9898BB] max-w-xl leading-relaxed">
-            Insights, dicas e novidades do mercado imobiliário para ajudar você a tomar as melhores decisões.
+            O olhar de arquiteta sobre o mercado Imobiliario de Alphaville - para quem quer decidir bem
           </p>
         </div>
       </section>

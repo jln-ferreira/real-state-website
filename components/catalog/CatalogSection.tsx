@@ -281,7 +281,9 @@ export default function CatalogSection({ properties, filters, onFiltersChange }:
               <span className="ml-2 font-light text-[#9898BB]">Imóveis</span>
             </h2>
             <p className="mt-1 text-sm text-[#9898BB]">
-              {results.length} imóvel{results.length !== 1 ? 's' : ''} selecionado{results.length !== 1 ? 's' : ''}
+              {results.length === 1
+                ? '1 Imóvel Selecionado'
+                : `${results.length} Imóveis Selecionados`}
             </p>
           </div>
 

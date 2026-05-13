@@ -252,7 +252,7 @@ function HeroSection({ filters, onChange, totalCount }: { filters: Filters; onCh
               Curadoria de imóveis de alto padrão · Alphaville e região
             </p>
             <h1 className="font-monument font-light tracking-wide text-[#4A5240]
-                           text-[2rem] leading-[1.18] sm:text-[2.4rem] lg:text-[2.75rem]">
+                           text-[1.72rem] leading-[1.16] sm:text-[2.05rem] lg:text-[2.35rem]">
               Não vendemos imóveis.
               <br />
               <span className="text-[#6B6B99]">

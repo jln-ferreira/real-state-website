@@ -18,8 +18,8 @@ const cormorant = Cormorant_Garamond({
 })
 
 export const metadata: Metadata = {
-  title: 'Casa Baccarat — Catálogo de Imóveis',
-  description: 'Encontre o imóvel perfeito. Explore milhares de anúncios com mapas interativos e filtros inteligentes.',
+  title: 'Casa Baccarat Imóveis . Curadoria de Alto Padrão em Alphaville',
+  description: 'Curadoria exclusiva de Imóveis de Alto Padrão em Alphaville e região. Cada imóvel selecionado com olhar de arquiteta - para quem entende que morar bem é uma escolha',
 }
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
