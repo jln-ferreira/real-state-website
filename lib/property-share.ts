@@ -107,7 +107,7 @@ export function getPropertyOpenGraphImageUrl(propertyId: string): string {
 export function getPropertyPhotoUrl(property: Property): string {
   const firstImage = property.media?.images?.[0]
   const firstImageUrl = typeof firstImage === 'string' ? firstImage : firstImage?.url
-  return absoluteUrl(firstImageUrl || property.media?.thumbnail || property.img || '/log.png')
+  return absoluteUrl(property.media?.thumbnail || property.img || firstImageUrl || '/log.png')
 }
 
 export function buildPropertyMetadata(property: Property): Metadata {
