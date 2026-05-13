@@ -103,7 +103,7 @@ export function getPropertyPageUrl(propertyId: string): string {
 export function getPropertyPhotoUrl(property: Property): string {
   const firstImage = property.media?.images?.[0]
   const firstImageUrl = typeof firstImage === 'string' ? firstImage : firstImage?.url
-  return absoluteUrl(property.media?.thumbnail || property.img || firstImageUrl || '/log.png')
+  return absoluteUrl(firstImageUrl || '/log.png')
 }
 
 export function buildPropertyMetadata(property: Property): Metadata {

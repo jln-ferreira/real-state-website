@@ -5,7 +5,7 @@ import Link from 'next/link'
 import type { Property } from '@/data/properties'
 import Layout from '@/components/Layout'
 import { BACCARAT_PHONE } from '@/lib/config'
-import { buildPropertyShareMessage } from '@/lib/property-share'
+import { buildPropertyShareMessage, getPropertyPageUrl } from '@/lib/property-share'
 
 // ── Icons ──────────────────────────────────────────────────────────────────────
 
@@ -164,12 +164,8 @@ export default function PropertyDetailView({ property, similarProperties }: { pr
     return () => document.removeEventListener('mousedown', handleClickOutside)
   }, [shareOpen])
 
-  function getPageUrl() {
-    return typeof window !== 'undefined' ? window.location.href : ''
-  }
-
   function copyLink() {
-    navigator.clipboard.writeText(getPageUrl()).then(() => {
+    navigator.clipboard.writeText(sharePageUrl).then(() => {
       setLinkCopied(true)
       setTimeout(() => setLinkCopied(false), 2000)
     })
@@ -214,7 +210,7 @@ export default function PropertyDetailView({ property, similarProperties }: { pr
     }
   }
 
-  const sharePageUrl = getPageUrl()
+  const sharePageUrl = getPropertyPageUrl(property.id)
   const shareMessage = buildPropertyShareMessage(property, sharePageUrl)
   const shareSubject = `${property.title} — Casa Baccarat Imóveis`
   const whatsappShareHref = `https://wa.me/?text=${encodeURIComponent(shareMessage)}`
