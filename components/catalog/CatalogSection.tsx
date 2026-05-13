@@ -56,9 +56,9 @@ function ActiveChips({ filters, onChange }: { filters: Filters; onChange: (f: Fi
   if (filters.ref.trim())
     chips.push({ label: `REF: ${filters.ref}`, clear: () => set({ ref: '' }) })
   if (filters.bedrooms > 0)
-    chips.push({ label: `${filters.bedrooms}+ suítes`, clear: () => set({ bedrooms: 0 }) })
+    chips.push({ label: `${filters.bedrooms}+ quartos`, clear: () => set({ bedrooms: 0 }) })
   if (filters.bathrooms > 0)
-    chips.push({ label: `${filters.bathrooms}+ banheiros`, clear: () => set({ bathrooms: 0 }) })
+    chips.push({ label: `${filters.bathrooms}+ vagas`, clear: () => set({ bathrooms: 0 }) })
   if (filters.areaMin || filters.areaMax) {
     const lo = filters.areaMin ? `${Number(filters.areaMin).toLocaleString()} m²` : ''
     const hi = filters.areaMax ? `${Number(filters.areaMax).toLocaleString()} m²` : ''

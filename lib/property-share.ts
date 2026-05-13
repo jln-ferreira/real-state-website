@@ -100,13 +100,16 @@ export function getPropertyPageUrl(propertyId: string): string {
   return absoluteUrl(`/property/${propertyId}`)
 }
 
-export function getPropertyPreviewImage(property: Property): string {
-  return absoluteUrl(property.media?.thumbnail || property.media?.images?.[0]?.url || property.img || '/placeholder-property.svg')
+export function getPropertyPhotoUrl(property: Property): string {
+  const firstImage = property.media?.images?.[0]
+  const firstImageUrl = typeof firstImage === 'string' ? firstImage : firstImage?.url
+  return absoluteUrl(firstImageUrl || property.media?.thumbnail || property.img || '/log.png')
 }
 
 export function buildPropertyMetadata(property: Property): Metadata {
   const url = getPropertyPageUrl(property.id)
-  const image = getPropertyPreviewImage(property)
+  const image = getPropertyPhotoUrl(property)
+  const title = `${property.title} | Casa Baccarat Imóveis`
   const descriptionParts = [
     locationLine(property),
     property.description?.trim(),
@@ -115,11 +118,11 @@ export function buildPropertyMetadata(property: Property): Metadata {
   const description = descriptionParts.join(' | ')
 
   return {
-    title: `${property.title} | Casa Baccarat Imóveis`,
+    title,
     description,
     alternates: { canonical: url },
     openGraph: {
-      title: property.title,
+      title,
       description,
       url,
       siteName: 'Casa Baccarat Imóveis',
@@ -135,7 +138,7 @@ export function buildPropertyMetadata(property: Property): Metadata {
     },
     twitter: {
       card: 'summary_large_image',
-      title: property.title,
+      title,
       description,
       images: image ? [image] : undefined,
     },

@@ -84,10 +84,6 @@ export function formatPrice(p: Property): string {
   return p.price.type === 'rent' ? `${currency} ${n}/mês` : `${currency} ${n}`
 }
 
-export function sqftToM2(sqft: number): number {
-  return Math.round(sqft * 0.0929)
-}
-
 // ── Dataset (empty — populated via admin panel) ───────────────────────────────
 
 export const PROPERTIES: Property[] = []
@@ -127,16 +123,23 @@ export const DEFAULT_FILTERS: Filters = {
 // ── Filter function ───────────────────────────────────────────────────────────
 
 export function applyFilters(properties: Property[], f: Filters): Property[] {
+  const maxPrice = Number(f.valorMax)
+  const areaMin = Number(f.areaMin)
+  const areaMax = Number(f.areaMax)
+  const ref = f.ref.trim().toLowerCase()
+
   return properties.filter(p => {
     if (f.negocio !== 'all' && p.price.type !== f.negocio) return false
     if (f.tipo    !== 'all' && p.propertyDetails.type !== f.tipo) return false
-    if (f.valorMax && p.price.amount > Number(f.valorMax)) return false
+    if (f.valorMax && !Number.isNaN(maxPrice) && p.price.amount > maxPrice) return false
     if (f.residential !== 'all' && p.location.residential !== f.residential) return false
-    if (f.ref && !p.id.toLowerCase().includes(f.ref.toLowerCase())) return false
-    if (f.bedrooms  > 0 && p.propertyDetails.bedrooms  < f.bedrooms)  return false
-    if (f.bathrooms > 0 && p.propertyDetails.bathrooms < f.bathrooms) return false
-    if (f.areaMin && sqftToM2(p.propertyDetails.areaSqFt) < Number(f.areaMin)) return false
-    if (f.areaMax && sqftToM2(p.propertyDetails.areaSqFt) > Number(f.areaMax)) return false
+    if (ref && !p.id.toLowerCase().includes(ref)) return false
+    const totalRooms = p.propertyDetails.quartos ?? p.propertyDetails.bedrooms
+    const parkingSpaces = p.propertyDetails.vagas ?? 0
+    if (f.bedrooms  > 0 && totalRooms < f.bedrooms) return false
+    if (f.bathrooms > 0 && parkingSpaces < f.bathrooms) return false
+    if (f.areaMin && !Number.isNaN(areaMin) && p.propertyDetails.areaSqFt < areaMin) return false
+    if (f.areaMax && !Number.isNaN(areaMax) && p.propertyDetails.areaSqFt > areaMax) return false
     if (f.features.length > 0) {
       for (const feat of f.features) {
         if (feat === 'baccarat') {

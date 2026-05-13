@@ -1,9 +1,8 @@
 'use client'
 
-import { useState, useRef, useEffect } from 'react'
+import { useState, useRef, useEffect, useMemo } from 'react'
 import {
   DEFAULT_FILTERS,
-  RESIDENTIAL_OPTIONS,
   type Filters,
   type PropertyType,
   type Feature,
@@ -202,7 +201,17 @@ function AdvancedInput({
 
 // ── HeroSection ────────────────────────────────────────────────────────────────
 
-function HeroSection({ filters, onChange, totalCount }: { filters: Filters; onChange: (f: Filters) => void; totalCount: number }) {
+function HeroSection({
+  filters,
+  onChange,
+  totalCount,
+  residentialOptions,
+}: {
+  filters: Filters
+  onChange: (f: Filters) => void
+  totalCount: number
+  residentialOptions: string[]
+}) {
   const [expanded, setExpanded] = useState(false)
   const set = (patch: Partial<Filters>) => onChange({ ...filters, ...patch })
 
@@ -223,7 +232,7 @@ function HeroSection({ filters, onChange, totalCount }: { filters: Filters; onCh
 
   const residentialOpts = [
     { label: 'Todos', value: 'all' },
-    ...RESIDENTIAL_OPTIONS.map(r => ({ label: r, value: r })),
+    ...residentialOptions.map(r => ({ label: r, value: r })),
   ]
 
   return (
@@ -429,13 +438,13 @@ function HeroSection({ filters, onChange, totalCount }: { filters: Filters; onCh
               <div className="mb-5 grid grid-cols-2 gap-3">
                 <div className="flex flex-col items-center gap-3 rounded-xl border border-[#E0DACE] bg-white p-4">
                   <span className="font-monument text-[10px] text-[#9898BB]">
-                    NUMERO DE SUITES
+                    NUMERO DE QUARTOS
                   </span>
                   <Stepper value={filters.bedrooms} onChange={v => set({ bedrooms: v })} />
                 </div>
                 <div className="flex flex-col items-center gap-3 rounded-xl border border-[#E0DACE] bg-white p-4">
                   <span className="font-monument text-[10px] text-[#9898BB]">
-                    NUMERO DE LAVABOS
+                    NUMERO DE VAGAS
                   </span>
                   <Stepper value={filters.bathrooms} onChange={v => set({ bathrooms: v })} />
                 </div>
@@ -517,10 +526,23 @@ function HeroSection({ filters, onChange, totalCount }: { filters: Filters; onCh
 
 export default function HomeClient({ initialProperties }: { initialProperties: Property[] }) {
   const [filters, setFilters] = useState<Filters>(DEFAULT_FILTERS)
+  const residentialOptions = useMemo(
+    () => Array.from(new Set(
+      initialProperties
+        .map(p => p.location.residential?.trim())
+        .filter((value): value is string => Boolean(value))
+    )).sort((a, b) => a.localeCompare(b, 'pt-BR')),
+    [initialProperties],
+  )
 
   return (
     <>
-      <HeroSection filters={filters} onChange={setFilters} totalCount={initialProperties.length} />
+      <HeroSection
+        filters={filters}
+        onChange={setFilters}
+        totalCount={initialProperties.length}
+        residentialOptions={residentialOptions}
+      />
       <CatalogSection properties={initialProperties} filters={filters} onFiltersChange={setFilters} />
     </>
   )
