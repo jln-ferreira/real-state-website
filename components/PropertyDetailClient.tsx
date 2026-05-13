@@ -137,6 +137,15 @@ export default function PropertyDetailClient({ property }: { property: Property 
     return typeof window !== 'undefined' ? window.location.href : ''
   }
 
+  function getSharePageUrl() {
+    const pageUrl = getPageUrl()
+    if (!pageUrl) return ''
+
+    const url = new URL(pageUrl)
+    url.searchParams.set('wa-preview', String(property.timestamps?.updatedAt ?? property.id))
+    return url.toString()
+  }
+
   function copyLink() {
     navigator.clipboard.writeText(getPageUrl()).then(() => {
       setLinkCopied(true)
@@ -144,11 +153,12 @@ export default function PropertyDetailClient({ property }: { property: Property 
     })
   }
 
-  const shareMessage = buildPropertyShareMessage(property, getPageUrl())
+  const sharePageUrl = getSharePageUrl()
+  const shareMessage = buildPropertyShareMessage(property, sharePageUrl)
   const shareSubject = `${property.title} — Casa Baccarat Imóveis`
   const whatsappShareHref = `https://wa.me/?text=${encodeURIComponent(shareMessage)}`
   const emailShareHref = `mailto:?subject=${encodeURIComponent(shareSubject)}&body=${encodeURIComponent(shareMessage)}`
-  const companyWhatsAppMessage = `Olá, Julia! Vi um imóvel no site da Casa Baccarat e gostaria de saber mais\n\n${getPageUrl()}`
+  const companyWhatsAppMessage = `Olá, Julia! Vi um imóvel no site da Casa Baccarat e gostaria de saber mais\n\n${sharePageUrl}`
   const companyWhatsAppHref = `https://wa.me/${BACCARAT_PHONE}?text=${encodeURIComponent(companyWhatsAppMessage)}`
 
   function trackImageView(index: number) {
