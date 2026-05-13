@@ -144,9 +144,10 @@ export default function PropertyDetailClient({ property }: { property: Property 
     })
   }
 
-  const shareText = encodeURIComponent(`${property.title} — Casa Baccarat`)
-  const shareUrl  = encodeURIComponent(getPageUrl())
-  const whatsappHref = `https://wa.me/${BACCARAT_PHONE}?text=${encodeURIComponent(buildPropertyShareMessage(property, getPageUrl()))}`
+  const shareMessage = buildPropertyShareMessage(property, getPageUrl())
+  const shareSubject = `${property.title} — Casa Baccarat Imóveis`
+  const whatsappShareHref = `https://wa.me/?text=${encodeURIComponent(shareMessage)}`
+  const emailShareHref = `mailto:?subject=${encodeURIComponent(shareSubject)}&body=${encodeURIComponent(shareMessage)}`
 
   function trackImageView(index: number) {
     const url = images[index]?.url
@@ -203,7 +204,7 @@ export default function PropertyDetailClient({ property }: { property: Property 
             {shareOpen && (
               <div className="absolute right-0 top-full mt-2 w-52 bg-white rounded-xl shadow-lg border border-neutral-100 py-1 z-50">
                 <a
-                  href={whatsappHref}
+                  href={whatsappShareHref}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="flex items-center gap-3 px-4 py-2.5 text-sm text-neutral-700 hover:bg-neutral-50"
@@ -215,31 +216,7 @@ export default function PropertyDetailClient({ property }: { property: Property 
                   WhatsApp
                 </a>
                 <a
-                  href={`https://www.facebook.com/sharer/sharer.php?u=${shareUrl}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex items-center gap-3 px-4 py-2.5 text-sm text-neutral-700 hover:bg-neutral-50"
-                  onClick={() => setShareOpen(false)}
-                >
-                  <span className="text-[#1877F2] w-4 h-4 shrink-0">
-                    <svg viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4"><path d="M24 12.073C24 5.405 18.627 0 12 0S0 5.405 0 12.073c0 6.023 4.388 11.018 10.125 11.927v-8.437H7.078v-3.49h3.047V9.428c0-3.018 1.793-4.684 4.533-4.684 1.313 0 2.686.236 2.686.236v2.964h-1.513c-1.491 0-1.956.93-1.956 1.883v2.246h3.328l-.532 3.49h-2.796V24C19.612 23.091 24 18.096 24 12.073z"/></svg>
-                  </span>
-                  Facebook
-                </a>
-                <a
-                  href={`https://twitter.com/intent/tweet?text=${shareText}&url=${shareUrl}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex items-center gap-3 px-4 py-2.5 text-sm text-neutral-700 hover:bg-neutral-50"
-                  onClick={() => setShareOpen(false)}
-                >
-                  <span className="text-neutral-900 w-4 h-4 shrink-0">
-                    <svg viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.746l7.73-8.835L1.254 2.25H8.08l4.259 5.631L18.244 2.25zm-1.161 17.52h1.833L7.084 4.126H5.117L17.083 19.77z"/></svg>
-                  </span>
-                  X (Twitter)
-                </a>
-                <a
-                  href={`mailto:?subject=${shareText}&body=Confira este imóvel: ${getPageUrl()}`}
+                  href={emailShareHref}
                   className="flex items-center gap-3 px-4 py-2.5 text-sm text-neutral-700 hover:bg-neutral-50"
                   onClick={() => setShareOpen(false)}
                 >

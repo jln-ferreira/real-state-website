@@ -22,6 +22,8 @@ const FEATURE_LABELS: Record<string, string> = {
 }
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || process.env.VERCEL_URL || 'https://casabaccarat.com.br'
+const PREVIEW_IMAGE_WIDTH = 1200
+const PREVIEW_IMAGE_HEIGHT = 630
 
 function normalizeSiteUrl(url: string): string {
   return url.startsWith('http') ? url : `https://${url}`
@@ -122,7 +124,14 @@ export function buildPropertyMetadata(property: Property): Metadata {
       url,
       siteName: 'Casa Baccarat Imóveis',
       type: 'website',
-      images: image ? [{ url: image, alt: property.title }] : undefined,
+      images: image
+        ? [{
+            url: image,
+            width: PREVIEW_IMAGE_WIDTH,
+            height: PREVIEW_IMAGE_HEIGHT,
+            alt: property.title,
+          }]
+        : undefined,
     },
     twitter: {
       card: 'summary_large_image',
