@@ -137,15 +137,6 @@ export default function PropertyDetailClient({ property }: { property: Property 
     return typeof window !== 'undefined' ? window.location.href : ''
   }
 
-  function getSharePageUrl() {
-    const pageUrl = getPageUrl()
-    if (!pageUrl) return ''
-
-    const url = new URL(pageUrl)
-    url.searchParams.set('wa-preview', String(property.timestamps?.updatedAt ?? property.id))
-    return url.toString()
-  }
-
   function copyLink() {
     navigator.clipboard.writeText(getPageUrl()).then(() => {
       setLinkCopied(true)
@@ -153,7 +144,7 @@ export default function PropertyDetailClient({ property }: { property: Property 
     })
   }
 
-  const sharePageUrl = getSharePageUrl()
+  const sharePageUrl = getPageUrl()
   const shareMessage = buildPropertyShareMessage(property, sharePageUrl)
   const shareSubject = `${property.title} — Casa Baccarat Imóveis`
   const whatsappShareHref = `https://wa.me/?text=${encodeURIComponent(shareMessage)}`

@@ -21,7 +21,7 @@ const FEATURE_LABELS: Record<string, string> = {
   '24h security': 'Seguranca 24h',
 }
 
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || process.env.VERCEL_URL || 'https://casabaccarat.com.br'
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://casabaccarat.com.br'
 const PREVIEW_IMAGE_WIDTH = 1200
 const PREVIEW_IMAGE_HEIGHT = 630
 
@@ -100,10 +100,6 @@ export function getPropertyPageUrl(propertyId: string): string {
   return absoluteUrl(`/property/${propertyId}`)
 }
 
-export function getPropertyOpenGraphImageUrl(propertyId: string): string {
-  return absoluteUrl(`/api/properties/${propertyId}/og-image`)
-}
-
 export function getPropertyPhotoUrl(property: Property): string {
   const firstImage = property.media?.images?.[0]
   const firstImageUrl = typeof firstImage === 'string' ? firstImage : firstImage?.url
@@ -112,7 +108,7 @@ export function getPropertyPhotoUrl(property: Property): string {
 
 export function buildPropertyMetadata(property: Property): Metadata {
   const url = getPropertyPageUrl(property.id)
-  const image = getPropertyOpenGraphImageUrl(property.id)
+  const image = getPropertyPhotoUrl(property)
   const title = `${property.title} | Casa Baccarat Imóveis`
   const descriptionParts = [
     locationLine(property),
