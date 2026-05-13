@@ -148,6 +148,8 @@ export default function PropertyDetailClient({ property }: { property: Property 
   const shareSubject = `${property.title} — Casa Baccarat Imóveis`
   const whatsappShareHref = `https://wa.me/?text=${encodeURIComponent(shareMessage)}`
   const emailShareHref = `mailto:?subject=${encodeURIComponent(shareSubject)}&body=${encodeURIComponent(shareMessage)}`
+  const companyWhatsAppMessage = `Olá, Julia! Vi um imóvel no site da Casa Baccarat e gostaria de saber mais\n\n${getPageUrl()}`
+  const companyWhatsAppHref = `https://wa.me/${BACCARAT_PHONE}?text=${encodeURIComponent(companyWhatsAppMessage)}`
 
   function trackImageView(index: number) {
     const url = images[index]?.url
@@ -362,7 +364,7 @@ export default function PropertyDetailClient({ property }: { property: Property 
             {/* WhatsApp CTA */}
             {property.agent?.phone && (
               <a
-                href={`https://wa.me/${BACCARAT_PHONE}`}
+                href={companyWhatsAppHref}
                 target="_blank"
                 rel="noreferrer"
                 className="w-full flex items-center justify-center gap-3 px-6 py-3 rounded-xl bg-green-500 hover:bg-green-600 text-white font-semibold transition-colors"
