@@ -5,7 +5,7 @@ import Link from 'next/link'
 import type { Property } from '@/data/properties'
 import { PROPERTIES } from '@/data/properties'
 import { BACCARAT_PHONE } from '@/lib/config'
-import { buildPropertyShareMessage, getPropertyPageUrl } from '@/lib/property-share'
+import { buildPropertyShareMessage, getPropertyPageUrl, getPropertySharePreviewUrl } from '@/lib/property-share'
 
 // ── Icons ──────────────────────────────────────────────────────────────────────
 
@@ -141,11 +141,12 @@ export default function PropertyDetailClient({ property }: { property: Property 
   }
 
   const sharePageUrl = getPropertyPageUrl(property.id)
-  const shareMessage = buildPropertyShareMessage(property, sharePageUrl)
+  const sharePreviewUrl = getPropertySharePreviewUrl(property)
+  const shareMessage = buildPropertyShareMessage(property, sharePreviewUrl)
   const shareSubject = `${property.title} — Casa Baccarat Imóveis`
   const whatsappShareHref = `https://wa.me/?text=${encodeURIComponent(shareMessage)}`
   const emailShareHref = `mailto:?subject=${encodeURIComponent(shareSubject)}&body=${encodeURIComponent(shareMessage)}`
-  const companyWhatsAppMessage = `Olá, Julia! Vi um imóvel no site da Casa Baccarat e gostaria de saber mais\n\n${sharePageUrl}`
+  const companyWhatsAppMessage = `Olá, Julia! Vi um imóvel no site da Casa Baccarat e gostaria de saber mais\n\n${sharePreviewUrl}`
   const companyWhatsAppHref = `https://wa.me/${BACCARAT_PHONE}?text=${encodeURIComponent(companyWhatsAppMessage)}`
 
   function trackImageView(index: number) {

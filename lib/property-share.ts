@@ -100,6 +100,12 @@ export function getPropertyPageUrl(propertyId: string): string {
   return absoluteUrl(`/property/${propertyId}`)
 }
 
+export function getPropertySharePreviewUrl(property: Property): string {
+  const url = new URL(getPropertyPageUrl(property.id))
+  url.searchParams.set('preview', String(property.timestamps?.updatedAt ?? property.id))
+  return url.toString()
+}
+
 export function getPropertyPhotoUrl(property: Property): string {
   const firstImage = property.media?.images?.[0]
   const firstImageUrl = typeof firstImage === 'string' ? firstImage : firstImage?.url
