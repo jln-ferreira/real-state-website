@@ -5,6 +5,9 @@ import { notFound } from 'next/navigation'
 import PropertyDetailView from './PropertyDetailView'
 import { buildPropertyMetadata } from '@/lib/property-share'
 
+export const dynamic = 'force-dynamic'
+export const revalidate = 0
+
 async function resolveProperty(id: string) {
   try {
     const property = await getPropertyById(id)
