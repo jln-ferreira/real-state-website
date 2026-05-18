@@ -3,6 +3,8 @@ import HomeClient from '@/components/HomeClient'
 import { getProperties } from '@/lib/properties'
 import type { Property } from '@/data/properties'
 
+export const dynamic = 'force-dynamic'
+
 export default async function Home() {
   let properties: Property[] = []
   try {

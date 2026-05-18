@@ -4,6 +4,7 @@ import { createProperty, getProperties } from '@/lib/properties'
 import { randomUUID } from 'crypto'
 import type { Property } from '@/data/properties'
 import { revalidatePath } from 'next/cache'
+import { logAudit } from '@/lib/audit'
 
 async function requireUser(req: NextRequest) {
   const session = await auth()
@@ -87,8 +88,15 @@ export async function POST(req: NextRequest) {
     }
 
     const created = await createProperty(property)
+    await logAudit({
+      action: 'SUBMIT',
+      propertyId: created.id,
+      field: 'ownerId',
+      newValue: userId,
+    })
     revalidatePath('/user/dashboard')
     revalidatePath('/admin/approvals')
+    revalidatePath('/admin/audit')
     return NextResponse.json(created, { status: 201 })
   } catch (err) {
     console.error('[user/properties POST]', err)

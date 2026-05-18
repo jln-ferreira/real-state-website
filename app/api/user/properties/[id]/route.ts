@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { auth } from '@/auth'
 import { getPropertyById, updateProperty, deleteProperty } from '@/lib/properties'
 import { revalidatePath } from 'next/cache'
+import { logAudit } from '@/lib/audit'
 
 async function requireUser(req: NextRequest) {
   const session = await auth()
@@ -84,6 +85,14 @@ export async function PATCH(
 
     revalidatePath('/user/dashboard')
     revalidatePath('/admin/approvals')
+    revalidatePath('/admin/audit')
+    await logAudit({
+      action: 'SUBMIT',
+      propertyId: updated.id,
+      field: 'adminStatus',
+      oldValue: existing.adminStatus,
+      newValue: 'pending',
+    })
     return NextResponse.json(updated)
   } catch (err) {
     console.error('[user/properties PATCH]', err)
@@ -106,6 +115,13 @@ export async function DELETE(
   if (existing.ownerId !== userId) return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
 
   await deleteProperty(id)
+  await logAudit({
+    action: 'DELETE',
+    propertyId: id,
+    field: 'ownerId',
+    oldValue: userId,
+  })
   revalidatePath('/user/dashboard')
+  revalidatePath('/admin/audit')
   return NextResponse.json({ ok: true })
 }

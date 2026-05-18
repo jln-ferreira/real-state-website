@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { auth } from '@/auth'
 import { getPropertyById, updateProperty } from '@/lib/properties'
 import { revalidatePath } from 'next/cache'
+import { logAudit } from '@/lib/audit'
 
 export async function PATCH(
   req: NextRequest,
@@ -38,5 +39,14 @@ export async function PATCH(
 
   revalidatePath('/')
   revalidatePath('/user/dashboard')
+  revalidatePath('/admin/approvals')
+  revalidatePath('/admin/audit')
+  await logAudit({
+    action: adminStatus === 'approved' ? 'APPROVE' : 'REJECT',
+    propertyId: updated.id,
+    field: 'adminStatus',
+    oldValue: existing.adminStatus,
+    newValue: adminStatus,
+  })
   return NextResponse.json(updated)
 }

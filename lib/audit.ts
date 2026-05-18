@@ -1,14 +1,24 @@
-import { db } from './db'
+import { db, ensureInit } from './db'
+
+export type AuditAction =
+  | 'CREATE'
+  | 'UPDATE'
+  | 'DELETE'
+  | 'DUPLICATE'
+  | 'SUBMIT'
+  | 'APPROVE'
+  | 'REJECT'
 
 export async function logAudit({
   action, propertyId, field, oldValue, newValue,
 }: {
-  action: 'CREATE' | 'UPDATE' | 'DELETE' | 'DUPLICATE'
+  action: AuditAction
   propertyId?: string
   field?: string
   oldValue?: string
   newValue?: string
 }) {
+  await ensureInit()
   await db.execute({
     sql: 'INSERT INTO audit_log (action, property_id, field, old_value, new_value) VALUES (?, ?, ?, ?, ?)',
     args: [action, propertyId ?? null, field ?? null, oldValue ?? null, newValue ?? null],
@@ -16,6 +26,7 @@ export async function logAudit({
 }
 
 export async function getAuditLog(limit = 50) {
+  await ensureInit()
   const result = await db.execute({
     sql: 'SELECT * FROM audit_log ORDER BY timestamp DESC LIMIT ?',
     args: [limit],

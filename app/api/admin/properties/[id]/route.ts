@@ -3,6 +3,7 @@ import { getPropertyById, updateProperty, deleteProperty } from '@/lib/propertie
 import { logAudit } from '@/lib/audit'
 import { PartialPropertySchema } from '@/lib/schemas'
 import { NextResponse } from 'next/server'
+import { revalidatePath } from 'next/cache'
 
 export async function GET(_: Request, { params }: { params: Promise<{ id: string }> }) {
   const session = await auth()
@@ -32,6 +33,9 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
       })
     }
   }
+  revalidatePath('/')
+  revalidatePath('/admin/properties')
+  revalidatePath('/admin/audit')
   return NextResponse.json(updated)
 }
 
@@ -41,5 +45,8 @@ export async function DELETE(_: Request, { params }: { params: Promise<{ id: str
   const { id } = await params
   await deleteProperty(id)
   await logAudit({ action: 'DELETE', propertyId: id })
+  revalidatePath('/')
+  revalidatePath('/admin/properties')
+  revalidatePath('/admin/audit')
   return NextResponse.json({ success: true })
 }

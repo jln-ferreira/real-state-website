@@ -1,5 +1,7 @@
 import { getAuditLog } from '@/lib/audit'
 
+export const dynamic = 'force-dynamic'
+
 function formatDate(ts: string) {
   return new Date(ts).toLocaleString('en-CA', { month: 'short', day: 'numeric', year: 'numeric', hour: 'numeric', minute: '2-digit' })
 }
@@ -9,6 +11,9 @@ const ACTION_STYLES: Record<string, string> = {
   UPDATE: 'bg-blue-100 text-blue-700',
   DELETE: 'bg-red-100 text-red-700',
   DUPLICATE: 'bg-purple-100 text-purple-700',
+  SUBMIT: 'bg-amber-100 text-amber-700',
+  APPROVE: 'bg-emerald-100 text-emerald-700',
+  REJECT: 'bg-rose-100 text-rose-700',
 }
 
 export default async function AuditPage() {
