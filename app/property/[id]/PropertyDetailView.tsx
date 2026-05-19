@@ -149,6 +149,7 @@ export default function PropertyDetailView({ property, similarProperties }: { pr
   const [linkCopied,   setLinkCopied]   = useState(false)
   const [formStatus,   setFormStatus]   = useState<'idle' | 'sending' | 'success' | 'error'>('idle')
   const shareRef = useRef<HTMLDivElement>(null)
+  const touchStartX = useRef<number | null>(null)
 
   useEffect(() => {
     fetch(`/api/properties/${property.id}/view`, { method: 'POST' }).catch(() => {})
@@ -185,6 +186,20 @@ export default function PropertyDetailView({ property, similarProperties }: { pr
     setLightboxIndex(i)
     setLightboxOpen(true)
     trackImageView(i)
+  }
+
+  function goToMobileImage(index: number) {
+    const nextIndex = (index + images.length) % images.length
+    setActiveImg(nextIndex)
+    trackImageView(nextIndex)
+  }
+
+  function handleMobileTouchEnd(e: React.TouchEvent<HTMLDivElement>) {
+    if (touchStartX.current == null) return
+    const distance = touchStartX.current - e.changedTouches[0].clientX
+    touchStartX.current = null
+    if (Math.abs(distance) < 36) return
+    goToMobileImage(activeImg + (distance > 0 ? 1 : -1))
   }
 
   function trackWhatsApp() {
@@ -321,14 +336,56 @@ export default function PropertyDetailView({ property, similarProperties }: { pr
         </div>
 
         {/* ── Mobile carousel ──────────────────────────────────────────────── */}
-        <div className="md:hidden relative aspect-[4/3] rounded-2xl overflow-hidden">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src={images[activeImg].url} alt={images[activeImg].caption ?? property.title} className="w-full h-full object-cover" onError={e => { (e.target as HTMLImageElement).src = '/placeholder-property.svg' }} />
+        <div className="md:hidden relative aspect-[4/3] rounded-2xl overflow-hidden bg-neutral-100">
+          <div
+            onTouchStart={e => { touchStartX.current = e.touches[0].clientX }}
+            onTouchEnd={handleMobileTouchEnd}
+            className="flex h-full transition-transform duration-300 ease-out"
+            style={{ transform: `translateX(-${activeImg * 100}%)` }}
+          >
+            {images.map((img, i) => (
+              <button
+                key={`${img.url}-${i}`}
+                type="button"
+                onClick={() => openLightbox(i)}
+                className="relative h-full w-full flex-shrink-0 bg-neutral-100"
+                aria-label={`Abrir foto ${i + 1} de ${images.length}`}
+              >
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src={img.url} alt={img.caption ?? property.title} className="w-full h-full object-cover" onError={e => { (e.target as HTMLImageElement).src = '/placeholder-property.svg' }} />
+              </button>
+            ))}
+          </div>
+          {images.length > 1 && (
+            <>
+              <button
+                type="button"
+                onClick={() => goToMobileImage(activeImg - 1)}
+                className="absolute left-2 top-1/2 flex h-9 w-9 -translate-y-1/2 items-center justify-center rounded-full bg-black/45 text-white backdrop-blur-sm"
+                aria-label="Foto anterior"
+              >
+                <ChevronLeftIcon className="h-5 w-5" />
+              </button>
+              <button
+                type="button"
+                onClick={() => goToMobileImage(activeImg + 1)}
+                className="absolute right-2 top-1/2 flex h-9 w-9 -translate-y-1/2 items-center justify-center rounded-full bg-black/45 text-white backdrop-blur-sm"
+                aria-label="Próxima foto"
+              >
+                <ChevronRightIcon className="h-5 w-5" />
+              </button>
+            </>
+          )}
+          <div className="absolute top-8 right-3 rounded-full bg-black/60 px-2.5 py-1 text-[11px] font-semibold text-white backdrop-blur-sm">
+            {activeImg + 1}/{images.length}
+          </div>
           <div className="absolute bottom-3 left-0 right-0 flex justify-center gap-1">
             {images.map((_, i) => (
               <button
                 key={i}
-                onClick={() => setActiveImg(i)}
+                type="button"
+                onClick={() => goToMobileImage(i)}
+                aria-label={`Ver foto ${i + 1}`}
                 className={`h-1.5 rounded-full transition-all ${i === activeImg ? 'w-3 bg-white' : 'w-1.5 bg-white/50'}`}
               />
             ))}
@@ -343,9 +400,11 @@ export default function PropertyDetailView({ property, similarProperties }: { pr
 
             {/* Title card */}
             <div className="p-4 rounded-2xl border border-[#E0DACE] bg-white shadow-sm">
-              <div className="flex items-start justify-between gap-2 mb-0.5">
-                <h1 className="text-lg md:text-xl font-bold text-neutral-900">{property.title}</h1>
-                <span className="flex-shrink-0 px-4 py-1.5 text-base font-extrabold text-[#6B6B99] bg-[#6B6B99]/10 rounded-lg">
+              <div className="mb-1">
+                <h1 className="text-base md:text-[17px] font-bold leading-snug text-neutral-900">{property.title}</h1>
+              </div>
+              <div className="mb-1.5 flex justify-start">
+                <span className="rounded-md bg-[#6B6B99]/10 px-2 py-0.5 text-[10px] font-bold text-[#6B6B99]">
                   {property.id}
                 </span>
               </div>
