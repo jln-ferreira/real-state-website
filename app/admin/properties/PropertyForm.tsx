@@ -300,7 +300,10 @@ function MediaTab({
                       <input type="file" accept="image/*" className="sr-only" disabled={!!uploading[i]}
                         onChange={e => {
                           const f = e.target.files?.[0]
-                          if (f) uploadFile(f, url => updateImage(i, { url }), v => setUploading(u => ({ ...u, [i]: v })))
+                          if (f) uploadFile(f, url => {
+                            updateImage(i, { url })
+                            if (!thumbnail) onThumbnailChange(url)
+                          }, v => setUploading(u => ({ ...u, [i]: v })))
                           e.target.value = ''
                         }} />
                     </label>
@@ -337,7 +340,10 @@ function MediaTab({
                   const idx = startIdx + fi
                   uploadFile(
                     file,
-                    url => updateImage(idx, { url }),
+                    url => {
+                      updateImage(idx, { url })
+                      if (!thumbnail && fi === 0) onThumbnailChange(url)
+                    },
                     v => setUploading(u => ({ ...u, [idx]: v }))
                   )
                 })

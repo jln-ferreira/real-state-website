@@ -141,6 +141,9 @@ export default function UserPropertyFormClient({ user }: { user: UserInfo }) {
   const [saving, setSaving] = useState(false)
   const [apiError, setApiError] = useState('')
   const [submitError, setSubmitError] = useState('')
+  const [thumbUploading, setThumbUploading] = useState(false)
+  const [uploading, setUploading] = useState<Record<number, boolean>>({})
+  const [bulkUploading, setBulkUploading] = useState(false)
 
   const filledCount = REQUIRED_FIELDS.filter(f => String(form[f]).trim() !== '').length
   const progress = Math.round((filledCount / REQUIRED_FIELDS.length) * 100)
@@ -175,6 +178,81 @@ export default function UserPropertyFormClient({ user }: { user: UserInfo }) {
 
   function removeImage(idx: number) {
     setForm(f => ({ ...f, images: f.images.filter((_, i) => i !== idx) }))
+  }
+
+  async function uploadFile(file: File): Promise<string | null> {
+    const fd = new FormData()
+    fd.append('file', file)
+    const res = await fetch('/api/admin/upload', { method: 'POST', body: fd })
+    const data = await res.json()
+    if (!res.ok || !data.url) {
+      setApiError(data.error ?? 'Erro ao enviar arquivo.')
+      return null
+    }
+    return data.url
+  }
+
+  async function uploadThumbnail(file: File) {
+    setApiError('')
+    setThumbUploading(true)
+    try {
+      const url = await uploadFile(file)
+      if (url) {
+        setForm(f => ({ ...f, thumbnail: url }))
+        setErrors(e => {
+          const { thumbnail, ...rest } = e
+          return rest
+        })
+      }
+    } finally {
+      setThumbUploading(false)
+    }
+  }
+
+  async function uploadImage(file: File, idx: number) {
+    setApiError('')
+    setUploading(u => ({ ...u, [idx]: true }))
+    try {
+      const url = await uploadFile(file)
+      if (url) {
+        setForm(f => {
+          const imgs = [...f.images]
+          imgs[idx] = url
+          return { ...f, thumbnail: f.thumbnail || url, images: imgs }
+        })
+        setErrors(e => {
+          const { thumbnail, ...rest } = e
+          return rest
+        })
+      }
+    } finally {
+      setUploading(u => ({ ...u, [idx]: false }))
+    }
+  }
+
+  async function uploadImages(files: File[]) {
+    if (files.length === 0) return
+    setApiError('')
+    setBulkUploading(true)
+    try {
+      const urls = (await Promise.all(files.map(uploadFile))).filter((url): url is string => Boolean(url))
+      if (urls.length > 0) {
+        setForm(f => {
+          const existing = f.images.filter(Boolean)
+          return {
+            ...f,
+            thumbnail: f.thumbnail || urls[0],
+            images: [...existing, ...urls],
+          }
+        })
+        setErrors(e => {
+          const { thumbnail, ...rest } = e
+          return rest
+        })
+      }
+    } finally {
+      setBulkUploading(false)
+    }
   }
 
   function validate(): boolean {
@@ -461,8 +539,24 @@ export default function UserPropertyFormClient({ user }: { user: UserInfo }) {
           <SectionTitle>Mídia</SectionTitle>
           <div className="space-y-4">
             <Field label="URL da Miniatura (foto principal)" required error={errors.thumbnail}>
-              <input type="url" value={form.thumbnail} onChange={set('thumbnail')} placeholder="https://..." className={errors.thumbnail ? inputErrCls : inputCls} />
+              <div className="flex gap-2">
+                <input type="url" value={form.thumbnail} onChange={set('thumbnail')} placeholder="https://..." className={errors.thumbnail ? inputErrCls : inputCls} />
+                <label className={`flex-shrink-0 px-3 py-2.5 rounded-xl text-sm font-semibold cursor-pointer transition-colors ${thumbUploading ? 'bg-[#E6E6EF] text-[#A3A3C2]' : 'bg-[#6B6B99] text-white hover:bg-[#4F4F6B]'}`}>
+                  {thumbUploading ? 'Enviando...' : 'Upload'}
+                  <input type="file" accept="image/*" className="sr-only" disabled={thumbUploading}
+                    onChange={e => {
+                      const file = e.target.files?.[0]
+                      if (file) uploadThumbnail(file)
+                      e.target.value = ''
+                    }} />
+                </label>
+              </div>
             </Field>
+            {form.thumbnail && (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img src={form.thumbnail} alt="Miniatura" className="w-24 h-20 object-cover rounded-xl bg-[#F7F7FA] border border-[#E6E6EF]"
+                onError={e => { (e.target as HTMLImageElement).style.display = 'none' }} />
+            )}
             <div>
               <label className="block text-xs font-semibold text-[#4F4F6B] mb-1.5">Fotos adicionais (URLs)</label>
               <div className="space-y-2">
@@ -475,6 +569,24 @@ export default function UserPropertyFormClient({ user }: { user: UserInfo }) {
                       placeholder="https://..."
                       className={inputCls}
                     />
+                    <label className={`w-8 h-8 flex-shrink-0 flex items-center justify-center rounded-xl cursor-pointer transition-colors ${uploading[i] ? 'bg-[#E6E6EF] text-[#A3A3C2]' : 'bg-[#F7F7FA] text-[#6B6B99] hover:bg-[#E6E6EF]'}`}>
+                      {uploading[i] ? (
+                        <svg className="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
+                          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z" />
+                        </svg>
+                      ) : (
+                        <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5m-13.5-9L12 3m0 0l4.5 4.5M12 3v13.5" />
+                        </svg>
+                      )}
+                      <input type="file" accept="image/*" className="sr-only" disabled={!!uploading[i]}
+                        onChange={e => {
+                          const file = e.target.files?.[0]
+                          if (file) uploadImage(file, i)
+                          e.target.value = ''
+                        }} />
+                    </label>
                     {form.images.length > 1 && (
                       <button type="button" onClick={() => removeImage(i)}
                         className="w-8 h-8 flex-shrink-0 flex items-center justify-center rounded-xl text-[#A3A3C2] hover:text-red-500 hover:bg-red-50 transition-colors">
@@ -492,6 +604,17 @@ export default function UserPropertyFormClient({ user }: { user: UserInfo }) {
                   </svg>
                   Adicionar foto
                 </button>
+                <label className={`text-xs font-medium flex items-center gap-1 transition-colors ${bulkUploading ? 'text-[#A3A3C2]' : 'text-[#6B6B99] hover:text-[#4F4F6B] cursor-pointer'}`}>
+                  <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5m-13.5-9L12 3m0 0l4.5 4.5M12 3v13.5" />
+                  </svg>
+                  {bulkUploading ? 'Enviando fotos...' : 'Enviar fotos do computador'}
+                  <input type="file" accept="image/*" multiple className="sr-only" disabled={bulkUploading}
+                    onChange={e => {
+                      uploadImages(Array.from(e.target.files ?? []))
+                      e.target.value = ''
+                    }} />
+                </label>
               </div>
             </div>
           </div>

@@ -31,6 +31,7 @@ export default async function BlogPage() {
   }
   const posts = allPosts.filter(p => p.published !== false)
   const [featured, ...rest] = posts
+  const hasPosts = posts.length > 0
 
   return (
     <Layout>
@@ -54,51 +55,58 @@ export default async function BlogPage() {
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-14">
 
           {/* ── Featured post ─────────────────────────────────────────────────── */}
-          <Link
-            href={`/blog/${featured.slug}`}
-            className="group block rounded-[14px] overflow-hidden bg-white mb-10 lg:grid lg:grid-cols-2
-                       border border-[#E0DACE] transition-all duration-300
-                       shadow-[0_4px_20px_rgba(0,0,0,0.06)] hover:shadow-[0_16px_48px_rgba(0,0,0,0.10)]
-                       hover:-translate-y-0.5"
-          >
-            {/* Image */}
-            <div className="relative h-64 lg:h-auto overflow-hidden">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
-                src={featured.image}
-                alt={featured.title}
-                loading="lazy"
-                className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/25 to-transparent lg:bg-gradient-to-r" />
-              <div className="absolute top-4 left-4 flex flex-wrap gap-1">
-                {getPostCategories(featured).map(cat => (
-                  <span key={cat} className={`px-2.5 py-1 rounded-full text-xs font-semibold ${categoryClass(cat)}`}>{cat}</span>
-                ))}
+          {hasPosts ? (
+            <Link
+              href={`/blog/${featured.slug}`}
+              className="group block rounded-[14px] overflow-hidden bg-white mb-10 lg:grid lg:grid-cols-2
+                         border border-[#E0DACE] transition-all duration-300
+                         shadow-[0_4px_20px_rgba(0,0,0,0.06)] hover:shadow-[0_16px_48px_rgba(0,0,0,0.10)]
+                         hover:-translate-y-0.5"
+            >
+              {/* Image */}
+              <div className="relative h-64 lg:h-auto overflow-hidden">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={featured.image}
+                  alt={featured.title}
+                  loading="lazy"
+                  className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/25 to-transparent lg:bg-gradient-to-r" />
+                <div className="absolute top-4 left-4 flex flex-wrap gap-1">
+                  {getPostCategories(featured).map(cat => (
+                    <span key={cat} className={`px-2.5 py-1 rounded-full text-xs font-semibold ${categoryClass(cat)}`}>{cat}</span>
+                  ))}
+                </div>
               </div>
-            </div>
 
-            {/* Content */}
-            <div className="flex flex-col justify-center p-8 lg:p-10">
-              <span className="text-xs text-[#9898BB] mb-3">
-                {formatDate(featured.date)} · {featured.readTime} de leitura
-              </span>
-              <h2 className="text-2xl lg:text-3xl font-bold text-[#4A5240] leading-snug mb-3
-                             group-hover:text-[#6B6B99] transition-colors duration-300">
-                {featured.title}
-              </h2>
-              <p className="text-[#9898BB] leading-relaxed mb-6 text-sm lg:text-base">
-                {featured.excerpt}
-              </p>
-              <span className="inline-flex items-center gap-1.5 text-sm font-semibold text-[#6B6B99]">
-                Ler artigo
-                <svg className="w-4 h-4 transition-transform duration-200 group-hover:translate-x-1"
-                     fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
-                </svg>
-              </span>
+              {/* Content */}
+              <div className="flex flex-col justify-center p-8 lg:p-10">
+                <span className="text-xs text-[#9898BB] mb-3">
+                  {formatDate(featured.date)} · {featured.readTime} de leitura
+                </span>
+                <h2 className="text-2xl lg:text-3xl font-bold text-[#4A5240] leading-snug mb-3
+                               group-hover:text-[#6B6B99] transition-colors duration-300">
+                  {featured.title}
+                </h2>
+                <p className="text-[#9898BB] leading-relaxed mb-6 text-sm lg:text-base">
+                  {featured.excerpt}
+                </p>
+                <span className="inline-flex items-center gap-1.5 text-sm font-semibold text-[#6B6B99]">
+                  Ler artigo
+                  <svg className="w-4 h-4 transition-transform duration-200 group-hover:translate-x-1"
+                       fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
+                  </svg>
+                </span>
+              </div>
+            </Link>
+          ) : (
+            <div className="rounded-[14px] bg-white border border-[#E0DACE] px-6 py-12 text-center shadow-[0_4px_20px_rgba(0,0,0,0.06)]">
+              <h2 className="text-xl font-bold text-[#4A5240] mb-2">Nenhum artigo publicado ainda</h2>
+              <p className="text-sm text-[#9898BB]">Os artigos aparecerão aqui assim que forem publicados.</p>
             </div>
-          </Link>
+          )}
 
           {/* ── Grid ──────────────────────────────────────────────────────────── */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
