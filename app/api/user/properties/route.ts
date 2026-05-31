@@ -33,6 +33,19 @@ export async function POST(req: NextRequest) {
   try {
     const body = await req.json()
 
+    const rawImages: Array<{ url: string } | string> = body.media?.images ?? []
+    const imageObjs = rawImages
+      .map(i => (typeof i === 'string' ? { url: i } : i))
+      .filter(i => i.url)
+    const thumbnail: string = body.media?.thumbnail ?? body.img ?? imageObjs[0]?.url ?? ''
+    const allImages = thumbnail
+      ? [{ url: thumbnail }, ...imageObjs.filter(i => i.url !== thumbnail)]
+      : imageObjs
+
+    if (!thumbnail) {
+      return NextResponse.json({ error: 'Envie pelo menos uma foto do imóvel.' }, { status: 400 })
+    }
+
     // Generate a unique ID
     const all = await getProperties()
     const nums = all
@@ -45,7 +58,7 @@ export async function POST(req: NextRequest) {
     const property: Property = {
       id: newId,
       title: body.title ?? '',
-      img: body.img ?? body.media?.thumbnail ?? '',
+      img: thumbnail,
       description: body.description ?? '',
       price: {
         amount: body.price?.amount ?? 0,
@@ -72,8 +85,8 @@ export async function POST(req: NextRequest) {
       },
       features: body.features ?? [],
       media: {
-        images: body.media?.images ?? [],
-        thumbnail: body.media?.thumbnail ?? '',
+        images: allImages,
+        thumbnail,
       },
       status: { isActive: false, isFeatured: false, isSpecial: false },
       metrics: { views: 0, favorites: 0, searchAppearances: 0 },

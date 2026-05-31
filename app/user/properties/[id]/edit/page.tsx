@@ -2,7 +2,7 @@ import { auth } from '@/auth'
 import { redirect, notFound } from 'next/navigation'
 import { getPropertyById } from '@/lib/properties'
 import { getUserById } from '@/lib/users'
-import UserPropertyEditClient from './UserPropertyEditClient'
+import UserPropertyEditShell from './UserPropertyEditShell'
 
 export const dynamic = 'force-dynamic'
 export const maxDuration = 30
@@ -27,5 +27,5 @@ export default async function EditUserPropertyPage({ params }: { params: Promise
     email: dbUser?.email ?? (session.user.email ?? ''),
   }
 
-  return <UserPropertyEditClient property={property} user={user} />
+  return <UserPropertyEditShell property={property} user={user} />
 }

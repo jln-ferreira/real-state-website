@@ -1,5 +1,6 @@
 import { auth } from '@/auth'
 import { NextResponse } from 'next/server'
+import { revalidatePath } from 'next/cache'
 import { PostSchema } from '@/lib/schemas'
 import { getPost, updatePost, deletePost } from '@/lib/posts'
 
@@ -27,6 +28,9 @@ export async function PATCH(
   if (!parsed.success)
     return NextResponse.json({ error: 'Validation failed', issues: parsed.error.issues }, { status: 400 })
   const updated = await updatePost(slug, parsed.data)
+  revalidatePath('/blog')
+  revalidatePath(`/blog/${slug}`)
+  revalidatePath('/admin/blog')
   return NextResponse.json(updated)
 }
 
@@ -38,5 +42,8 @@ export async function DELETE(
   if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   const { slug } = await params
   await deletePost(slug)
+  revalidatePath('/blog')
+  revalidatePath(`/blog/${slug}`)
+  revalidatePath('/admin/blog')
   return NextResponse.json({ ok: true })
 }

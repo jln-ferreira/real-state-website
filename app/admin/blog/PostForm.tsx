@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import type { Post } from '@/data/posts'
+import { getUploadErrorMessage, prepareImageForUpload } from '@/lib/client-image-upload'
 
 const TABS = ['Informações', 'Conteúdo'] as const
 type Tab = typeof TABS[number]
@@ -437,12 +438,15 @@ export default function PostForm({ post: initial }: { post?: Post }) {
                         if (!file) return
                         setCoverUploading(true)
                         try {
+                          const uploadFile = await prepareImageForUpload(file)
                           const fd = new FormData()
-                          fd.append('file', file)
+                          fd.append('file', uploadFile)
                           const res = await fetch('/api/admin/upload', { method: 'POST', body: fd })
                           const data = await res.json()
-                          if (data.url) setForm(f => ({ ...f, image: data.url }))
+                          if (res.ok && data.url) setForm(f => ({ ...f, image: data.url }))
                           else alert(data.error ?? 'Erro ao enviar arquivo.')
+                        } catch (err) {
+                          alert(getUploadErrorMessage(err, file))
                         } finally {
                           setCoverUploading(false)
                           e.target.value = ''

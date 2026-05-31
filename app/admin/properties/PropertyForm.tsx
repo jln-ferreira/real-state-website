@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import type { Property } from '@/data/properties'
+import { getUploadErrorMessage, prepareImageForUpload } from '@/lib/client-image-upload'
 
 const TABS = ['Info Básica', 'Preço', 'Localização', 'Detalhes', 'Características', 'Mídia', 'Status & Agente'] as const
 type Tab = typeof TABS[number]
@@ -187,8 +188,9 @@ function MediaTab({
   async function uploadFile(file: File, onUrl: (url: string) => void, setProgress: (v: boolean) => void) {
     setProgress(true)
     try {
+      const uploadFile = await prepareImageForUpload(file)
       const fd = new FormData()
-      fd.append('file', file)
+      fd.append('file', uploadFile)
       const res = await fetch('/api/admin/upload', { method: 'POST', body: fd })
       const data = await res.json()
       if (!res.ok) {
@@ -197,6 +199,8 @@ function MediaTab({
       }
       if (data.url) onUrl(data.url)
       else alert(data.error ?? 'Erro ao enviar arquivo.')
+    } catch (err) {
+      alert(getUploadErrorMessage(err, file))
     } finally {
       setProgress(false)
     }

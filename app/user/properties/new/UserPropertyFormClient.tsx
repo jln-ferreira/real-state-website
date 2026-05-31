@@ -3,6 +3,7 @@
 import { useState, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
+import { getUploadErrorMessage, prepareImageForUpload } from '@/lib/client-image-upload'
 
 const PROPERTY_TYPES = [
   { value: 'apartment', label: 'Apartamento' },
@@ -181,15 +182,21 @@ export default function UserPropertyFormClient({ user }: { user: UserInfo }) {
   }
 
   async function uploadFile(file: File): Promise<string | null> {
-    const fd = new FormData()
-    fd.append('file', file)
-    const res = await fetch('/api/admin/upload', { method: 'POST', body: fd })
-    const data = await res.json()
-    if (!res.ok || !data.url) {
-      setApiError(data.error ?? 'Erro ao enviar arquivo.')
+    try {
+      const uploadFile = await prepareImageForUpload(file)
+      const fd = new FormData()
+      fd.append('file', uploadFile)
+      const res = await fetch('/api/admin/upload', { method: 'POST', body: fd })
+      const data = await res.json()
+      if (!res.ok || !data.url) {
+        setApiError(data.error ?? 'Erro ao enviar arquivo.')
+        return null
+      }
+      return data.url
+    } catch (err) {
+      setApiError(getUploadErrorMessage(err, file))
       return null
     }
-    return data.url
   }
 
   async function uploadThumbnail(file: File) {

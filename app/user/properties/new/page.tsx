@@ -1,7 +1,7 @@
 import { auth } from '@/auth'
 import { redirect } from 'next/navigation'
 import { getUserById } from '@/lib/users'
-import UserPropertyFormClient from './UserPropertyFormClient'
+import UserPropertyFormShell from './UserPropertyFormShell'
 
 export const dynamic = 'force-dynamic'
 export const maxDuration = 30
@@ -21,5 +21,5 @@ export default async function NewUserPropertyPage() {
     email: dbUser?.email ?? (session.user.email ?? ''),
   }
 
-  return <UserPropertyFormClient user={user} />
+  return <UserPropertyFormShell user={user} />
 }
