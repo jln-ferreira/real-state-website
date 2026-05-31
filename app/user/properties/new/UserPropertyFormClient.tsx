@@ -145,6 +145,8 @@ export default function UserPropertyFormClient({ user }: { user: UserInfo }) {
   const [thumbUploading, setThumbUploading] = useState(false)
   const [uploading, setUploading] = useState<Record<number, boolean>>({})
   const [bulkUploading, setBulkUploading] = useState(false)
+  const [dragImageIndex, setDragImageIndex] = useState<number | null>(null)
+  const [dragOverImageIndex, setDragOverImageIndex] = useState<number | null>(null)
 
   const filledCount = REQUIRED_FIELDS.filter(f => String(form[f]).trim() !== '').length
   const progress = Math.round((filledCount / REQUIRED_FIELDS.length) * 100)
@@ -179,6 +181,16 @@ export default function UserPropertyFormClient({ user }: { user: UserInfo }) {
 
   function removeImage(idx: number) {
     setForm(f => ({ ...f, images: f.images.filter((_, i) => i !== idx) }))
+  }
+
+  function moveImage(from: number, to: number) {
+    if (!Number.isInteger(from) || !Number.isInteger(to) || from === to || from < 0 || to < 0 || from >= form.images.length || to >= form.images.length) return
+    setForm(f => {
+      const images = [...f.images]
+      const [moved] = images.splice(from, 1)
+      images.splice(to, 0, moved)
+      return { ...f, images }
+    })
   }
 
   async function uploadFile(file: File): Promise<string | null> {
@@ -566,9 +578,45 @@ export default function UserPropertyFormClient({ user }: { user: UserInfo }) {
             )}
             <div>
               <label className="block text-xs font-semibold text-[#4F4F6B] mb-1.5">Fotos adicionais (URLs)</label>
+              <p className="text-xs text-[#A3A3C2] mb-2">Arraste as fotos para alterar a sequência exibida no anúncio.</p>
               <div className="space-y-2">
                 {form.images.map((img, i) => (
-                  <div key={i} className="flex items-center gap-2">
+                  <div
+                    key={i}
+                    onDragOver={e => {
+                      e.preventDefault()
+                      e.dataTransfer.dropEffect = 'move'
+                      setDragOverImageIndex(i)
+                    }}
+                    onDragLeave={() => setDragOverImageIndex(current => current === i ? null : current)}
+                    onDrop={e => {
+                      e.preventDefault()
+                      const rawIndex = e.dataTransfer.getData('text/plain')
+                      const from = dragImageIndex ?? (rawIndex ? Number(rawIndex) : NaN)
+                      if (Number.isInteger(from)) moveImage(from, i)
+                      setDragImageIndex(null)
+                      setDragOverImageIndex(null)
+                    }}
+                    className={`flex items-center gap-2 rounded-xl transition ${dragOverImageIndex === i ? 'bg-[#F0F0F7] ring-2 ring-[#6B6B99]/25' : ''} ${dragImageIndex === i ? 'opacity-60' : ''}`}
+                  >
+                    <button
+                      type="button"
+                      draggable
+                      onDragStart={e => {
+                        setDragImageIndex(i)
+                        e.dataTransfer.effectAllowed = 'move'
+                        e.dataTransfer.setData('text/plain', String(i))
+                      }}
+                      onDragEnd={() => {
+                        setDragImageIndex(null)
+                        setDragOverImageIndex(null)
+                      }}
+                      className="w-8 h-8 flex-shrink-0 flex items-center justify-center rounded-xl bg-[#F7F7FA] border border-[#E6E6EF] text-xs font-semibold text-[#6B6B99] cursor-grab active:cursor-grabbing"
+                      aria-label={`Arrastar foto ${i + 1}`}
+                      title="Arrastar para reordenar"
+                    >
+                      {i + 1}
+                    </button>
                     <input
                       type="url"
                       value={img}
@@ -576,6 +624,24 @@ export default function UserPropertyFormClient({ user }: { user: UserInfo }) {
                       placeholder="https://..."
                       className={inputCls}
                     />
+                    {form.images.length > 1 && (
+                      <div className="flex flex-col gap-1">
+                        <button type="button" onClick={() => moveImage(i, i - 1)} disabled={i === 0}
+                          className="w-7 h-4 flex items-center justify-center rounded-md text-[#A3A3C2] hover:text-[#6B6B99] hover:bg-[#E6E6EF] disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+                          aria-label={`Mover foto ${i + 1} para cima`}>
+                          <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M5 15l7-7 7 7" />
+                          </svg>
+                        </button>
+                        <button type="button" onClick={() => moveImage(i, i + 1)} disabled={i === form.images.length - 1}
+                          className="w-7 h-4 flex items-center justify-center rounded-md text-[#A3A3C2] hover:text-[#6B6B99] hover:bg-[#E6E6EF] disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+                          aria-label={`Mover foto ${i + 1} para baixo`}>
+                          <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
+                          </svg>
+                        </button>
+                      </div>
+                    )}
                     <label className={`w-8 h-8 flex-shrink-0 flex items-center justify-center rounded-xl cursor-pointer transition-colors ${uploading[i] ? 'bg-[#E6E6EF] text-[#A3A3C2]' : 'bg-[#F7F7FA] text-[#6B6B99] hover:bg-[#E6E6EF]'}`}>
                       {uploading[i] ? (
                         <svg className="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">

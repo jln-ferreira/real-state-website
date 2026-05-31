@@ -184,6 +184,8 @@ function MediaTab({
 }) {
   const [uploading, setUploading] = useState<Record<number, boolean>>({})
   const [thumbUploading, setThumbUploading] = useState(false)
+  const [dragIndex, setDragIndex] = useState<number | null>(null)
+  const [dragOverIndex, setDragOverIndex] = useState<number | null>(null)
 
   async function uploadFile(file: File, onUrl: (url: string) => void, setProgress: (v: boolean) => void) {
     setProgress(true)
@@ -216,6 +218,16 @@ function MediaTab({
 
   function removeImage(i: number) {
     onImagesChange(prev => prev.filter((_, j) => j !== i))
+  }
+
+  function moveImage(from: number, to: number) {
+    if (!Number.isInteger(from) || !Number.isInteger(to) || from === to || from < 0 || to < 0 || from >= images.length || to >= images.length) return
+    onImagesChange(prev => {
+      const next = [...prev]
+      const [moved] = next.splice(from, 1)
+      next.splice(to, 0, moved)
+      return next
+    })
   }
 
   return (
@@ -258,11 +270,33 @@ function MediaTab({
           Fotos do imóvel
           <span className="font-normal text-neutral-400 ml-1">({images.length} foto{images.length !== 1 ? 's' : ''})</span>
         </label>
+        <p className="text-xs text-neutral-400 mb-2">Arraste as fotos para definir a sequência exibida no anúncio.</p>
 
         {images.length > 0 && (
           <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 mb-3">
             {images.map((img, i) => (
-              <div key={i} className="relative group rounded-xl overflow-hidden border border-neutral-200 bg-neutral-50">
+              <div
+                key={i}
+                onDragOver={e => {
+                  e.preventDefault()
+                  e.dataTransfer.dropEffect = 'move'
+                  setDragOverIndex(i)
+                }}
+                onDragLeave={() => setDragOverIndex(current => current === i ? null : current)}
+                onDrop={e => {
+                  e.preventDefault()
+                  const rawIndex = e.dataTransfer.getData('text/plain')
+                  const from = dragIndex ?? (rawIndex ? Number(rawIndex) : NaN)
+                  if (Number.isInteger(from)) moveImage(from, i)
+                  setDragIndex(null)
+                  setDragOverIndex(null)
+                }}
+                onDragEnd={() => {
+                  setDragIndex(null)
+                  setDragOverIndex(null)
+                }}
+                className={`relative group rounded-xl overflow-hidden border bg-neutral-50 transition ${dragOverIndex === i ? 'border-[#1E3A5F] ring-2 ring-[#1E3A5F]/20' : 'border-neutral-200'} ${dragIndex === i ? 'opacity-60' : ''}`}
+              >
                 {/* Preview */}
                 <div className="aspect-[4/3] bg-neutral-100">
                   {img.url ? (
@@ -281,6 +315,27 @@ function MediaTab({
                     </div>
                   )}
                 </div>
+                <button
+                  type="button"
+                  draggable
+                  onDragStart={e => {
+                    setDragIndex(i)
+                    e.dataTransfer.effectAllowed = 'move'
+                    e.dataTransfer.setData('text/plain', String(i))
+                  }}
+                  onDragEnd={() => {
+                    setDragIndex(null)
+                    setDragOverIndex(null)
+                  }}
+                  className="absolute top-1.5 left-1.5 flex items-center gap-1 rounded-full bg-white/90 px-2 py-1 text-[11px] font-semibold text-neutral-700 shadow cursor-grab active:cursor-grabbing"
+                  aria-label={`Arrastar foto ${i + 1}`}
+                  title="Arrastar para reordenar"
+                >
+                  <svg className="w-3.5 h-3.5 text-neutral-400" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M8 6h.01M8 12h.01M8 18h.01M16 6h.01M16 12h.01M16 18h.01" />
+                  </svg>
+                  {i + 1}
+                </button>
                 {/* Delete button */}
                 <button type="button" onClick={() => removeImage(i)}
                   className="absolute top-1.5 right-1.5 w-6 h-6 rounded-full bg-red-500 text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity shadow">
@@ -290,6 +345,18 @@ function MediaTab({
                 </button>
                 {/* Caption + URL */}
                 <div className="p-2 space-y-1.5">
+                  {images.length > 1 && (
+                    <div className="flex gap-1">
+                      <button type="button" onClick={() => moveImage(i, i - 1)} disabled={i === 0}
+                        className="flex-1 px-2 py-1 rounded-md bg-neutral-100 text-[11px] font-medium text-neutral-500 hover:bg-neutral-200 disabled:opacity-40 disabled:cursor-not-allowed">
+                        Subir
+                      </button>
+                      <button type="button" onClick={() => moveImage(i, i + 1)} disabled={i === images.length - 1}
+                        className="flex-1 px-2 py-1 rounded-md bg-neutral-100 text-[11px] font-medium text-neutral-500 hover:bg-neutral-200 disabled:opacity-40 disabled:cursor-not-allowed">
+                        Descer
+                      </button>
+                    </div>
+                  )}
                   <input type="text" value={img.caption ?? ''} placeholder="Legenda (opcional)"
                     onChange={e => updateImage(i, { caption: e.target.value })}
                     className="w-full px-2 py-1.5 bg-neutral-100 rounded-md text-xs border-0 outline-none focus:ring-2 focus:ring-[#1E3A5F]/20" />
