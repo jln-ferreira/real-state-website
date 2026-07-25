@@ -47,6 +47,7 @@ interface FormState {
   city: string
   province: string
   residential: string
+  quartos: number
   bedrooms: number
   lavabo: number
   escritorio: number
@@ -65,7 +66,7 @@ function emptyForm(user: UserInfo): FormState {
     title: '', description: '', propertyType: 'apartment', priceType: 'sale',
     priceAmount: '', currency: 'BRL', condominio: '', iptu: '',
     address: '', city: '', province: '', residential: '',
-    bedrooms: 1, lavabo: 1, escritorio: 0, areaSqFt: '', yearBuilt: '',
+    quartos: 0, bedrooms: 0, lavabo: 0, escritorio: 0, areaSqFt: '', yearBuilt: '',
     features: [], thumbnail: '', images: [''],
     agentName: user.name, agentPhone: user.phone, agentEmail: user.email,
   }
@@ -288,8 +289,6 @@ export default function UserPropertyFormClient({ user }: { user: UserInfo }) {
     if (!form.agentName.trim()) e.agentName = 'Nome é obrigatório'
     if (!form.agentPhone.trim()) e.agentPhone = 'Telefone é obrigatório'
     if (!form.agentEmail.trim()) e.agentEmail = 'E-mail é obrigatório'
-    if (form.bedrooms < 1) e.bedrooms = 'Mínimo 1 suíte'
-    if (form.lavabo < 1) e.lavabo = 'Mínimo 1 lavabo'
     if (!form.areaSqFt.trim() || parseFloat(form.areaSqFt) <= 0) e.areaSqFt = 'Área é obrigatória'
     setErrors(e)
     return Object.keys(e).length === 0
@@ -335,8 +334,9 @@ export default function UserPropertyFormClient({ user }: { user: UserInfo }) {
       },
       propertyDetails: {
         type: form.propertyType,
+        quartos: form.quartos,
         bedrooms: form.bedrooms,
-        bathrooms: form.lavabo,
+        bathrooms: 0,
         lavabo: form.lavabo,
         escritorio: form.escritorio,
         areaSqFt: parseFloat(form.areaSqFt) || 0,
@@ -493,20 +493,23 @@ export default function UserPropertyFormClient({ user }: { user: UserInfo }) {
         <div>
           <SectionTitle>Detalhes</SectionTitle>
           <div className="space-y-4">
-            <div className="grid grid-cols-3 gap-4">
+            <div className="grid grid-cols-2 gap-4">
+              <Counter
+                label="Nº de Quartos (total)"
+                value={form.quartos}
+                onChange={v => setForm(f => ({ ...f, quartos: v }))}
+              />
               <Counter
                 label="Suítes"
                 value={form.bedrooms}
-                min={1}
-                required
                 error={errors.bedrooms}
                 onChange={v => setForm(f => ({ ...f, bedrooms: v }))}
               />
+            </div>
+            <div className="grid grid-cols-2 gap-4">
               <Counter
                 label="Lavabos"
                 value={form.lavabo}
-                min={1}
-                required
                 error={errors.lavabo}
                 onChange={v => setForm(f => ({ ...f, lavabo: v }))}
               />

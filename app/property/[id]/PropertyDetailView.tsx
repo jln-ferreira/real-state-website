@@ -2,7 +2,7 @@
 
 import { useState, useRef, useEffect } from 'react'
 import Link from 'next/link'
-import type { Property } from '@/data/properties'
+import { getTotalRooms, type Property } from '@/data/properties'
 import Layout from '@/components/Layout'
 import { BACCARAT_PHONE } from '@/lib/config'
 import { buildPropertyShareMessage, getPropertyPageUrl, getPropertySharePreviewUrl } from '@/lib/property-share'
@@ -707,10 +707,16 @@ export default function PropertyDetailView({ property, similarProperties }: { pr
                         {p.description}
                       </p>
                       <div className="flex flex-wrap gap-x-3 gap-y-1 text-xs text-neutral-500 mb-2">
+                        {getTotalRooms(p.propertyDetails) > 0 && (
+                          <span className="flex items-center gap-1.5">
+                            <BedIcon className="w-3 h-3" />
+                            <strong className="text-neutral-800">{getTotalRooms(p.propertyDetails)}</strong> quarto{getTotalRooms(p.propertyDetails) !== 1 ? 's' : ''}
+                          </span>
+                        )}
                         {p.propertyDetails.bedrooms > 0 && (
                           <span className="flex items-center gap-1.5">
                             <BedIcon className="w-3 h-3" />
-                            <strong className="text-neutral-800">{p.propertyDetails.bedrooms}</strong>
+                            <strong className="text-neutral-800">{p.propertyDetails.bedrooms}</strong> suíte{p.propertyDetails.bedrooms !== 1 ? 's' : ''}
                           </span>
                         )}
                         <span className="flex items-center gap-1.5">

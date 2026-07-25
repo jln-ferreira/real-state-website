@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import { type Property, formatPrice } from '@/data/properties'
+import { type Property, formatPrice, getTotalRooms } from '@/data/properties'
 
 const TYPE_LABELS: Record<Property['propertyDetails']['type'], string> = {
   house:      'Casa',
@@ -9,6 +9,7 @@ const TYPE_LABELS: Record<Property['propertyDetails']['type'], string> = {
 }
 
 export default function PropertyCard({ p }: { p: Property }) {
+  const totalRooms = getTotalRooms(p.propertyDetails)
   return (
     <Link href={`/property/${p.id}`} className="block">
       <article
@@ -66,6 +67,9 @@ export default function PropertyCard({ p }: { p: Property }) {
           {/* Area · Suites */}
           <p className="text-[0.9rem] text-[#4F5847]">
             {p.propertyDetails.areaSqFt.toLocaleString()} m²
+            {totalRooms > 0 && (
+              <> · {totalRooms} quarto{totalRooms !== 1 ? 's' : ''}</>
+            )}
             {p.propertyDetails.bedrooms > 0 && (
               <> · {p.propertyDetails.bedrooms} suíte{p.propertyDetails.bedrooms !== 1 ? 's' : ''}</>
             )}

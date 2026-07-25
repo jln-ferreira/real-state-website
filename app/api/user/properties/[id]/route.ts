@@ -61,6 +61,8 @@ export async function PATCH(
       location: body.location,
       propertyDetails: {
         ...body.propertyDetails,
+        quartos: body.propertyDetails?.quartos ?? existing.propertyDetails.quartos ?? existing.propertyDetails.bedrooms ?? 0,
+        bathrooms: body.propertyDetails?.bathrooms ?? existing.propertyDetails.bathrooms ?? 0,
         lavabo: body.propertyDetails?.lavabo ?? 0,
       },
       features: body.features ?? [],

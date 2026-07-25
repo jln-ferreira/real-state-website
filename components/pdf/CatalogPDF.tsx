@@ -1,6 +1,6 @@
 ﻿import React from 'react'
 import { Document, Page, View, Text, Image, StyleSheet } from '@react-pdf/renderer'
-import type { Property } from '@/data/properties'
+import { getTotalRooms, type Property } from '@/data/properties'
 
 const BRAND = '#6B6B99'
 const DARK  = '#4A5240'
@@ -122,6 +122,7 @@ function formatPrice(p: Property): string {
 }
 
 function PropertyPage({ p }: { p: Property }) {
+  const totalRooms = getTotalRooms(p.propertyDetails)
   const isSale     = p.price.type === 'sale'
   const galleryImgs = (p.media?.images ?? []).map(i => i.url).filter(Boolean).slice(1, 5)
   const features   = (p.features ?? []).filter(Boolean)
@@ -168,6 +169,12 @@ function PropertyPage({ p }: { p: Property }) {
 
         {/* Stats */}
         <View style={styles.statsRow}>
+          {totalRooms > 0 && (
+            <View style={styles.stat}>
+              <Text style={styles.statVal}>{totalRooms}</Text>
+              <Text style={styles.statLbl}>Quartos</Text>
+            </View>
+          )}
           {p.propertyDetails.bedrooms > 0 && (
             <View style={styles.stat}>
               <Text style={styles.statVal}>{p.propertyDetails.bedrooms}</Text>

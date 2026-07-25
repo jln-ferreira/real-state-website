@@ -34,7 +34,7 @@ interface FormState {
   title: string; description: string; propertyType: string; priceType: string
   priceAmount: string; currency: string; condominio: string; iptu: string
   address: string; city: string; province: string; residential: string
-  bedrooms: number; lavabo: number; escritorio: number; areaSqFt: string; yearBuilt: string
+  quartos: number; bedrooms: number; lavabo: number; escritorio: number; areaSqFt: string; yearBuilt: string
   features: string[]; thumbnail: string; images: string[]
   agentName: string; agentPhone: string; agentEmail: string
 }
@@ -80,8 +80,9 @@ function fromProperty(p: Property, user: UserInfo): FormState {
     city: p.location?.city ?? '',
     province: p.location?.province ?? '',
     residential: p.location?.residential ?? '',
-    bedrooms: p.propertyDetails?.bedrooms ?? 1,
-    lavabo: p.propertyDetails?.lavabo ?? p.propertyDetails?.bathrooms ?? 0,
+    quartos: p.propertyDetails?.quartos ?? p.propertyDetails?.bedrooms ?? 0,
+    bedrooms: p.propertyDetails?.bedrooms ?? 0,
+    lavabo: p.propertyDetails?.lavabo ?? 0,
     escritorio: p.propertyDetails?.escritorio ?? 0,
     areaSqFt: p.propertyDetails?.areaSqFt ? String(p.propertyDetails.areaSqFt) : '',
     yearBuilt: p.propertyDetails?.yearBuilt ? String(p.propertyDetails.yearBuilt) : '',
@@ -267,8 +268,6 @@ export default function UserPropertyEditClient({ property, user }: { property: P
     if (!form.agentName.trim()) e.agentName = 'Nome é obrigatório'
     if (!form.agentPhone.trim()) e.agentPhone = 'Telefone é obrigatório'
     if (!form.agentEmail.trim()) e.agentEmail = 'E-mail é obrigatório'
-    if (form.bedrooms < 1) e.bedrooms = 'Mínimo 1 suíte'
-    if (form.lavabo < 1) e.lavabo = 'Mínimo 1 lavabo'
     if (!form.areaSqFt.trim() || parseFloat(form.areaSqFt) <= 0) e.areaSqFt = 'Área é obrigatória'
     setErrors(e)
     return Object.keys(e).length === 0
@@ -305,8 +304,9 @@ export default function UserPropertyEditClient({ property, user }: { property: P
       location: { address: form.address, city: form.city, province: form.province, country: 'Brasil', residential: form.residential },
       propertyDetails: {
         type: form.propertyType,
+        quartos: form.quartos,
         bedrooms: form.bedrooms,
-        bathrooms: form.lavabo,
+        bathrooms: property.propertyDetails?.bathrooms ?? 0,
         lavabo: form.lavabo,
         escritorio: form.escritorio,
         areaSqFt: parseFloat(form.areaSqFt) || 0,
@@ -450,10 +450,14 @@ export default function UserPropertyEditClient({ property, user }: { property: P
         <div>
           <SectionTitle>Detalhes</SectionTitle>
           <div className="space-y-4">
-            <div className="grid grid-cols-3 gap-4">
-              <Counter label="Suítes" value={form.bedrooms} min={1} required error={errors.bedrooms}
+            <div className="grid grid-cols-2 gap-4">
+              <Counter label="Nº de Quartos (total)" value={form.quartos}
+                onChange={v => setForm(f => ({ ...f, quartos: v }))} />
+              <Counter label="Suítes" value={form.bedrooms} error={errors.bedrooms}
                 onChange={v => setForm(f => ({ ...f, bedrooms: v }))} />
-              <Counter label="Lavabos" value={form.lavabo} min={1} required error={errors.lavabo}
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+              <Counter label="Lavabos" value={form.lavabo} error={errors.lavabo}
                 onChange={v => setForm(f => ({ ...f, lavabo: v }))} />
               <Counter label="Escritórios" value={form.escritorio} min={0}
                 onChange={v => setForm(f => ({ ...f, escritorio: v }))} />

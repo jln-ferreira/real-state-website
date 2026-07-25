@@ -7,6 +7,7 @@ import {
   applyFilters,
   sortProperties,
   formatPrice,
+  getTotalRooms,
   type Filters,
   type SortKey,
   type Property,
@@ -55,10 +56,16 @@ function ActiveChips({ filters, onChange }: { filters: Filters; onChange: (f: Fi
     chips.push({ label: filters.residential, clear: () => set({ residential: 'all' }) })
   if (filters.ref.trim())
     chips.push({ label: `REF: ${filters.ref}`, clear: () => set({ ref: '' }) })
-  if (filters.bedrooms > 0)
-    chips.push({ label: `${filters.bedrooms}+ quartos`, clear: () => set({ bedrooms: 0 }) })
-  if (filters.bathrooms > 0)
-    chips.push({ label: `${filters.bathrooms}+ vagas`, clear: () => set({ bathrooms: 0 }) })
+  if (filters.bedrooms !== null)
+    chips.push({
+      label: filters.bedrooms === 0 ? '0 quartos' : `${filters.bedrooms}+ quartos`,
+      clear: () => set({ bedrooms: null }),
+    })
+  if (filters.bathrooms !== null)
+    chips.push({
+      label: filters.bathrooms === 0 ? '0 vagas' : `${filters.bathrooms}+ vagas`,
+      clear: () => set({ bathrooms: null }),
+    })
   if (filters.areaMin || filters.areaMax) {
     const lo = filters.areaMin ? `${Number(filters.areaMin).toLocaleString()} m²` : ''
     const hi = filters.areaMax ? `${Number(filters.areaMax).toLocaleString()} m²` : ''
@@ -132,6 +139,7 @@ function EmptyState({ onReset }: { onReset: () => void }) {
 // ── Featured highlight card ────────────────────────────────────────────────────
 
 function FeaturedCard({ p }: { p: Property }) {
+  const totalRooms = getTotalRooms(p.propertyDetails)
   return (
     <Link href={`/property/${p.id}`} className="block">
       <article
@@ -178,6 +186,9 @@ function FeaturedCard({ p }: { p: Property }) {
           </p>
           <p className="text-[0.9rem] text-[#4F5847]">
             {p.propertyDetails.areaSqFt.toLocaleString()} m²
+            {totalRooms > 0 && (
+              <> · {totalRooms} quarto{totalRooms !== 1 ? 's' : ''}</>
+            )}
             {p.propertyDetails.bedrooms > 0 && (
               <> · {p.propertyDetails.bedrooms} suíte{p.propertyDetails.bedrooms !== 1 ? 's' : ''}</>
             )}

@@ -76,6 +76,7 @@ export async function POST(req: NextRequest) {
       },
       propertyDetails: {
         type: body.propertyDetails?.type ?? 'apartment',
+        quartos: body.propertyDetails?.quartos ?? 0,
         bedrooms: body.propertyDetails?.bedrooms ?? 0,
         bathrooms: body.propertyDetails?.bathrooms ?? 0,
         lavabo: body.propertyDetails?.lavabo ?? 0,

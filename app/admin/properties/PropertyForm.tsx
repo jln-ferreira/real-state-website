@@ -437,7 +437,7 @@ function emptyProperty(): Property {
     description: '',
     price: { amount: 0, currency: 'BRL', type: 'sale' },
     location: { address: '', city: '', province: '', country: 'Brasil', postalCode: '', residential: '' },
-    propertyDetails: { type: 'apartment', bedrooms: 0, bathrooms: 0, areaSqFt: 0, lavabo: 0, escritorio: 0 },
+    propertyDetails: { type: 'apartment', quartos: 0, bedrooms: 0, bathrooms: 0, areaSqFt: 0, lavabo: 0, escritorio: 0 },
     features: [],
     media: { images: [], thumbnail: '' },
     status: { isActive: false, isFeatured: false, isSpecial: false },
@@ -512,9 +512,6 @@ export default function PropertyForm({ property: initial, readOnly = false }: { 
     if (!form.agent.name.trim()) e['agent.name'] = 'Nome do agente é obrigatório'
     if (!form.agent.phone.trim()) e['agent.phone'] = 'Telefone do agente é obrigatório'
     if (!form.agent.email.trim()) e['agent.email'] = 'E-mail do agente é obrigatório'
-    if ((form.propertyDetails.quartos ?? 0) < 1) e['propertyDetails.quartos'] = 'Mínimo 1 quarto'
-    if (form.propertyDetails.bedrooms < 1) e['propertyDetails.bedrooms'] = 'Mínimo 1 suíte'
-    if ((form.propertyDetails.lavabo ?? 0) < 1) e['propertyDetails.lavabo'] = 'Mínimo 1 lavabo'
     setErrors(e)
     return e
   }
@@ -699,6 +696,8 @@ export default function PropertyForm({ property: initial, readOnly = false }: { 
           changes.push({ label: 'Estado', old: snap.location.province, cur: form.location.province })
         if (snap.location?.residential !== undefined && snap.location.residential !== form.location.residential)
           changes.push({ label: 'Residencial', old: snap.location.residential, cur: form.location.residential })
+        if (snap.propertyDetails?.quartos !== undefined && snap.propertyDetails.quartos !== (form.propertyDetails.quartos ?? 0))
+          changes.push({ label: 'Quartos (total)', old: String(snap.propertyDetails.quartos), cur: String(form.propertyDetails.quartos ?? 0) })
         if (snap.propertyDetails?.bedrooms !== undefined && snap.propertyDetails.bedrooms !== form.propertyDetails.bedrooms)
           changes.push({ label: 'Suítes', old: String(snap.propertyDetails.bedrooms), cur: String(form.propertyDetails.bedrooms) })
         if (snap.propertyDetails?.lavabo !== undefined && snap.propertyDetails.lavabo !== (form.propertyDetails.lavabo ?? 0))
@@ -900,8 +899,6 @@ export default function PropertyForm({ property: initial, readOnly = false }: { 
               <Counter
                 label="Nº de Quartos (total)"
                 value={form.propertyDetails.quartos ?? 0}
-                min={1}
-                required
                 onChange={n => setForm(f => ({ ...f, propertyDetails: { ...f.propertyDetails, quartos: n } }))}
                 error={errors['propertyDetails.quartos']}
               />
@@ -916,8 +913,6 @@ export default function PropertyForm({ property: initial, readOnly = false }: { 
               <Counter
                 label="Lavabo"
                 value={form.propertyDetails.lavabo ?? 0}
-                min={1}
-                required
                 onChange={n => setForm(f => ({ ...f, propertyDetails: { ...f.propertyDetails, lavabo: n } }))}
                 error={errors['propertyDetails.lavabo']}
               />

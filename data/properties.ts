@@ -100,8 +100,8 @@ export interface Filters {
   valorMax:    string
   residential: string
   ref:         string
-  bedrooms:    number
-  bathrooms:   number
+  bedrooms:    number | null
+  bathrooms:   number | null
   areaMin:     string
   areaMax:     string
   features:    Feature[]
@@ -113,11 +113,16 @@ export const DEFAULT_FILTERS: Filters = {
   valorMax:    '',
   residential: 'all',
   ref:         '',
-  bedrooms:    0,
-  bathrooms:   0,
+  bedrooms:    null,
+  bathrooms:   null,
   areaMin:     '',
   areaMax:     '',
   features:    [],
+}
+
+/** Total bedrooms, with a fallback for legacy records created before `quartos`. */
+export function getTotalRooms(details: Property['propertyDetails']): number {
+  return details.quartos ?? details.bedrooms
 }
 
 // ── Filter function ───────────────────────────────────────────────────────────
@@ -134,10 +139,14 @@ export function applyFilters(properties: Property[], f: Filters): Property[] {
     if (f.valorMax && !Number.isNaN(maxPrice) && p.price.amount > maxPrice) return false
     if (f.residential !== 'all' && p.location.residential !== f.residential) return false
     if (ref && !p.id.toLowerCase().includes(ref)) return false
-    const totalRooms = p.propertyDetails.quartos ?? p.propertyDetails.bedrooms
+    const totalRooms = getTotalRooms(p.propertyDetails)
     const parkingSpaces = p.propertyDetails.vagas ?? 0
-    if (f.bedrooms  > 0 && totalRooms < f.bedrooms) return false
-    if (f.bathrooms > 0 && parkingSpaces < f.bathrooms) return false
+    if (f.bedrooms !== null) {
+      if (f.bedrooms === 0 ? totalRooms !== 0 : totalRooms < f.bedrooms) return false
+    }
+    if (f.bathrooms !== null) {
+      if (f.bathrooms === 0 ? parkingSpaces !== 0 : parkingSpaces < f.bathrooms) return false
+    }
     if (f.areaMin && !Number.isNaN(areaMin) && p.propertyDetails.areaSqFt < areaMin) return false
     if (f.areaMax && !Number.isNaN(areaMax) && p.propertyDetails.areaSqFt > areaMax) return false
     if (f.features.length > 0) {

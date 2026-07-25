@@ -140,13 +140,13 @@ function CustomDropdown({
 
 // ── Stepper ────────────────────────────────────────────────────────────────────
 
-function Stepper({ value, onChange }: { value: number; onChange: (v: number) => void }) {
+function Stepper({ value, onChange }: { value: number | null; onChange: (v: number | null) => void }) {
   return (
     <div className="flex items-center gap-3">
       <button
         type="button"
-        onClick={() => onChange(Math.max(0, value - 1))}
-        disabled={value === 0}
+        onClick={() => onChange(value === null || value === 0 ? null : value - 1)}
+        disabled={value === null}
         className="flex h-8 w-8 items-center justify-center rounded-full border-2
                    border-[#E0DACE] text-[#4A5240] transition-colors
                    hover:border-[#6B6B99] hover:text-[#6B6B99]
@@ -156,12 +156,12 @@ function Stepper({ value, onChange }: { value: number; onChange: (v: number) => 
           <path strokeLinecap="round" strokeLinejoin="round" d="M5 12h14" />
         </svg>
       </button>
-      <span className="w-7 text-center text-sm font-bold text-[#4A5240]">
-        {value}+
+      <span className="w-12 text-center text-sm font-bold text-[#4A5240]">
+        {value === null ? 'Todos' : value === 0 ? '0' : `${value}+`}
       </span>
       <button
         type="button"
-        onClick={() => onChange(value + 1)}
+        onClick={() => onChange(value === null ? 0 : value + 1)}
         className="flex h-8 w-8 items-center justify-center rounded-full border-2
                    border-[#E0DACE] text-[#4A5240] transition-colors
                    hover:border-[#6B6B99] hover:text-[#6B6B99]"
@@ -261,10 +261,9 @@ function HeroSection({
               Curadoria de imóveis de alto padrão · Alphaville e região
             </p>
             <h1 className="font-monument font-light tracking-wide text-[#4A5240]
-                           text-[1.72rem] leading-[1.16] sm:text-[2.05rem] lg:text-[2.35rem]">
-              Não vendemos imóveis.
-              <br />
-              <span className="text-[#6B6B99]">
+                           text-[1.72rem] leading-[1.16] sm:text-[2.05rem] lg:text-[1.85rem]">
+              <span className="block lg:text-[2.35rem]">Não vendemos imóveis.</span>
+              <span className="block text-[#6B6B99]">
                 Apresentamos o lugar onde<br /> você vai querer viver.
               </span>
             </h1>
@@ -494,12 +493,12 @@ function HeroSection({
               </div>
 
               {/* Clear */}
-              {(filters.bedrooms > 0 || filters.bathrooms > 0 ||
+              {(filters.bedrooms !== null || filters.bathrooms !== null ||
                 filters.areaMin || filters.areaMax || filters.features.length > 0) && (
                 <div className="mt-5 flex justify-end border-t border-[#E0DACE] pt-4">
                   <button
                     type="button"
-                    onClick={() => set({ bedrooms: 0, bathrooms: 0, areaMin: '', areaMax: '', features: [] })}
+                    onClick={() => set({ bedrooms: null, bathrooms: null, areaMin: '', areaMax: '', features: [] })}
                     className="flex items-center gap-1.5 rounded-full border border-[#E0DACE] px-4 py-1.5
                                text-sm font-medium text-[#9898BB] transition-colors
                                hover:border-[#6B6B99] hover:text-[#6B6B99]"
