@@ -16,10 +16,10 @@ export default function WhatsAppFloatingButton() {
       rel="noopener noreferrer"
       aria-label="Conversar com a Casa Baccarat pelo WhatsApp"
       title="Fale conosco pelo WhatsApp"
-      className="fixed right-4 bottom-4 z-50 flex h-14 w-14 items-center justify-center rounded-full bg-[#4E6B5E] text-white shadow-[0_6px_20px_rgba(30,35,26,0.35)] transition duration-200 hover:scale-105 hover:bg-[#435C50] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#4E6B5E] sm:right-6 sm:bottom-6"
+      className="fixed right-4 bottom-4 z-50 flex h-16 w-16 items-center justify-center rounded-full bg-[#4E6B5E] text-white shadow-[0_6px_20px_rgba(30,35,26,0.35)] transition duration-200 hover:scale-105 hover:bg-[#435C50] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#4E6B5E] sm:right-6 sm:bottom-6"
     >
       <svg
-        className="h-7 w-7"
+        className="h-8 w-8"
         fill="currentColor"
         viewBox="0 0 24 24"
         aria-hidden="true"
