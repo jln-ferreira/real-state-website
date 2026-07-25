@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import { Montserrat, Cormorant_Garamond } from 'next/font/google'
 import './globals.css'
 import TopLoader from '@/components/TopLoader'
+import WhatsAppFloatingButton from '@/components/WhatsAppFloatingButton'
 
 const montserrat = Montserrat({
   subsets: ['latin'],
@@ -33,6 +34,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body className="antialiased">
         <TopLoader />
         {children}
+        <WhatsAppFloatingButton />
       </body>
     </html>
   )
