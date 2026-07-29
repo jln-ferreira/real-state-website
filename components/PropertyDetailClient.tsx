@@ -173,7 +173,14 @@ export default function PropertyDetailClient({ property }: { property: Property 
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ ...formData, propertyId: property.id }),
       })
-      setFormStatus(res.ok ? 'success' : 'error')
+      if (res.ok) {
+        setFormStatus('success')
+        try {
+          window.gtag_report_conversion?.()
+        } catch {}
+      } else {
+        setFormStatus('error')
+      }
     } catch {
       setFormStatus('error')
     }
